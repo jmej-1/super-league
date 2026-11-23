@@ -1,0 +1,1 @@
+# week|roster_id|IR-slot player ids, checked by hand in Sleeper (overrides the snapshot)

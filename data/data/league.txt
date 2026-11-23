@@ -1,0 +1,23 @@
+# key=value settings (from Sleeper league endpoint + commissioner)
+league_id=1395560684279836672
+season=2026
+teams=10
+regular_season_weeks=14
+playoff_teams=6
+playoff_byes=2
+playoff_week_start=15
+lineup=QB,RB,RB,WR,WR,TE,FLEX,K,DEF
+flex=RB,WR,TE
+tiebreaker=points_for
+trade_deadline=12
+# roster_id|real_name|sleeper_user|team_name
+roster=1|Sammy|sammykatz5|Katz & Kriminal
+roster=2|Jesse|JesseMej|
+roster=3|Zack|Zackw2004|Wooh sheisty
+roster=4|Nick|954nick|Lamar-a-Lago Files
+roster=5|Ben|benbalshi|
+roster=6|Jason|JasonGiancarli|Baby Back Gibbs
+roster=7|Harrison|HC13|
+roster=8|Beck|DaddyKier|Brew & Bussy
+roster=9|Hamish|hamishoz|Winners of Oz
+roster=10|Thomas|tjkorona25|Chase That Bag

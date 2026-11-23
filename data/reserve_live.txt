@@ -1,0 +1,6 @@
+# week|roster_id|player id locked in the IR slot during that week (seen at an update after his game kicked off)
+11|2|12474
+11|10|8142
+11|4|4881
+11|5|13287
+11|9|12489

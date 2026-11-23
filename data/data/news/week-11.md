@@ -1,0 +1,274 @@
+# Super League Desk, Week 11. One file per week; stories are separated by a line of five equals signs.
+=====
+slug: w11-waivers
+title: Thomas Cuts His Quarterback
+dek: Drake Maye is a free agent. Ben beats Sammy to Emeka Egbuka. Waiver night in four moves, plus two free-agent grabs after.
+week: 11
+kind: feature
+teams: 10,5,1,9
+date: 2026-11-18 03:40
+---
+Wednesday's waivers ran at 3 a.m. Here's what happened while everyone slept.
+
+## Thomas drops Maye
+
+{t:10} cut {p:11564}, his 6th-round pick and his starter in 9 of his 10 games. The only exception was Week 4, when Thomas went with {p:12545} instead. He claimed {p:1166} in his place, so Cousins is now Thomas's only QB.
+
+Maye's Super League line: **17.3 PPG, −15.7 PAA, QB16 by WAR.** He's been below the typical starting QB, but he also put up a 39.5 earlier this season. New England is on bye this week, so Cousins starts Sunday either way. The question is what happens in Week 12, when Maye is back on the field and on somebody else's waiver list.
+
+Thomas has now moved his best receiver and his quarterback in the same 12 hours. The team called Njigba's in Paris has neither Njigba nor Maye.
+
+## Ben gets Egbuka
+
+{t:5} and {t:1} both put in claims for {p:12514}. Ben had priority, and he got him. Ben cut kicker {p:6650} to make room, even though McLaughlin is the No. 4 K in the league by PAA (+12.7).
+
+It's Ben's second big move in a day, after he sent CeeDee Lamb to Hamish on Tuesday.
+
+## Sammy settles for defense
+
+With no Egbuka, Sammy swapped {p:7021} for rookie WR {p:13274} and picked up {p:DEN}, dropping New England. The Patriots are on bye this week. Denver projects for 8.6 on Sunday.
+
+## Hamish swaps kickers
+
+{t:9} cut {p:13545} (4.3 PPG) for {p:7839}. Small, but McPherson's +7.4 PAA is fifth among kickers.
+
+## After the claims
+
+Once waivers cleared, two teams grabbed free agents without dropping anyone.
+
+Sammy picked up {p:12533}, Washington's starting running back. He's on IR with a groin injury that's kept him out since October, so this is a stash for December, not a Week 11 start. He averaged 8.5 a game when healthy.
+
+{t:6} added kicker {p:2020}.
+=====
+slug: w11-trade-ben-hamish
+title: Ben Sells His First-Round Pick for Three Starters
+dek: CeeDee Lamb, DK Metcalf and Brenton Strange go to Hamish. Travis Kelce, Javonte Williams and Malik Nabers go to Ben.
+week: 11
+kind: feature
+teams: 5,9
+date: 2026-11-17 21:40
+---
+Four hours after the Smith-Njigba deal, the league got another one.
+
+{t:5} sends {p:6786}, {p:5846} and {p:9480} to {t:9}. Hamish sends back {p:1466}, {p:7588} and {p:11632}. Hamish accepted Tuesday night, and the trade has gone through.
+
+## The numbers
+
+| | Starts | PPG | WAR | PAA |
+|---|---|---|---|---|
+| **Ben gets** | | | | |
+| Javonte Williams | 10 | 15.5 | 0.83 | +26.4 |
+| Malik Nabers | 9 | 12.0 | 0.17 | +12.3 |
+| Travis Kelce | 5 | 8.4 | 0.06 | +5.4 |
+| **Hamish gets** | | | | |
+| CeeDee Lamb | 10 | 18.4 | 0.98 | +76.3 |
+| DK Metcalf | 4 | 6.4 | −0.20 | −18.6 |
+| Brenton Strange | 3 | 5.9 | −0.06 | −4.6 |
+
+Lamb is the best player in the deal by a mile. He's the No. 2 WR in Super League by WAR and PAA, and he's started every week since Ben took him 10th overall. Nobody else in the trade has an PAA above +26.4.
+
+But Ben only ever started one of the three he's giving up every week. Metcalf and Strange have combined for 7 starts and −23.2 PAA. Ben gets back Williams, the No. 8 RB by WAR, plus a WR2 in Nabers and a tight end. Add up the WAR and Ben comes out ahead, **1.06 to 0.72**.
+
+## Kelce's ankle
+
+The catch is the oldest player in the deal. Kelce limped off Sunday in Atlanta with an ankle injury. He's 37 and was leading the Chiefs in receiving yards when he went down. Sleeper has him questionable for Week 11.
+
+## The Cowboys swap
+
+Ben trades one Cowboy for another: Lamb out, Williams in. Ben is now betting that Dallas runs the ball.
+
+## What it's worth
+
+| | Before | After |
+|---|---|---|
+| Ben playoffs | 76.2% | 80.7% |
+| Ben bye | 7.2% | 9.8% |
+| Ben title | 3.3% | 4.9% |
+| Hamish playoffs | 3.8% | 2.5% |
+
+Ben is 6-4 and plays {t:3} this week in the game that moves the playoff race more than any other. The trade flips it: Ben goes from a **46.1%** underdog to a **52.4%** favorite. Zack's playoff odds slip from 74.7% to 71.8% before a snap is played.
+
+At 3-7, Hamish needed a swing and took the best player in the deal. The model says it isn't enough: he gets Lamb but loses two starters, and his playoff odds slip to 2.5%.
+=====
+slug: w11-trade-sammy-thomas
+title: Njigba's in Paris Trades Njigba
+dek: Thomas ships the league's best receiver to Sammy for Ja'Marr Chase and Zach Charbonnet. Sammy's title odds jump six points.
+week: 11
+kind: feature
+teams: 1,10
+date: 2026-11-17 17:10
+---
+{t:10} named his team after {p:9488}. On Tuesday he traded him.
+
+Thomas sends Smith-Njigba to {t:1}. Sammy sends back {p:7564} and {p:9753}. Two days after Chase put up 231 yards on Pittsburgh, he's on the move for the second time this season.
+
+## The numbers
+
+| | Smith-Njigba | Chase | Charbonnet |
+|---|---|---|---|
+| Starts | 10 | 9 | 1 |
+| Points | 223.7 | 161.8 | 9.4 |
+| PPG | 22.4 | 18.0 | 9.4 |
+| WAR | 1.48 | 0.84 | 0.01 |
+| WAR rank | WR1 | WR3 | RB32 |
+| PAA | +116.5 | +65.5 | −5.2 |
+| High | 38.0 | 28.6 | 9.4 |
+
+Smith-Njigba has been the best receiver in Super League by every measure we keep. He's started every week for Thomas and has beaten the typical starting WR by **116.5 points**, almost double Chase's margin. Thomas took him 5th overall. Chase went 3rd, to Harrison, who flipped him to Sammy in Week 1.
+
+## Thomas's side
+
+Two for one. Thomas is 5-5, sitting on the playoff line, and he turns one star into a WR3 who plays this week plus a running back. It's a bet on width over height.
+
+## The timing
+
+Seattle is on bye this week, so neither Smith-Njigba nor Charbonnet plays in Week 11. Chase does, on Monday night in Washington, which changes two games at once:
+
+- **Sammy vs Harrison:** the cover story's Burrow-to-Chase stack is gone. Sammy still has {p:6770} on Monday night, but no Chase to go with him. Sammy's win chance falls from **68.2% to 55.3%**.
+- **Thomas vs Jesse:** Chase goes straight into Thomas's lineup. Thomas goes from a **38.5%** underdog to a **51%** favorite.
+
+## What it's worth
+
+| | Before | After |
+|---|---|---|
+| Sammy title | 28.1% | 34.5% |
+| Sammy bye | 73.1% | 73.8% |
+| Thomas playoffs | 75.9% | 74.0% |
+| Thomas title | 10.2% | 8.2% |
+
+Sammy gives up Week 11 to win December. Thomas wins Week 11 and gives up a little of the long run. Jesse, who never touched the deal, loses six points of bye odds (**61.9% to 55.7%**) because his Week 11 opponent just got better.
+=====
+slug: w11-cover-monday-night
+title: First Place Gets Decided on Monday Night, in Washington
+dek: Sammy's Burrow and Chase. Harrison's Daniels. Same field, same night, and the bye on the line.
+week: 11
+kind: cover
+game: 11-1-7
+teams: 1,7
+date: 2026-11-17 01:45
+---
+Two 7-3 teams. One bye they can both see from here. And the matchup won't be settled until the last NFL game of the week, when Cincinnati visits Washington on Monday night.
+
+Here's the twist: {t:1} and {t:7} have their quarterbacks in **the same game**. {p:6770} and {p:7564} take the field for the Bengals. {p:11566} takes it for the Commanders. Every Burrow touchdown is a Sammy point. Every Daniels drive that keeps Burrow on the sideline is a Harrison point.
+
+## The hottest QB in football
+
+Burrow has accounted for four or more touchdowns in five straight games. Last Sunday he threw for 409 and four against Pittsburgh, and Chase caught 11 for 231.
+
+In Super League, the pair has been the best QB-WR stack all year:
+
+| | Burrow | Chase |
+|---|---|---|
+| Starts | 9 | 9 |
+| PPG | 25.8 | 18.0 |
+| WAR | 0.87 (QB1) | 0.88 (WR3) |
+| PAA | +60.9 (QB1) | +65.5 (WR3) |
+
+Sleeper projects them for 25.1 and 18.0 on Monday.
+
+## Daniels, the hard way
+
+Daniels has had a different season. He dislocated his elbow against Dallas in Week 2 and has only made five Super League starts. His numbers are ordinary: 17.8 a start, **−0.02 WAR**, 12th among QBs. But he's coming off the 32-yard game-winner to Stefon Diggs last Thursday, and Washington hosts this one. He's projected for 21.0.
+
+## The rest of the card
+
+Most of this matchup gets played before Monday:
+
+- **Sunday early:** {p:3198} at Carolina, {p:11584} at Detroit, {p:8137} against {p:5967} in Dallas. Pollard and Pickens on the same field, one for each side.
+- **Sunday night:** {p:4034} hosts Minnesota. He's the No. 2 RB by WAR (1.59) and just scored 44.3. The Vikings defense just had eight sacks.
+- **Harrison's depth:** {p:12527} (12.7 a start) and {p:10236} (7.7) need to show up. {p:8112} is on bye.
+
+Sammy has the deeper roster. He's averaging **121.7 points a game**, second in the league. Harrison is third at 113.5. The last time they met, in Week 2, Sammy won 133.48 to 89.88.
+
+## The math
+
+Sammy is a **68% favorite**, projected 117.8 to 104.0.
+
+| | Bye if win | Bye if loss |
+|---|---|---|
+| Sammy | 87.9% | 41.3% |
+| Harrison | 74.4% | 29.2% |
+
+Both teams are 98% or better to make the playoffs either way. This one is about the bye. Win, and it's yours to lose. Lose, and you're likely playing an extra week.
+
+=====
+slug: w11-preview-sammy-harrison
+title: 7-3 vs 7-3: The Bye Week Showdown
+dek: The top two teams meet with first place and nearly 47 points of bye odds on the line.
+week: 11
+kind: preview
+game: 11-1-7
+teams: 1,7
+date: 2026-11-17 01:30
+---
+The two best records in the league, head to head. {t:1} is a **68% favorite** and projected for 117.8. {t:7} is projected for 104.0.
+
+**Sammy's core:** {p:6770} (25.1), {p:7564} (18.0), {p:11584} (15.7), {p:3198} (14.9). Burrow is the No. 1 QB by WAR (0.87) and Chase the No. 3 WR (0.88). New arrival {p:9753} is on bye.
+
+**Harrison's answer:** {p:11566} (21.0), last week's MVP {p:4034} (18.0) and {p:5967} (13.5). He plays without {p:8112}, whose Falcons are on bye.
+
+**What's at stake:** the bye. Sammy is **87.9% with a win, 41.3% with a loss**. Harrison is **74.4% with a win, 29.2% with a loss**. Both are already 98% or better to make the playoffs.
+=====
+slug: w11-preview-jesse-thomas
+title: Thomas Loses Smith-Njigba and Maye to Byes Before Facing JesseMej
+dek: The league's best receiver and Thomas's starting QB are both off this week.
+week: 11
+kind: preview
+game: 11-2-10
+teams: 2,10
+date: 2026-11-17 01:30
+---
+{t:2} is a **62% favorite**, projected 110.9 to 102.7, and that number assumes Thomas finds a quarterback.
+
+Seattle and New England are both on bye, so {t:10} is without {p:9488} (No. 1 WR by WAR) and {p:11564}. {p:12512} is out too with Cleveland's bye. Thomas will lean on {p:6790} (18.1), {p:9224} (12.7) and {p:8146} (12.6).
+
+Jesse comes off a 174.64. {p:4984} is projected for 24.3, {p:12481} 15.3, and {p:8131} and {p:9487} 12.5 each.
+
+**What's at stake:** Jesse's bye odds are **76.5% with a win, 38.5% with a loss**. Thomas's playoff odds are 90.2% with a win and 67.0% with a loss.
+=====
+slug: w11-preview-zack-ben
+title: Zack vs Ben Is the Biggest Game of the Week
+dek: The winner is about 92% to make the playoffs. The loser drops to about 57%.
+week: 11
+kind: preview
+game: 11-3-5
+teams: 3,5
+date: 2026-11-17 01:30
+---
+No game left on the schedule moves the playoff race more. {t:3} is a **54% favorite** and a 3-point pick over {t:5}.
+
+**Zack** rides last week's hot hands: {p:7547} (15.8), {p:7594} (14.5) and {p:6813} (13.5), with {p:11560} (20.4) at QB. He needs a defense, with the Seahawks on bye.
+
+**Ben** counters with {p:6786} (18.8), {p:8183} (16.6), {p:12490} (14.3) and {p:4866} (11.6).
+
+**What's at stake:** Zack goes **91.5% with a win, 56.9% with a loss**. Ben goes **92.4% with a win, 57.9% with a loss**. A combined 69.1-point swing.
+=====
+slug: w11-preview-jason-nick
+title: Nick Needs a Win, and Jason Needs It Almost as Much
+dek: A five-game losing streak meets a team coming off Gibbs's 40.7.
+week: 11
+kind: preview
+game: 11-6-4
+teams: 6,4
+date: 2026-11-17 01:30
+---
+{t:6} is a **58% favorite** and 5.5-point pick over {t:4}.
+
+{p:9221} (21.3) leads Jason, with {p:7523} (19.8) and {p:7569} (13.8) behind him. Nick has {p:8138} (17.9), {p:96} (17.0) and {p:6794} (15.7), but loses {p:8150} and the Rams defense to bye.
+
+**What's at stake:** Jason's playoff odds are **84.7% with a win, 53.4% with a loss**. Nick is 3.7% with a win. A sixth straight loss all but ends his season.
+=====
+slug: w11-preview-hamish-beck
+title: Two 3-7 Teams Play for a Pulse
+dek: Hamish is a 21.5-point favorite. The winner keeps a long shot alive.
+week: 11
+kind: preview
+game: 11-9-8
+teams: 9,8
+date: 2026-11-17 01:30
+---
+{t:9} is projected for 123.0, the most in the league this week, and is a **77% favorite** over {t:8}.
+
+Hamish has {p:4046} (22.1) coming off five touchdowns, {p:7588} (18.7), {p:13345} (15.8) and {p:6801} (15.6). New arrival {p:5892} is projected for 13.1 if his groin lets him play. Beck has {p:3294} (21.3), {p:8151} (17.1) and {p:8228} (13.3).
+
+**What's at stake:** not much, and everything. Hamish is 4.1% to make the playoffs with a win and 0.3% with a loss. Beck is 4.8% with a win and 0.1% with a loss.

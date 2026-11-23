@@ -1,0 +1,6 @@
+*(Claude's notes, Week 10 edition. Rewritten each week.)*
+- **New model this week:** projections now come from Sleeper's projected stats rescored in league scoring (see Model). That moved some teams a lot vs the old roster-only model.
+- **Thomas** has the best title odds (27.7%) and the highest rest-of-season projection (117.2). Sleeper is higher on his lineup going forward than his 2026 results, and his Week 11 bye pile-up is patched by pickups (Bo Nix, Ryan Flournoy: 82.4 → 106.5).
+- **Sammy** has the best playoff (98.3%) and bye (59.8%) odds on the strength of his 6-3 record and league-high PF.
+- **6th seed:** Zack (52.7%) and Jason (49.2%) are near coin flips; Hamish (13.2%), Nick (7.7%) and Beck (6.0%) need help.
+- **Roster holes the model fills:** Nick and Ben add a kicker in Week 10 (Chris Boswell); Beck streams Jordan Love in Week 14 for Dak's bye.

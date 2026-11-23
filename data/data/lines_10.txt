@@ -1,0 +1,6 @@
+# favorite_roster|underdog_roster|spread|total  (Week 10)
+5|1|0.5|195.0
+2|8|16.0|213.5
+9|3|2.5|208.5
+7|4|0.5|209.0
+10|6|2.5|214.5
