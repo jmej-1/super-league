@@ -376,13 +376,19 @@ if os.path.exists(os.path.join(avd, "urls.txt")) and os.path.exists(f"{D}/league
     for user, url in urls.items():
         if user not in mgr: continue
         r_, m_ = mgr[user]; img = os.path.join(avd, user + ".img")
-        if first or known.get(user) == url: known[user] = url; continue
+        if known.get(user) == url: continue
         if not os.path.exists(img): continue                 # changed, but the new image could not be downloaded: try again next update
         try:
-            from PIL import Image
+            from PIL import Image, ImageChops
             im = Image.open(img).convert("RGBA"); im.thumbnail((256, 256))
         except Exception: continue
         cur = f"{D}/logos/{m_}.png"
+        if first and os.path.exists(cur):                    # first look: only a logo that really differs from the one on file counts as a change
+            try:
+                a_ = Image.open(cur).convert("RGB").resize((48, 48)); b_ = im.convert("RGB").resize((48, 48))
+                diff = sum(ImageChops.difference(a_, b_).convert("L").getdata()) / (48 * 48)
+            except Exception: diff = 0
+            if diff < 25: known[user] = url; continue
         if os.path.exists(cur):
             os.makedirs(f"{D}/logos_old", exist_ok=True); old_ = f"{m_}_{now_:%Y%m%d%H%M}.png"
             shutil.copy(cur, f"{D}/logos_old/{old_}")

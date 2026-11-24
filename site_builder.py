@@ -1403,6 +1403,8 @@ class Site:
         NL = s_.news_list(); s = s_.s
         if not NL: return ""
         fs = [n for n in s_.features() if n["week"] >= s.last]          # previews stay on game pages, never the home headline
+        pins = [n for n in s_.features() if str(n.get("pin", "")).lower() in ("yes", "true", "1")]   # "pin: yes" keeps a story as the home cover
+        if pins: fs = pins[:1] + [n for n in fs if n is not pins[0]]
         if fs:
             n = fs[0]; href = s_.nurl(n, ""); lg = "".join(s_.logo(r, "", "lgh") for r in n["teams"][:2]); kick = s_.KIND.get(n["kind"], "Feature")
         else:
