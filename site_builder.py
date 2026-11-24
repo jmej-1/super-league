@@ -39,7 +39,7 @@ def bar(p, cls=""):
 
 def FONTS(pre):
     ff = [("Big Shoulders Display", "big-shoulders-display", w) for w in (600, 800, 900)] + [("Instrument Sans", "instrument-sans", w) for w in (400, 500, 600, 700)]
-    return "<style>" + "".join(f"@font-face{{font-family:'{n}';font-style:normal;font-weight:{w};font-display:swap;src:url({pre}fonts/{f}-latin-{w}-normal.woff2) format('woff2')}}" for n, f, w in ff) + ".gbt{display:inline-block;min-width:84px;text-align:center}.swg{display:block;font-size:11px;color:var(--mute);font-weight:500;white-space:nowrap}.nw{white-space:nowrap}</style>"
+    return "<style>" + "".join(f"@font-face{{font-family:'{n}';font-style:normal;font-weight:{w};font-display:swap;src:url({pre}fonts/{f}-latin-{w}-normal.woff2) format('woff2')}}" for n, f, w in ff) + "</style>"
 
 CSS = """
 :root{
@@ -564,6 +564,12 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 }
 """
 
+CSS += """
+@media(max-width:640px){nav.menu{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}}
+"""
+CSS += """
+.gbt{display:inline-block;min-width:84px;text-align:center}.swg{display:block;font-size:11px;color:var(--mute);font-weight:500;white-space:nowrap}.nw{white-space:nowrap}.trm{display:none;font-size:13px;margin-top:4px;color:var(--mute)}@media(max-width:640px){.trtab{min-width:0!important}.trtab .trx{display:none}.trtab .trm{display:block}.trtab td.c,.trtab th.c,.trtab td.rk,.trtab th:first-child{display:none}.trtab td.r{white-space:nowrap}}details.how{margin:-4px 0 18px}details.how summary{cursor:pointer;font-weight:600;font-size:14px}@media(max-width:640px){.exctop .exmb{display:none!important}.exctop td,.exctop th{padding-left:6px;padding-right:6px}.exctop td:nth-child(3){font-size:12px;white-space:nowrap}}
+"""
 CSS += """
 /* trade analyzer */
 .tapick{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
@@ -1774,7 +1780,7 @@ class Site:
         for t, k in season_list:          # each race is addressable: #/races/<key> lands on it
             F["races"] = F["races"].replace(f"<h2>{t} race</h2>", f'<h2 id="races-{k}" style="scroll-margin-top:70px">{t} race</h2>', 1)
         trophies = "".join(f'<a class="trophy" href="#/races/{k}"><b>{t}</b><span>{"League vote among the top 10, after Week 14." if k == "mvp" else "Regular season only. Final after Week 14."} </span><span class="go">See the race</span></a>' for t, k in season_list)
-        F["awards"] = (f'<section><h2>Season awards</h2><p class="intro">Given out once the {s_.yr} season is over. Until then, follow the leaderboards on the Races page.</p><div class="trophies">{trophies}</div></section>'
+        F["awards"] = (f'<section><h2>Season awards</h2><p class="intro">Given out once the {s_.yr} season is over. Until then, the races above show who leads each one.</p><div class="trophies">{trophies}</div></section>'
                        f'<section><h2>Weekly MVP</h2><div class="scroll"><table><thead><tr><th>Wk</th><th>MVP</th><th class="r">PAA</th></tr></thead><tbody>{wk_rows}</tbody></table></div></section>')
         Rv = s.repl["val"]
         def imp(t, r, i):          # how much he has mattered to the team that got him: WAR in its lineup since the trade, then season WAR
@@ -1793,7 +1799,7 @@ class Site:
             for j, x in enumerate(t["sides"]):
                 wins = x["pts"] / s.ppw; net[x["r"]] += wins
                 trow.append(f'<tr class="{"tstart" if j == 0 else ""}"><td class="rk">{t["k"] if j == 0 else ""}</td><td class="c">{"Week " + str(t["w"]) if j == 0 else ""}</td>'
-                            f'<td>{s_.tl(x["r"], pre)}</td><td class="muted" style="font-size:13px">received</td><td>{gotfrom(t, x)}</td>{'<td class="r muted" style="font-size:13px">No games yet</td>' if t["w"] > s.last and not (t["w"] == s.nxt and s_.wk_live(s.nxt)) else f'<td class="r big {"pos" if wins > 0 else "neg" if wins < 0 else ""}">{wins:+.1f}</td>'}</tr>')
+                            f'<td class="trt">{s_.tl(x["r"], pre)}<div class="trm">{("<b>Week " + str(t["w"]) + ":</b> ") if j == 0 else ""}{gotfrom(t, x)}</div></td><td class="muted trx" style="font-size:13px">received</td><td class="trx">{gotfrom(t, x)}</td>{'<td class="r muted" style="font-size:13px">No games yet</td>' if t["w"] > s.last and not (t["w"] == s.nxt and s_.wk_live(s.nxt)) else f'<td class="r big {"pos" if wins > 0 else "neg" if wins < 0 else ""}">{wins:+.1f}</td>'}</tr>')
         vet = [t for t in s.trades if t["vetoed"]]
         def vrow(t):
             tv = dict(w=t["w"], frm=t.get("frm", {}), sides=[dict(r=r, got=got) for r, (got, gave) in t["sides"].items()])
@@ -1803,7 +1809,7 @@ class Site:
         vetrows = "".join(vrow(t) for t in vet)
         netrows = "".join(f'<tr><td>{s_.tl(r, pre)}</td><td class="r big {"pos" if v > 0 else "neg"}">{v:+.1f}</td></tr>' for r, v in sorted(net.items(), key=lambda kv: -kv[1]))
         F["trades"] = (f'<section><h2>Every trade</h2>'
-                       f'<div class="scroll"><table><thead><tr><th></th><th class="c">When</th><th>Team</th><th></th><th>Players</th><th class="r">Wins added</th></tr></thead><tbody>{"".join(trow)}</tbody></table></div></section>'
+                       f'<div class="scroll"><table class="trtab"><thead><tr><th></th><th class="c">When</th><th>Team</th><th class="trx"></th><th class="trx">Players received</th><th class="r">Wins added</th></tr></thead><tbody>{"".join(trow)}</tbody></table></div></section>'
                        + (f'<section><h2>Vetoed trades</h2><p class="intro">Agreed, then undone by the commissioner. Kept for the record; they never count toward anyone\'s trade grade, pickups or cuts.</p><div class="scroll"><table><thead><tr><th></th><th class="c">When</th><th>Team</th><th></th><th>Players</th><th class="r"></th></tr></thead><tbody>{vetrows}</tbody></table></div></section>' if vet else "") +
                        f'<section><h2>Net by team</h2><table class="pt" style="max-width:520px"><tbody>{netrows}</tbody></table></section>')
         allsc = sorted([(s.G[w]["scores"][r], w, r) for w in s.weeks for r in s.R])
@@ -3026,8 +3032,8 @@ class Site:
         def row(k, g, v):
             w_, x, y = g; wi = x if s.G[w_]["scores"][x] > s.G[w_]["scores"][y] else y; lo = y if wi == x else x
             return (f'<tr><td class="rk">{k}</td><td><a class="pn" href="{s_.gurl(w_, x, y, pre)}"><b>{E(s_.TN(wi, w_))}</b> over {E(s_.TN(lo, w_))}</a><small class="muted"> Week {w_}</small></td>'
-                    f'<td class="r">{fp(s.G[w_]["scores"][wi])}-{fp(s.G[w_]["scores"][lo])}</td><td class="r"><span class="exm" style="display:inline-block;vertical-align:middle;margin-right:8px" aria-hidden="true"><i style="width:{s_.exc_bar(v)}%"></i></span><b>{v:.1f}</b></td></tr>')
-        tbl = lambda rows: f'<div class="scroll"><table class="pt" style="min-width:0"><thead><tr><th></th><th>Game</th><th class="r">Score</th><th class="r">Excitement</th></tr></thead><tbody>{rows}</tbody></table></div>'
+                    f'<td class="r">{fp(s.G[w_]["scores"][wi])}-{fp(s.G[w_]["scores"][lo])}</td><td class="r"><span class="exm exmb" style="display:inline-block;vertical-align:middle;margin-right:8px" aria-hidden="true"><i style="width:{s_.exc_bar(v)}%"></i></span><b>{v:.1f}</b></td></tr>')
+        tbl = lambda rows: f'<div class="scroll"><table class="pt exctop" style="min-width:0"><thead><tr><th></th><th>Game</th><th class="r">Score</th><th class="r">Excitement</th></tr></thead><tbody>{rows}</tbody></table></div>'
         n = len(allg)
         top = "".join(row(k, g, v) for k, (g, v) in enumerate(allg[:5], 1))
         bot = "".join(row(n - k, g, v) for k, (g, v) in enumerate(list(reversed(allg))[:5]))
@@ -3038,7 +3044,7 @@ class Site:
         mrows = "".join(f'<tr><td class="rk">{k}</td><td><span class="tat2x">{s_.logo(r, pre, "lgs")}<a href="{s_.turl(r, pre)}"><b>{E(s_.TN(r))}</b></a> <small class="muted">{E(s.M[r])}</small></span></td>'
                         f'<td class="r"><b>{sum(per[r]) / len(per[r]):.1f}</b></td><td class="r">{max(per[r]):.1f}</td><td class="r">{sum(1 for v in per[r] if v >= 60)}</td></tr>'
                         for k, r in enumerate(mg, 1) if per[r])
-        return (f'<p class="intro">Every finished game, rebuilt play by play. Excitement is a weighted average of six pieces, each a plain formula with no cap: Comeback 25% (60 x log10 of the odds against the winner at his lowest), Finish 20% (40 x win-chance movement in the last quarter of the game), Close 20% (100 minus 2.5 per point of margin), Drama 15% (20 x win-chance movement before that), Lead changes 10% (15 per favorite flip) and Scoring 10% (combined points minus 150). About 33 is a typical game, 70 or more a classic, and a blowout can dip below 0.</p>'
+        return (f'<p class="intro">Every finished game, scored for drama from its play-by-play win chances. About 33 is a typical game, 70 or more is a classic.</p><details class="how"><summary>How it\'s scored</summary><p class="intro">Every finished game, rebuilt play by play. Excitement is a weighted average of six pieces, each a plain formula with no cap: Comeback 25% (60 x log10 of the odds against the winner at his lowest), Finish 20% (40 x win-chance movement in the last quarter of the game), Close 20% (100 minus 2.5 per point of margin), Drama 15% (20 x win-chance movement before that), Lead changes 10% (15 per favorite flip) and Scoring 10% (combined points minus 150). About 33 is a typical game, 70 or more a classic, and a blowout can dip below 0.</p></details>'
                 f'<div class="grid2"><section><h2>Most exciting</h2>{tbl(top)}</section><section><h2>Least exciting</h2>{tbl(bot)}</section></div>'
                 f'<section><h2>Managers <small>average excitement of their games</small></h2><div class="scroll"><table class="pt" style="min-width:0"><thead><tr><th></th><th>Team</th><th class="r">Average</th><th class="r">Best</th><th class="r">60 or higher</th></tr></thead><tbody>{mrows}</tbody></table></div></section>'
                 f'<section><h2>Every game</h2><p class="intro">Tap a column to sort. Each ring shows that piece as a share of the best ever in that piece.</p>{s_.exc_table(pre)}</section>')
