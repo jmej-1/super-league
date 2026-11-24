@@ -864,14 +864,73 @@ class Site:
         s = s_.s
         return s.nm(i) if (not i.isdigit() or s.pos(i) == "DEF") else f"{s_.posd(i)} {s.nm(i)}"
 
-    def TN(s_, r): return s_.s.L["rosters"][r]["team"] or s_.s.L["rosters"][r]["user"]   # no team name set: use the Sleeper username (HC13, JesseMej...)
+    def TN(s_, r, w=None):
+        """Team name. With a week (or inside a page for a past week/story), the name it had then; otherwise today's.
+        No team name set: the Sleeper username (HC13, JesseMej...)."""
+        cur = s_.s.L["rosters"][r]["team"] or s_.s.L["rosters"][r]["user"]
+        at = s_.wk_start(w) if w is not None else getattr(s_, "_at", None)
+        if at is None: return cur
+        for ts, rr, old_, new_ in reversed(s_.name_hist()):
+            if rr == r and at < ts: cur = old_ or s_.s.L["rosters"][r]["user"]
+        return cur
+    def name_hist(s_):
+        """[(utc, roster, old name, new name)] from data/team_names.txt, oldest first."""
+        if not hasattr(s_, "_nh"):
+            s_._nh = []; f = os.path.join(os.path.dirname(s_.logo_dir), "team_names.txt")
+            if os.path.exists(f):
+                for l in open(f):
+                    if l.startswith("#") or not l.strip(): continue
+                    ts, rr, o, n = l.rstrip("\n").split("|")[:4]
+                    s_._nh.append((datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%MZ"), int(rr), o, n))
+            s_._nh.sort()
+        return s_._nh
+    def logo_hist(s_):
+        """[(utc, roster, css class)] logos used before utc, from data/logo_history.txt (utc|roster|file in data/logos_old)."""
+        if not hasattr(s_, "_lh"):
+            s_._lh = []; f = os.path.join(os.path.dirname(s_.logo_dir), "logo_history.txt")
+            if os.path.exists(f):
+                for l in open(f):
+                    if l.startswith("#") or not l.strip(): continue
+                    ts, rr, fn = l.rstrip("\n").split("|")[:3]
+                    s_._lh.append((datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%MZ"), int(rr), "L" + rr + "_" + os.path.splitext(fn)[0].replace(".", "_")))
+            s_._lh.sort()
+        return s_._lh
+    def logo_cls(s_, r, w=None):
+        at = s_.wk_start(w) if w is not None else getattr(s_, "_at", None); c = f"L{r}"
+        if at is not None:
+            for ts, rr, cl in reversed(s_.logo_hist()):
+                if rr == r and at < ts: c = cl
+        return c
+    def wk_start(s_, w):
+        """First kickoff of week w (UTC). A rename before it shows on that week's games."""
+        if not hasattr(s_, "_wks"):
+            s_._wks = {}; f = os.path.join(os.path.dirname(s_.logo_dir), "schedule.txt")
+            if os.path.exists(f):
+                for l in open(f):
+                    if l.startswith("#") or not l.strip(): continue
+                    ww, ts = l.split("|")[:2]; d = datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%MZ")
+                    if int(ww) not in s_._wks or d < s_._wks[int(ww)]: s_._wks[int(ww)] = d
+        return s_._wks.get(int(w), datetime.datetime.max)
+    def names_js(s_):
+        """For the browser: {roster: [[week a name/logo started, name, logo class], ...]} only for teams that changed."""
+        out = {}
+        for r in s_.s.R:
+            ch = sorted({ts for ts, rr, *_ in s_.name_hist() if rr == r} | {ts for ts, rr, _ in s_.logo_hist() if rr == r})
+            if not ch: continue
+            ws = sorted(s_.s.weeks + [s_.s.nxt]) if hasattr(s_.s, "nxt") else sorted(s_.s.weeks)
+            seg = []; prev = None
+            for w in range(1, max(ws + [18]) + 1):
+                v = (s_.TN(r, w), s_.logo_cls(r, w))
+                if v != prev: seg.append([w, v[0], v[1]]); prev = v
+            out[r] = seg
+        return out
     def turl(s_, r, pre): return f"{pre}team/{s_.M[r]}.html"
     def gurl(s_, w, a, b, pre):
         a, b = sorted((a, b)); return f"{pre}game/w{w}-{a}-{b}.html"
     def gurl_r(s_, w, r, pre):
         g = s_.game_of.get((w, r)); return s_.gurl(w, g[0], g[1], pre) if g else None
-    def logo(s_, r, pre, cls="lg"):
-        return f'<i class="im {cls} L{r}" role="img" aria-label="{E(s_.TN(r))} logo"></i>'
+    def logo(s_, r, pre, cls="lg", w=None):
+        return f'<i class="im {cls} {s_.logo_cls(r, w)}" role="img" aria-label="{E(s_.TN(r, w))} logo"></i>'
     def tl(s_, r, pre): return f'<a class="tl" href="{s_.turl(r, pre)}">{s_.logo(r, pre)}<span><b>{E(s_.TN(r))}</b><small>{E(s_.M[r])}</small></span></a>'
     def posd(s_, i, sep="/"):
         """Position for display; two-way players show both (WR/DB, or 'WR, DB' on a profile)."""
@@ -1049,7 +1108,7 @@ class Site:
         heists.sort(key=lambda x: -x[1])
         def h_sub(k):
             t, wn, ls = k
-            return (s_.logo(wn["r"], pre, "lg"), f'{E(s_.TN(wn["r"]))} over {E(s_.TN(ls["r"]))}',
+            return (s_.logo(wn["r"], pre, "lg", t["w"]), f'{E(s_.TN(wn["r"], t["w"]))} over {E(s_.TN(ls["r"], t["w"]))}',
                     f'Week {t["w"]}: got {", ".join(s_.pa(i, nm(i)) for i in wn["got"])} for {", ".join(s_.pa(i, nm(i)) for i in wn["gave"])}')
         def h_li(j, k, v):
             t, wn, ls = k
@@ -1114,13 +1173,13 @@ class Site:
         imp = sorted((x for x in s_.improbable() if x["w"] in s.weeks), key=lambda x: x["low"])[:10]
         def im_sub(k):
             x = imp[k]
-            return (s_.logo(x["wi"], pre, "lg"), f'{E(s_.TN(x["wi"]))} over {E(s_.TN(x["lo"]))}', f'Week {x["w"]}: down to {pct(x["low"])} {"before kickoff" if x["at"] == "Pregame" else ("at " + x["at"][1:].replace("Live, ", "")) if x["at"].startswith("@") else "after " + ("the " + x["at"] + " games" if ":" in x["at"] else x["at"])}{f", trailed by as much as {x['down']:.1f}" if x["down"] > 0.05 else ""}, won {fp(s.G[x["w"]]["scores"][x["wi"]])} to {fp(s.G[x["w"]]["scores"][x["lo"]])}')
+            return (s_.logo(x["wi"], pre, "lg", x["w"]), f'{E(s_.TN(x["wi"], x["w"]))} over {E(s_.TN(x["lo"], x["w"]))}', f'Week {x["w"]}: down to {pct(x["low"])} {"before kickoff" if x["at"] == "Pregame" else ("at " + x["at"][1:].replace("Live, ", "")) if x["at"].startswith("@") else "after " + ("the " + x["at"] + " games" if ":" in x["at"] else x["at"])}{f", trailed by as much as {x['down']:.1f}" if x["down"] > 0.05 else ""}, won {fp(s.G[x["w"]]["scores"][x["wi"]])} to {fp(s.G[x["w"]]["scores"][x["lo"]])}')
         b9 = block("Comeback of the Year race", "The lowest win chance a winner came back from.",
                    [(k, imp[k]["low"]) for k in range(len(imp))], pct, "lowest win chance", im_sub, lambda k: s_.gurl(imp[k]["w"], imp[k]["wi"], imp[k]["lo"], pre)) if imp else ""
         exl = sorted(((g, s_.excitement(*g)) for g in [(w_, x, y) for w_ in s.weeks for x, y in s.G[w_]["pairs"]] if s_.excitement(*g) is not None), key=lambda kv: -kv[1])[:10]
         def ex_sub(g):
             w_, x, y = g; wi = x if s.G[w_]["scores"][x] > s.G[w_]["scores"][y] else y; lo = y if wi == x else x
-            return (s_.logo(wi, pre, "lg"), f'{E(s_.TN(wi))} over {E(s_.TN(lo))}', f'Week {w_}, {fp(s.G[w_]["scores"][wi])} to {fp(s.G[w_]["scores"][lo])}')
+            return (s_.logo(wi, pre, "lg", w_), f'{E(s_.TN(wi, w_))} over {E(s_.TN(lo, w_))}', f'Week {w_}, {fp(s.G[w_]["scores"][wi])} to {fp(s.G[w_]["scores"][lo])}')
         b10 = block("Game of the Year race", "The most exciting games, by excitement score.", exl, lambda v: f"{v:.1f}", "excitement", ex_sub, lambda g: s_.gurl(g[0], g[1], g[2], pre)) if exl else ""
         grp = lambda h, *bs: f'<section><h3 class="wsub">{h}</h3><div class="awards4">{"".join(bs)}</div></section>' if any(bs) else ""
         return grp("Managers", b1, b2) + grp("Moves", b3, b5p, b5, b7, b8) + grp("Games", b10, b9)
@@ -1307,6 +1366,8 @@ class Site:
         s = s_.s; P = {}; NL = s_.news_list(); yr = s_.yr
         for n in s_.features():
             pre = "../"
+            try: s_._at = datetime.datetime.strptime(str(n.get("date", ""))[:16], "%Y-%m-%d %H:%M") + datetime.timedelta(hours=5)   # ET story time to UTC
+            except Exception: s_._at = s_.wk_start(n["week"])
             lg = "".join(s_.logo(r, pre, "lgb") for r in n["teams"][:2])
             more = [x for x in s_.features() if x is not n][:6]
             body = (f'<section class="field nhero"><div class="wrap"><a class="back" href="{pre}news.html">News</a>'
@@ -1316,6 +1377,7 @@ class Site:
                     + (f'<section><h2>More features</h2><div class="ngrid">{"".join(s_.ncard(x, pre) for x in more)}</div></section>' if more else "")
                     + f'</main>{s_.footer(pre)}')
             P[f"news/{n['slug']}.html"] = page(f"{n['title']}, Super League", body, pre, "news")
+            s_._at = None
         pre = ""
         feats = "".join(s_.ncard(n, pre) for n in s_.features())
         weeks = sorted({n["week"] for n in NL if n.get("game")}, reverse=True)
@@ -2162,8 +2224,8 @@ class Site:
         wins_ = [x for x in res if x["win"]]; loss_ = [x for x in res if not x["win"]]
         bs = max(((p, w, i) for w in s.weeks for i, p in s.W[w][r]["S"] if i != "0"))
         trec = [("Highest score", fp(hi_["me"]), hi_["w"]), ("Lowest score", fp(lo_["me"]), lo_["w"])]
-        if wins_: bw_ = max(wins_, key=lambda x: x["me"] - x["th"]); trec.append(("Biggest win", f'by {fp(bw_["me"] - bw_["th"])} over {s_.TN(bw_["op"])}', bw_["w"]))
-        if loss_: wl_ = max(loss_, key=lambda x: x["th"] - x["me"]); trec.append(("Worst loss", f'by {fp(wl_["th"] - wl_["me"])} to {s_.TN(wl_["op"])}', wl_["w"]))
+        if wins_: bw_ = max(wins_, key=lambda x: x["me"] - x["th"]); trec.append(("Biggest win", f'by {fp(bw_["me"] - bw_["th"])} over {s_.TN(bw_["op"], bw_["w"])}', bw_["w"]))
+        if loss_: wl_ = max(loss_, key=lambda x: x["th"] - x["me"]); trec.append(("Worst loss", f'by {fp(wl_["th"] - wl_["me"])} to {s_.TN(wl_["op"], wl_["w"])}', wl_["w"]))
         trec.append(("Best start", f"{nm(bs[2])}, {fp(bs[0])}", bs[1]))
         trecs = '<div class="recs">' + "".join(f'<a class="rec" href="{s_.gurl_r(w, r, pre)}"><span class="k">{E(k)}</span><span class="v">{E(v)}</span><span class="w">Week {w}, {yr}</span></a>' for k, v, w in trec) + "</div>"
         seasons_nav = '<div class="seasons">' + "".join(f'<a href="{s_.turl(r, pre)}" aria-current="page">{y}</a>' for y in seasons) + '</div>'
@@ -2248,13 +2310,15 @@ class Site:
                     + "".join(f'<a href="{tu}#{y}"{" aria-current=page" if cur == str(y) else ""}>{y}</a>' for y in sorted(seasons, reverse=True)) + "</div></nav>")
         tabbar = '<nav class="ttabs" aria-label="Team sections"><div class="wrap">' + "".join(f'<a href="{tu}#{yr}-{k}" data-tab="{k}">{t}</a>' for k, t in tabs) + "</div></nav>"
         names = " / ".join(f"{E(s_.TN(r))} ({y})" for y in sorted(seasons, reverse=True))
+        olds = [o for ts, rr, o, n_ in s_.name_hist() if rr == r and o and o != s_.TN(r)]
+        if olds: names += ", formerly " + " / ".join(E(o) for o in dict.fromkeys(reversed(olds)))
         hero_all = (f'<section class="field"><div class="wrap"><a class="back" href="../teams.html">All teams</a>'
                     f'<div class="hero">{s_.logo(r, pre, "lgh")}<div><h1>{E(M[r])}</h1><div class="sub">{names}</div></div></div>'
                     f'<div class="herostats"><span><b>{s_.rec_str(r)}</b>record</span>'
                     f'<span><b>{len(seasons)}</b>season{"" if len(seasons) == 1 else "s"}</span><span><b>{s_.xw[r]:.1f}</b>xWins</span><span><b>{lk:+.1f}</b>luck</span></div>'
                     f'</div></section>')
         hero_yr = (f'<section class="field"><div class="wrap"><a class="back" href="../teams.html">All teams</a>'
-                   f'<div class="hero">{s_.logo(r, pre, "lgh")}<div><h1>{E(s_.TN(r))}</h1><div class="sub">{E(M[r])}, {yr}</div></div></div>'
+                   f'<div class="hero">{s_.logo(r, pre, "lgh")}<div><h1>{E(s_.TN(r))}</h1><div class="sub">{E(M[r])}, {yr}{(", formerly " + " / ".join(E(o) for o in dict.fromkeys(reversed([o for ts, rr, o, n_ in s_.name_hist() if rr == r and o and o != s_.TN(r)])))) if any(rr == r for _, rr, *__ in s_.name_hist()) else ""}</div></div></div>'
                    f'<div class="herostats"><span><b>{s_.rec_str(r)}</b>record</span><span><b>{s_.xw[r]:.1f}</b>xWins</span><span><b>{ordn(rk)}</b>standings</span><span><b>{ordn(pw_k)}</b>power</span><span><b>{pct(o["po"])}</b>playoffs</span><span><b>{pct(o["ti"])}</b>title</span></div>'
                    f'{upnext}</div></section>')
         byseason = (f'<div class="scroll"><table><thead><tr><th>Season</th><th>Team</th><th class="c">Record</th><th class="r">Points</th><th class="r">xWins</th><th class="r">Luck</th><th class="c">Finish</th></tr></thead><tbody>'
@@ -2940,7 +3004,7 @@ class Site:
         for (w_, x, y), v in allg:
             if (w_, x, y) not in terms: continue
             wi = x if s.G[w_]["scores"][x] > s.G[w_]["scores"][y] else y; lo = y if wi == x else x; T_ = terms[(w_, x, y)]
-            rows.append(f'<tr><td class="rk"></td><td data-v="{E(s_.TN(wi).lower())}"><a class="pn" href="{s_.gurl(w_, x, y, pre)}"><b>{E(s_.TN(wi))}</b> over {E(s_.TN(lo))}</a>'
+            rows.append(f'<tr><td class="rk"></td><td data-v="{E(s_.TN(wi, w_).lower())}"><a class="pn" href="{s_.gurl(w_, x, y, pre)}"><b>{E(s_.TN(wi, w_))}</b> over {E(s_.TN(lo, w_))}</a>'
                         f'<small class="muted"> Week {w_}, {fp(s.G[w_]["scores"][wi])}-{fp(s.G[w_]["scores"][lo])}</small></td>'
                         f'<td class="r big" data-v="{v}">{v:.1f}</td>' + "".join(f'<td class="c xr" data-v="{T_[k]:.3f}">{ring(T_[k], k)}</td>' for k in names) + '</tr>')
         th = (f'<th class="c">#</th><th class="xs" data-t="s" tabindex="0" role="button">Game</th><th class="r xs" data-t="n" aria-sort="descending" tabindex="0" role="button">Excitement</th>'
@@ -2951,7 +3015,7 @@ class Site:
         if not allg: return '<p class="muted">No finished games yet.</p>'
         def row(k, g, v):
             w_, x, y = g; wi = x if s.G[w_]["scores"][x] > s.G[w_]["scores"][y] else y; lo = y if wi == x else x
-            return (f'<tr><td class="rk">{k}</td><td><a class="pn" href="{s_.gurl(w_, x, y, pre)}"><b>{E(s_.TN(wi))}</b> over {E(s_.TN(lo))}</a><small class="muted"> Week {w_}</small></td>'
+            return (f'<tr><td class="rk">{k}</td><td><a class="pn" href="{s_.gurl(w_, x, y, pre)}"><b>{E(s_.TN(wi, w_))}</b> over {E(s_.TN(lo, w_))}</a><small class="muted"> Week {w_}</small></td>'
                     f'<td class="r">{fp(s.G[w_]["scores"][wi])}-{fp(s.G[w_]["scores"][lo])}</td><td class="r"><span class="exm" style="display:inline-block;vertical-align:middle;margin-right:8px" aria-hidden="true"><i style="width:{s_.exc_bar(v)}%"></i></span><b>{v:.1f}</b></td></tr>')
         tbl = lambda rows: f'<div class="scroll"><table class="pt" style="min-width:0"><thead><tr><th></th><th>Game</th><th class="r">Score</th><th class="r">Excitement</th></tr></thead><tbody>{rows}</tbody></table></div>'
         n = len(allg)
@@ -3654,6 +3718,10 @@ class Site:
         return f'<section><h2>Game stats</h2><div class="panel gstats"><div class="gsh"><b>{E(s_.TN(a))}</b><b>{E(s_.TN(b))}</b></div>{"".join(out_)}</div></section>'
 
     def game_done(s_, w, a, b):
+        s_._at = s_.wk_start(w)
+        try: return s_._game_done(w, a, b)
+        finally: s_._at = None
+    def _game_done(s_, w, a, b):
         s = s_.s; pre = "../"; G = s.G[w]; sa, sb = G["scores"][a], G["scores"][b]; yr = s_.yr
         med = s.pos_median(w); win = a if sa > sb else b
         slots = s.L["lineup"]
@@ -3754,6 +3822,10 @@ class Site:
                 f'<details class="omd"><summary>Every update</summary><div class="scroll"><table class="pt" style="min-width:0"><thead><tr><th>Saved</th><th class="r">{E(s_.M[a])}</th><th class="r">{E(s_.M[b])}</th><th class="r">Projected</th></tr></thead><tbody>{tbl}</tbody></table></div></details></section>')
 
     def game_next(s_, w, a, b):
+        s_._at = s_.wk_start(w)
+        try: return s_._game_next(w, a, b)
+        finally: s_._at = None
+    def _game_next(s_, w, a, b):
         s = s_.s; pre = "../"; nm = s_.s.nm; yr = s_.yr; out = s_.SIM[0]
         A, B = s_.upcoming(w, a), s_.upcoming(w, b); pa = s_.win_p(A, B)
         slots = s.L["lineup"]
@@ -3838,6 +3910,13 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         f = f"{logo_dir}/{s.M[r]}.png"
         if os.path.exists(f):
             lg += f".L{r}{{background-image:url(data:image/png;base64,{base64.b64encode(open(f, 'rb').read()).decode()})}}"
+    lhf = os.path.join(os.path.dirname(logo_dir), "logo_history.txt"); od = os.path.join(os.path.dirname(logo_dir), "logos_old")
+    if os.path.exists(lhf):
+        for l in open(lhf):
+            if l.startswith("#") or not l.strip(): continue
+            ts_, rr_, fn_ = l.rstrip("\n").split("|")[:3]
+            if os.path.exists(f"{od}/{fn_}"):
+                lg += f".L{rr_}_{os.path.splitext(fn_)[0].replace('.', '_')}{{background-image:url(data:image/{'png' if fn_.endswith('.png') else 'jpeg'};base64,{base64.b64encode(open(f'{od}/{fn_}', 'rb').read()).decode()})}}"
     nd = os.path.join(os.path.dirname(logo_dir), "nfl_logos")
     for ab in NFL_NICK:
         if os.path.exists(f"{nd}/{ab}.png"):
@@ -3980,7 +4059,8 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   window.addEventListener('hashchange',function(){pc.hidden=true;});
   function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function fpt(v){ if(v===null||v===undefined) return '-'; var r=Math.round(v*100)/100; return (Math.round(r*100)%10)?r.toFixed(2):r.toFixed(1); }
-  function tlink(r){ return r? '<a class="tl" href="#/team/'+TM[r][1]+'"><i class="im lgs L'+r+'"></i><b>'+esc(TM[r][0])+'</b></a>' : '<span class="muted">Free agent</span>'; }
+  function tmAt(r,w){ var h=TMW[r]; if(!h||!w) return [TM[r][0],'L'+r]; var v=[TM[r][0],'L'+r]; h.forEach(function(s){ if(+w>=s[0]) v=[s[1],s[2]]; }); return v; }   // name and logo a team had in week w
+  function tlink(r,w){ var v=r?tmAt(r,w):null; return r? '<a class="tl" href="#/team/'+TM[r][1]+'"><i class="im lgs '+v[1]+'"></i><b>'+esc(v[0])+'</b></a>' : '<span class="muted">Free agent</span>'; }
   function mv(t){
     var add=t[2]==='+', k=t[3];
     if(k==='Draft') return '<span class="pos">Drafted '+esc(t[4])+'</span>';
@@ -3992,7 +4072,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     return '<span class="'+(add?'pos':'neg')+'">'+lab+'</span>';
   }
   function plist(L){ return L.map(function(p){ return PD[p[0]]?'<a class="pn" href="#/player/'+p[0]+'">'+esc(p[1])+'</a>':esc(p[1]); }).join(', '); }
-  function tnm(r){ return r?'<a class="tn" href="#/team/'+TM[r][1]+'"><i class="im lgs L'+r+'"></i><b>'+esc(TM[r][0])+'</b></a>':'<b>free agency</b>'; }
+  function tnm(r,w){ var v=r?tmAt(r,w):null; return r?'<a class="tn" href="#/team/'+TM[r][1]+'"><i class="im lgs '+v[1]+'"></i><b>'+esc(v[0])+'</b></a>':'<b>free agency</b>'; }
   // Super League teams like a reference site: one line per season, tap it for every stint (same team and same NFL team, back to back)
   function mvpsHTML(d, ys){
     var M=[]; ys.forEach(function(y){ if(!d.sea[y]) return; d.sea[y].m.forEach(function(m){ var x=d.sea[y].w.filter(function(z){return z[0]===m[0];})[0]; M.push([y,m[0],m[1],x?x[4]:0,x?x[3]:0]); }); });
@@ -4254,8 +4334,8 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         var stt=x[2]?'<b class="pos">Started</b>':((S.irw||[]).indexOf(x[0])>=0?'IR':(x[1]?'Bench':'<span class="muted">Not rostered</span>'));
         if(x[14]&&!bye(x)) stt+=' <span class="stg inj" title="Injury tag going into the game">'+esc(x[14])+'</span>';
         if(x[8]) stt+=' <span class="stg '+(x[8]===2?'fin':'pk')+'">'+(x[8]===2?'Final':'Live')+'</span>';
-        h+='<tr class="'+(x[2]?'':'bn')+'"><td class="c">'+(x[1]&&x[4]?glink(x[0],x[1],x[4],x[0]):x[0])+'</td><td>'+(x[1]?tlink(x[1]):'<span class="muted">-</span>')+'</td><td class="c">'+(x[6]===1?'<b class="pos">W</b>':x[6]===0?'<b class="neg">L</b>':(x[8]?'<span class="muted">Live</span>':''))+'</td>'
-          +'<td>'+(x[4]?tlink(x[4]):'')+'</td><td class="c">'+stt+(x[11]?'<small class="grs">'+rkc(x)+'</small>':'')+'</td>'
+        h+='<tr class="'+(x[2]?'':'bn')+'"><td class="c">'+(x[1]&&x[4]?glink(x[0],x[1],x[4],x[0]):x[0])+'</td><td>'+(x[1]?tlink(x[1],x[0]):'<span class="muted">-</span>')+'</td><td class="c">'+(x[6]===1?'<b class="pos">W</b>':x[6]===0?'<b class="neg">L</b>':(x[8]?'<span class="muted">Live</span>':''))+'</td>'
+          +'<td>'+(x[4]?tlink(x[4],x[0]):'')+'</td><td class="c">'+stt+(x[11]?'<small class="grs">'+rkc(x)+'</small>':'')+'</td>'
           +'<td class="c grk">'+rkc(x)+'</td><td class="r big">'+(bye(x)?'<span class="byec">BYE</span>':(x[13]===0?'<span class="byec dnp" title="Did not play, 0 points">DNP</span>':fpt(x[3])))+(x[5]?'<small class="gsm">'+esc(x[5])+'</small>':'')+'</td>'+sg(x[10],1)+sg(x[9],2)+'<td class="muted gst">'+esc(x[5]||'')+'</td></tr>'; });
       h+='</tbody></table></div></section>';
       h+=mvpsHTML(d,[yr]);
@@ -4342,7 +4422,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   var SYM={g_comb:1,g_close:1}, RPER='all', RSC='L'; function tv(e){ return e.length>8?e[8]:e[0]; }
   // a season chip only where the record belongs to one season (a game, a season, a trade, a draft); never on all-time totals, and not inside a one-season view
   function yrOf(k){ return RPER==='all' && !/^(pc_|f_|c_)/.test(k); }
-  function hold(k,e){ var r=e[1], p=e[2], o=e[3], d=p&&PD[p], tn=function(x){ return RBOOK==='mgr'?TM[x][1]:TM[x][0]+' ('+TM[x][1]+')'; };          // manager records: just the manager
+  function hold(k,e){ var r=e[1], p=e[2], o=e[3], d=p&&PD[p], tn=function(x){ var nm_=(e[5]==YR&&e[4])?tmAt(x,e[4])[0]:TM[x][0]; return RBOOK==='mgr'?TM[x][1]:nm_+' ('+TM[x][1]+')'; };          // manager records: just the manager
     var pair=!d&&OVER[k]&&o;
     var main = d ? (RPOS==='ALL'&&d.p&&d.p!=='DEF'?(d.pd||d.p).replace(', ','/')+' ':'')+d.n : (pair ? TM[r][1]+(SYM[k]?' vs ':' over ')+TM[o][1] : tn(r));
     var st=yrOf(k)&&/^\\d+ starts?$/.test(e[7]||'') ? e[7] : '';
@@ -4576,7 +4656,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     if site is not None:
         import json as _json
         teams = {r: [site.TN(r), s.M[r]] for r in s.R}
-        pdata = ("<script>var TA=" + _json.dumps(site.ta_data(), separators=(",", ":")) + ";</script>" + open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "ta.js")).read() + "<script>var WKD=" + _json.dumps(site.week_data(), separators=(",", ":")) + ";var PD=" + _json.dumps(site.players_data(), separators=(",", ":")) + ";var TM=" + _json.dumps(teams, separators=(",", ":")) +
+        pdata = ("<script>var TA=" + _json.dumps(site.ta_data(), separators=(",", ":")) + ";</script>" + open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "ta.js")).read() + "<script>var WKD=" + _json.dumps(site.week_data(), separators=(",", ":")) + ";var PD=" + _json.dumps(site.players_data(), separators=(",", ":")) + ";var TM=" + _json.dumps(teams, separators=(",", ":")) + ";var TMW=" + _json.dumps(site.names_js(), separators=(",", ":")) +
                  ";var NG=" + _json.dumps({n["slug"]: "game/w%s-%s-%s" % ((lambda w, a, b: (w, min(a, b), max(a, b)))(*(int(x) for x in n["game"].split("-")))) for n in site.news_list() if n.get("kind") not in ("feature", "cover") and n.get("game")}, separators=(",", ":")) + ";var NFLN=" + _json.dumps({k: f"{NFL_CITY[k]} {NFL_NICK[k]}" for k in NFL_NICK if k in NFL_CITY}, separators=(",", ":")) + ";var NFLK=" + _json.dumps(NFL_NICK, separators=(",", ":")) + ";var OH=" + _json.dumps([[lab, ts, {str(r): [round(v[0], 4), round(v[1], 4), round(v[2], 4)] + ([round(v[3], 3)] if len(v) > 3 and v[3] is not None else []) for r, v in d.items()}] for lab, ts, d in site.oh_ext()], separators=(",", ":")) + ";var YR=" + _json.dumps(str(site.yr)) + ";var BY=" + _json.dumps({t: 0 for t in NFL_NICK} | {t: w for w, ts in s.byes.items() for t in ts}) + ";</script>")
         chrome = first[first.index("<body>") + 6:first.index("</div></div>", first.index('class="top"')) + 12]
         chrome = re.sub(r' aria-current=page', '', chrome)

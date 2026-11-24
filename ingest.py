@@ -357,4 +357,41 @@ if "users.json" in files and os.path.exists(f"{D}/league.txt"):
             fh.write("\n".join(hist) + "\n")
         print("renamed:", hist)
 
+# team logos: when a manager's Sleeper avatar changes, the old logo is kept in data/logos_old (listed in data/logo_history.txt,
+# used for his games before the change) and the new one becomes data/logos/{Manager}.png. data/logo_urls.txt remembers each avatar URL.
+avd = os.path.join(RAW, "avatars")
+if os.path.exists(os.path.join(avd, "urls.txt")) and os.path.exists(f"{D}/league.txt"):
+    import datetime as _dt, shutil
+    urls = dict(l.split(" ", 1) for l in open(os.path.join(avd, "urls.txt")).read().split("\n") if " " in l)
+    urls = {k: v.strip() for k, v in urls.items()}
+    mgr = {}
+    for l_ in open(f"{D}/league.txt"):
+        if l_.startswith("roster="):
+            f_ = l_.rstrip("\n").split("|"); mgr[f_[2]] = (f_[0].split("=")[1], f_[1])
+    known = {}
+    if os.path.exists(f"{D}/logo_urls.txt"):
+        for l_ in open(f"{D}/logo_urls.txt"):
+            if "|" in l_: u_, url_ = l_.rstrip("\n").split("|", 1); known[u_] = url_
+    first = not known; now_ = _dt.datetime.utcnow(); changed = []
+    for user, url in urls.items():
+        if user not in mgr: continue
+        r_, m_ = mgr[user]; img = os.path.join(avd, user + ".img")
+        if first or known.get(user) == url: known[user] = url; continue
+        if not os.path.exists(img): continue                 # changed, but the new image could not be downloaded: try again next update
+        try:
+            from PIL import Image
+            im = Image.open(img).convert("RGBA"); im.thumbnail((256, 256))
+        except Exception: continue
+        cur = f"{D}/logos/{m_}.png"
+        if os.path.exists(cur):
+            os.makedirs(f"{D}/logos_old", exist_ok=True); old_ = f"{m_}_{now_:%Y%m%d%H%M}.png"
+            shutil.copy(cur, f"{D}/logos_old/{old_}")
+            new_ = not os.path.exists(f"{D}/logo_history.txt")
+            with open(f"{D}/logo_history.txt", "a") as fh:
+                if new_: fh.write("# utc the logo was replaced|roster|old logo file in data/logos_old\n")
+                fh.write(f"{now_:%Y-%m-%dT%H:%MZ}|{r_}|{old_}\n")
+        im.save(cur); known[user] = url; changed.append(m_)
+    open(f"{D}/logo_urls.txt", "w").write("".join(f"{k}|{v}\n" for k, v in sorted(known.items())))
+    if changed: print("new logos:", changed)
+
 print("ingested:", {"stats": wk(r"stats_(\d+)\.json"), "proj": wk(r"proj_(\d+)\.json"), "matchups": mw, "tx": tw, "rosters": "rosters.json" in files, "players": "players.json" in files, "kicker_distance": kbonus})

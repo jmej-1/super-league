@@ -16,3 +16,12 @@ printf '%s\n' "${urls[@]}" | xargs -P 12 -L 1 sh -c 'curl -sS -f -m 60 --retry 2
 ls | wc -l
 # play-by-play for every game that has started (finished games are cached in DATA/pbp and not pulled again)
 if [ -n "$DATA" ]; then python3 -I "$HERE/pbp_fetch.py" "$OUT" "$DATA"; fi
+# team logos: each manager's league avatar (or account avatar). Optional: skipped quietly where Sleeper's image server is blocked.
+mkdir -p avatars
+python3 -I -c "
+import json
+for u in json.load(open('users.json')):
+    url = (u.get('metadata') or {}).get('avatar') or (('https://sleepercdn.com/avatars/' + u['avatar']) if u.get('avatar') else '')
+    if url: print(u['display_name'] + ' ' + url)
+" > avatars/urls.txt
+while read -r name url; do curl -sS -f -m 30 -o "avatars/$name.img" "$url" 2>/dev/null || rm -f "avatars/$name.img"; done < avatars/urls.txt
