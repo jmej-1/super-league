@@ -1462,6 +1462,8 @@ class Site:
             add("s_wins", s_.W0[r], rec, r, [r], u=u)
             add("s_pct", s_.W0[r] / n, pct(s_.W0[r] / n), r, [r], u=u, x=rec)            # same record = a shared record
             add("s_pctlo", -s_.W0[r] / n, pct(s_.W0[r] / n), r, [r], u=u, x=rec)
+            dd_ = [(w, x) for w in s.weeks for x in s_.dead_spots(w, r)]
+            if dd_: add("s_dead", len(dd_) + 1e-6 * len({w for w, _ in dd_}), str(len(dd_)), r, [r], u=u, x=f"in {len({w for w, _ in dd_})} week{'s' if len({w for w, _ in dd_}) != 1 else ''}: " + ", ".join(sorted({k for _, (_, k) in dd_})))
             add("s_pf", s_.PF[r], fp(s_.PF[r]), r, [r], u=u, x=f"{s_.PF[r] / n:.1f} a week")
             add("s_pflow", -s_.PF[r], fp(s_.PF[r]), r, [r], u=u, x=f"{s_.PF[r] / n:.1f} a week")
             add("s_pa", pa_, fp(pa_), r, [r], u=u, x=f"{pa_ / n:.1f} a week")
@@ -2878,6 +2880,14 @@ class Site:
         if k is None: return None
         prev = [d for ts, d in s_.inj_snaps() if ts < k and (k - ts).days < 6]
         return prev[-1].get(i, "") if prev else None
+    def dead_spots(s_, w, r):
+        """Lineup spots that could not score: left empty, a player on bye, or one who did not play. All the same to the manager."""
+        s = s_.s; out = []
+        for i, p in s.W[w][r]["S"]:
+            if i == "0": out.append((i, "empty"))
+            elif s_.team_at(w, i) in s.byes.get(w, []) or (not i.isdigit() and i in s.byes.get(w, [])): out.append((i, "bye"))
+            elif s_.dnp(w, i): out.append((i, "did not play"))
+        return out
     def dnp(s_, w, i):
         """Didn't play: on a team that played, but not one snap. Byes are their own thing."""
         s = s_.s
@@ -4405,7 +4415,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('.tip'); if(t&&t.closest('th.sortable,th.srt')){ tipEl.hidden=true; return; } if(t){ showTip(t,1); } else if(!(e.target.closest&&e.target.closest('.tipbox')&&!e.target.closest('.cx'))) tipEl.hidden=true; },true);
   window.addEventListener('scroll',function(){tipEl.hidden=true;},{passive:true}); window.addEventListener('hashchange',function(){tipEl.hidden=true;});
   var BOOK={team:[['Single game',[['g_high','Highest score'],['g_low','Lowest score'],['g_blow','Biggest blowout'],['g_close','Closest game'],['g_comb','Most combined points'],['g_hiloss','Highest score in a loss'],['g_lowin','Lowest score in a win'],['g_upset','Biggest upset'],['g_excite','Most exciting game'],['g_dull','Least exciting game'],['g_bench','Most points lost to start/sit']]],['Biggest comebacks',[['g_improb','Lowest win chance overcome'],['g_down','Biggest deficit overcome']]],
-      ['Season',[['s_pct','Best record'],['s_pctlo','Worst record'],['s_wins','Most wins'],['s_pf','Most points'],['s_pflow','Fewest points'],['s_pa','Most points against'],['s_xw','Most xWins'],['s_lucky','Luckiest'],['s_unlucky','Unluckiest'],['s_wstreak','Longest win streak'],['s_lstreak','Longest losing streak']],1]],
+      ['Season',[['s_pct','Best record'],['s_pctlo','Worst record'],['s_dead','Most dead lineup spots'],['s_wins','Most wins'],['s_pf','Most points'],['s_pflow','Fewest points'],['s_pa','Most points against'],['s_xw','Most xWins'],['s_lucky','Luckiest'],['s_unlucky','Unluckiest'],['s_wstreak','Longest win streak'],['s_lstreak','Longest losing streak']],1]],
     player:[['Single game',[['p_start','Most points'],['p_startlo','Fewest points'],['p_pm','Best PAA'],['p_pmlo','Worst PAA'],['p_war1','Most WAR'],['p_war1lo','Fewest WAR'],['p_bench','Most bench points']]],
       ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_wi','Most Win Impact'],['py_wilo','Least Win Impact'],['py_luck','Best supporting cast'],['py_unluck','Worst supporting cast'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
       ['Career',[['pc_pts','Most points'],['pc_ppg','Most points per game'],['pc_ptslo','Fewest points'],['pc_ppglo','Fewest points per game'],['pc_pm','Best PAA'],['pc_pmlo','Worst PAA'],['pc_war','Most WAR'],['pc_warlo','Fewest WAR'],['pc_wins','Most wins'],['pc_loss','Most losses'],['pc_wpct','Best win %'],['pc_wpctlo','Worst win %'],['pc_wi','Most Win Impact'],['pc_wilo','Least Win Impact'],['pc_luck','Best supporting cast'],['pc_unluck','Worst supporting cast'],['pc_gs','Most starts'],['pc_top','Most weeks as the #1 at his position'],['pc_ben','Most bench points'],['pc_benppg','Most bench points per week']],0,1]],
@@ -4691,6 +4701,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
             "Support": "Supporting cast: wins in his starts minus what his own play earned (0.5 a start plus his Win Impact). + means his teammates won games beyond what he gave them; - means he produced and his team lost anyway (Dak and Kittle territory). Not a knock on the player either way.",
             "Best supporting cast": "Wins in his starts minus what his own play earned (0.5 a start plus his Win Impact): how much his teammates won for him.",
             "Worst supporting cast": "Wins in his starts minus what his own play earned: the most he produced in games his team lost anyway.",
+            "Most dead lineup spots": "Starting spots that could not score: left empty, a player on bye, or a player who did not play. All the same thing to the manager.",
             "Best record": "Win % for the season. The same record is a shared record.",
             "Worst record": "Win % for the season. The same record is a shared record.",
             "PPG": "Points per game started, in Super League starting lineups.",

@@ -14,7 +14,7 @@ Week 11 will be remembered as the week the win-probability chart stopped meaning
 
 {t:7} beat {t:1} **107.86 to 107.60**, and it took until the last snap of the season's most dramatic Monday night.
 
-Harrison played the entire week with **two empty starting slots**, no tight end and no kicker. That cost him roughly 14 projected points before anyone kicked off and made him a 25.8% underdog. He has now left a starting slot empty in three of the last four weeks and is 2-1 in those games. Nobody else in the league has ever done it once.
+Harrison played the entire week with **two empty starting slots**, no tight end and no kicker. That cost him roughly 14 projected points before anyone kicked off and made him a 25.8% underdog. He has now left a starting slot empty in three of the last four weeks and is 2-1 in those games. An empty slot is no different from starting a guy on bye or ruled out, and by that count Harrison leads the league with 5 dead lineup spots. Nick is next with 3, including the Rams defense he started on their bye this week.
 
 It looked like it would finally catch up with him. Sammy led by 46 points at one stage, and It came down to {p:6770} vs. {p:11566}, LSU vs. LSU.
 
