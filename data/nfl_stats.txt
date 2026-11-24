@@ -1708,6 +1708,7 @@
 11|11539|fgm=1;fga=2;fgm_lng=56;xpm=4;xpa=4
 11|11560|pass_att=23;pass_cmp=15;pass_yd=181;pass_td=2;pass_int=1;rush_att=4;rush_yd=11
 11|11563|pass_att=35;pass_cmp=19;pass_yd=225;pass_td=1;pass_int=1;rush_att=6;rush_yd=5
+11|11566|pass_att=35;pass_cmp=23;pass_yd=289;rush_att=6;rush_yd=55
 11|11576|rush_att=16;rush_yd=75;rec_tgt=1;rec=1;rec_yd=9
 11|11584|rush_att=18;rush_yd=68;rush_td=1;rec_tgt=4;rec=3;rec_yd=32
 11|11620|rec_tgt=4;rec=4;rec_yd=45
@@ -1735,6 +1736,7 @@
 11|12526|rec_tgt=9;rec=6;rec_yd=71;rec_td=1
 11|12527|rush_att=11;rush_yd=79;rec_tgt=8;rec=5;rec_yd=90;rec_td=1
 11|12530|rush_att=1;rush_yd=9;rec_tgt=1;rec=1;rec_yd=3
+11|12533|rush_att=13;rush_yd=54;rush_td=1;rec_tgt=3;rec=2;rec_yd=23
 11|12534|rush_att=8;rush_yd=18;rec_tgt=1
 11|12545|pass_att=42;pass_cmp=25;pass_yd=222;pass_td=1;pass_int=1;rush_att=3;rush_yd=34
 11|13150|rec_tgt=5;rec=4;rec_yd=59
@@ -1751,6 +1753,7 @@
 11|1466|rec_tgt=7;rec=6;rec_yd=74;rec_td=2
 11|2020|fgm=2;fga=2;fgm_lng=41;xpm=1;xpa=2
 11|2216|rec_tgt=7;rec=6;rec_yd=109;rec_td=1
+11|2449|rec_tgt=6;rec=4;rec_yd=45
 11|2505|rec_tgt=3;rec=3;rec_yd=42
 11|3163|pass_att=28;pass_cmp=20;pass_yd=279;pass_td=2;rush_att=5;rush_yd=12
 11|3198|rush_att=13;rush_yd=94;rush_td=1;rec_tgt=5;rec=4;rec_yd=17;fum_lost=1
@@ -1759,12 +1762,14 @@
 11|4034|rush_att=12;rush_yd=49;rush_td=1;rec_tgt=3;rec=2;rec_yd=13
 11|4037|rec_tgt=3;rec=3;rec_yd=13
 11|4046|pass_att=39;pass_cmp=27;pass_yd=324;pass_td=3
+11|4147|rush_att=6;rush_yd=26;rec_tgt=4;rec=4;rec_yd=71
 11|4199|rush_att=8;rush_yd=30;rush_td=1;rec_tgt=1;rec=1;rec_yd=13
 11|4217|rec_tgt=3;rec=3;rec_yd=34;rec_td=2
 11|4227|fgm=2;fga=2;fgm_lng=44;xpm=4;xpa=4
 11|4866|rush_att=17;rush_yd=75;rush_td=1
 11|4983|rec_tgt=10;rec=8;rec_yd=91;rec_td=1
 11|4984|pass_att=45;pass_cmp=27;pass_yd=304;pass_td=1;pass_int=2
+11|4993|rec_tgt=6;rec=5;rec_yd=77
 11|5001|rec_tgt=1;rec=1;rec_yd=11
 11|5022|rec_tgt=1;rec=1;rec_yd=38
 11|5045|rec_tgt=2
@@ -1776,10 +1781,12 @@
 11|5967|rush_att=21;rush_yd=110;rec_tgt=1
 11|6083|fgm=1;fga=1;fgm_lng=28;xpm=3;xpa=3
 11|6650|xpm=3;xpa=3
+11|6770|pass_att=40;pass_cmp=28;pass_yd=300;pass_td=2;rush_att=2;rush_yd=-1
 11|6786|rec_tgt=12;rec=11;rec_yd=132;rec_td=1
 11|6790|rush_att=13;rush_yd=51;rec_tgt=2;rec=2;rec_yd=8;rec_td=1;fum_lost=1
 11|6794|rush_att=1;rush_yd=1;rec_tgt=9;rec=7;rec_yd=86;fum_lost=1
 11|6797|pass_att=21;pass_cmp=15;pass_yd=131;pass_td=2;rush_att=8;rush_yd=32;rush_td=1
+11|6801|rec_tgt=3;rec=2;rec_yd=43;rec_td=1
 11|6806|rush_att=1
 11|6813|rush_att=11;rush_yd=21;rec_tgt=5;rec=4;rec_yd=6
 11|7002|rec_tgt=1
@@ -1790,11 +1797,13 @@
 11|7526|rec_tgt=6;rec=3;rec_yd=61
 11|7543|rush_att=14;rush_yd=76;rec_tgt=1
 11|7547|rec_tgt=6;rec=5;rec_yd=37;rec_td=1
+11|7564|rec_tgt=9;rec=5;rec_yd=31
 11|7567|rush_att=4;rush_yd=16;rec_tgt=5;rec=4;rec_yd=43
 11|7569|rec_tgt=5;rec=3;rec_yd=58;rec_td=1
 11|7588|rush_att=18;rush_yd=67;rush_td=1;rec_tgt=3;rec=3;rec_yd=24;rec_td=1
 11|7594|rush_att=27;rush_yd=120;rush_td=2;rush_2pt=1
 11|7600|rush_att=1;rush_yd=1;rec_tgt=5;rec=5;rec_yd=39
+11|7839|fgm=2;fga=2;fgm_lng=56;xpm=2;xpa=2
 11|8130|rush_att=1;rush_yd=4;rec_tgt=14;rec=9;rec_yd=54
 11|8131|rec_tgt=3;rec=1;rec_yd=35
 11|8132|rush_att=7;rush_yd=23
@@ -1809,6 +1818,7 @@
 11|8259|fgm=1;fga=1;fgm_lng=52;xpm=3;xpa=3
 11|8408|rush_att=11;rush_yd=38;rec_tgt=1;rec=1;rec_yd=-1
 11|9221|rush_att=23;rush_yd=98;rush_td=2;rec_tgt=5;rec=4;rec_yd=20
+11|9224|rush_att=6;rush_yd=6;rec_tgt=8;rec=5;rec_yd=30
 11|9228|pass_att=30;pass_cmp=22;pass_yd=254;pass_td=2;pass_int=1;rush_att=2;rush_yd=-2
 11|9480|rec_tgt=3;rec=3;rec_yd=16
 11|9487|rec_tgt=17;rec=8;rec_yd=103
@@ -1820,6 +1830,7 @@
 11|BAL|sack=3;int=1;def_st_td=1;safe=1;pts_allow=35;yds_allow=378
 11|BUF|sack=2;int=1;pts_allow=9;yds_allow=185
 11|CHI|sack=6;int=1;fum_rec=1;safe=1;pts_allow=13;yds_allow=307
+11|CIN|sack=3;pts_allow=22;yds_allow=428
 11|DAL|sack=5;fum_rec=1;pts_allow=30;yds_allow=346
 11|DEN|sack=5;int=1;def_td=1;pts_allow=24;yds_allow=370
 11|DET|sack=4;pts_allow=21;yds_allow=274
@@ -1835,3 +1846,4 @@
 11|PIT|sack=3;pts_allow=19;yds_allow=214
 11|SF|sack=1;int=1;fum_rec=1;def_td=1;pts_allow=10;yds_allow=324
 11|TB|sack=1;pts_allow=31;yds_allow=386
+11|WAS|sack=3;pts_allow=20;yds_allow=312

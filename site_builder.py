@@ -696,6 +696,8 @@ def stamp():
     return "Updated " + t.strftime("%b %-d, %-I:%M %p")
 
 
+from pbp import WP_SD_SCALE as _WPSD
+
 class Site:
     def __init__(s_, s, T, TEAM, SIM, weeks_left, starts_pm, season_pm, logo_dir, proj):
         _nm = s.nm
@@ -916,6 +918,15 @@ class Site:
         """Record now, or going into a game (upto = the week before it)."""
         if upto is not None and upto < 1: return "0-0"
         return s_.s.rec(r, upto)
+    def sigm(s_):
+        """Spread of a game's margin this season: how far one player's PAA can move a win."""
+        if not hasattr(s_, "_sigm"):
+            s = s_.s; mg = [s.G[w]["scores"][a] - s.G[w]["scores"][b] for w in s.weeks for a, b in s.G[w]["pairs"]]
+            s_._sigm = math.sqrt(sum(v * v for v in mg) / max(1, len(mg))) or 30.0
+        return s_._sigm
+    def wi(s_, pm):
+        """Win Impact of one start: the win chance his PAA alone gives an otherwise average lineup, minus 50%."""
+        return float(norm.cdf(pm / s_.sigm())) - 0.5
     def xrec(s_, r): return f"{s_.xw[r]:.1f}-{s_.n - s_.xw[r]:.1f}"
 
     # ---- projections
@@ -1387,7 +1398,8 @@ class Site:
             pa_ = sum(s.G[w]["scores"][(lambda g: g[0] if g[1] == r else g[1])(s_.game_of[(w, r)])] for w in s.weeks)
             lk = s_.W0[r] - s_.xw[r]; u = s_.turl(r, "") + f"#{yr}"; rec = s_.rec_str(r)
             add("s_wins", s_.W0[r], rec, r, [r], u=u)
-            add("s_pct", s_.W0[r] / n, pct(s_.W0[r] / n), r, [r], u=u, x=rec)
+            add("s_pct", s_.W0[r] / n, pct(s_.W0[r] / n), r, [r], u=u, x=rec)            # same record = a shared record
+            add("s_pctlo", -s_.W0[r] / n, pct(s_.W0[r] / n), r, [r], u=u, x=rec)
             add("s_pf", s_.PF[r], fp(s_.PF[r]), r, [r], u=u, x=f"{s_.PF[r] / n:.1f} a week")
             add("s_pflow", -s_.PF[r], fp(s_.PF[r]), r, [r], u=u, x=f"{s_.PF[r] / n:.1f} a week")
             add("s_pa", pa_, fp(pa_), r, [r], u=u, x=f"{pa_ / n:.1f} a week")
@@ -1413,9 +1425,10 @@ class Site:
                     elif i != "0" and p == best.get(s.pos(i), (-1e9, []))[0]: best[s.pos(i)][1].append((i, r))
             for _, (p, who_) in best.items():
                 for i, r in who_: top[i][r] += 1
-        new = lambda: dict(pts=0.0, war=0.0, g=0, pm=0.0, wins=0, ben=0.0, by=Counter(), nfl=Counter(), seq=[])
+        new = lambda: dict(pts=0.0, war=0.0, g=0, pm=0.0, wins=0, xw=0.0, ben=0.0, by=Counter(), nfl=Counter(), seq=[])
         agg_t = defaultdict(new); agg_p = defaultdict(new)
         for w in s.weeks:
+            scw = s.G[w]["scores"]
             for r, d in s.W[w].items():
                 a, b = s_.game_of[(w, r)]; o = b if r == a else a; won = s.G[w]["scores"][r] > s.G[w]["scores"][o]
                 for i, p in d["S"]:
@@ -1429,7 +1442,7 @@ class Site:
                         add(f"p_pmlo_{P}", -pm, f"{pm:+.1f}", r, [r], p=i, o=o, w=w, u=G_(w, a, b), x=f"{fp(p)} pts")
                         add(f"p_war1lo_{P}", -wv, f"{wv:+.2f}", r, [r], p=i, o=o, w=w, u=G_(w, a, b), x=f"{fp(p)} pts")
                     for X in (agg_t[(i, r)], agg_p[i]):
-                        X["pts"] += p; X["war"] += wv; X["g"] += 1; X["pm"] += pm; X["wins"] += won; X["by"][r] += 1; X["nfl"][s_.team_at(w, i)] += max(p, 0) + 1e-3; X["seq"].append(s_.team_at(w, i))
+                        X["pts"] += p; X["war"] += wv; X["g"] += 1; X["pm"] += pm; X["wins"] += won; X["xw"] += 0.5 + s_.wi(pm); X["by"][r] += 1; X["nfl"][s_.team_at(w, i)] += max(p, 0) + 1e-3; X["seq"].append(s_.team_at(w, i))
                 irs_ = set(getattr(s, "reserve_wk", {}).get(w, {}).get(r, []))
                 for i, p in d["B"]:
                     if i == "0": continue
@@ -1479,9 +1492,13 @@ class Site:
                         if g_ >= 4:
                             A("ppg", pts_ / g_ + gp * 1e-2, fp(pts_ / g_), f"{g_} starts"); A("ppglo", -pts_ / g_ + gp * 1e-2, fp(pts_ / g_), f"{g_} starts")
                             A("ptslo", -pts_ + gp, fp(pts_), f"{g_} starts"); A("pmlo", -X["pm"] + gp, f"{X['pm']:+.1f}", f"{g_} starts"); A("warlo", -X["war"] + gp, f"{X['war']:+.2f}", f"{g_} starts")
-                        if gw_ >= 4:
+                        if gw_:                         # no minimum: ties go to more starts
                             A("wpct", X["wins"] / gw_ + gw_ * 1e-6, pct(X["wins"] / gw_), f"{X['wins']}-{gw_ - X['wins']}")
                             A("wpctlo", -X["wins"] / gw_ + gw_ * 1e-6, pct(X["wins"] / gw_), f"{X['wins']}-{gw_ - X['wins']}")
+                            lk_ = X["wins"] - X["xw"]; lx_ = f"{wl_} in his starts, {X['xw']:.1f} from his own play"
+                            A("luck", lk_ - gp, f"{lk_:+.1f}", lx_); A("unluck", -lk_ - gp, f"{lk_:+.1f}", lx_)
+                        wi_ = X["xw"] - 0.5 * gw_ if gw_ else 0.0
+                        if gw_: A("wi", wi_ - gp, f"{wi_:+.2f}", f"{gw_} starts"); A("wilo", -wi_ - gp, f"{wi_:+.2f}", f"{gw_} starts")
                         if n1: A("top", n1 - g_ * 1e-4, str(n1), f"of {g_} starts")          # ties: fewer starts wins (a higher rate)
                     bn_ = X.get("bn", 0)
                     if X["ben"] > 0: A("ben", X["ben"] - bn_ * 1e-6, fp(X["ben"]), f"{bn_} week{'' if bn_ == 1 else 's'} on the bench", sq="bseq")
@@ -1957,10 +1974,10 @@ class Site:
             return (f'<tr data-id="{i}" data-q="{q}" data-pos="{d["p"]}" data-own="{1 if d["o"] else 0}">'
                     f'<td data-v="{E(d["n"].lower())}"><a class="pn" href="player/{i}.html"><b>{E(d["n"])}</b></a></td>{cell(d["p"], E(d["pd"].replace(", ", "/")), "c")}{cell(d["t"], s_.nl(d["t"]), "c")}'
                     f'{cell(E(s_.TN(d["o"]).lower()) if d["o"] else "zzz", s_.tn(d["o"], pre) if d["o"] else "<span class=muted>FA</span>", "")}'
-                    f'{cell(st[0], st[0])}{cell(rkey, f"{wn}-{ls}" if wn + ls else "-", "c", na=not (wn + ls))}{cell(st[1], fp(st[1]), "r big")}{cell(st[7], fp(st[7]) if st[7] else "-", na=not st[7])}{cell(st[8], fp(st[8]) if st[8] else "-", na=not st[8])}{cell(st[9], fp(st[9]) if st[9] else "-", na=not st[9])}{cell(st[10], f"+{st[10]:.1f}" if st[10] else "-", na=not st[10])}{cell(round(per, 2), fp(round(per, 2)) if st[0] else "-", na=not st[0])}{cell(st[3], f"{st[3]:+.2f}" if st[0] else "-", na=not st[0])}{cell(st[4], f"{st[4]:+.1f}" if st[0] else "-", na=not st[0])}{cell(round(st[4] / st[0], 2) if st[0] else 0, f"{st[4] / st[0]:+.1f}" if st[0] else "-", na=not st[0])}{cell(MC_[0][i], MC_[0][i] or "-")}{cell(MC_[2][i], MC_[2][i] or "-")}'
+                    f'{cell(st[0], st[0])}{cell(rkey, f"{wn}-{ls}" if wn + ls else "-", "c", na=not (wn + ls))}{cell(st[1], fp(st[1]), "r big")}{cell(st[7], fp(st[7]) if st[7] else "-", na=not st[7])}{cell(st[8], fp(st[8]) if st[8] else "-", na=not st[8])}{cell(st[9], fp(st[9]) if st[9] else "-", na=not st[9])}{cell(st[10], f"+{st[10]:.1f}" if st[10] else "-", na=not st[10])}{cell(round(per, 2), fp(round(per, 2)) if st[0] else "-", na=not st[0])}{cell(st[3], f"{st[3]:+.2f}" if st[0] else "-", na=not st[0])}{cell(st[4], f"{st[4]:+.1f}" if st[0] else "-", na=not st[0])}{cell(round(st[4] / st[0], 2) if st[0] else 0, f"{st[4] / st[0]:+.1f}" if st[0] else "-", na=not st[0])}{cell(st[12], f"{st[12]:+.2f}" if wn + ls else "-", na=not (wn + ls))}{cell(st[13], f"{st[13]:+.1f}" if wn + ls else "-", na=not (wn + ls))}{cell(MC_[0][i], MC_[0][i] or "-")}{cell(MC_[2][i], MC_[2][i] or "-")}'
                     f'{cell(-pick, f"{dd[0]}.{dd[1]:02d}" if dd else "-", na=not dd)}{cell(d["wr"], d["wr"])}{cell(len(S_["irw"]), len(S_["irw"]) or "-")}</tr>')
         prow = "".join(prow_(i, d) for i, d in plist)
-        heads = [("Player", "s"), ("Pos", "s"), ("NFL", "s"), ("Current team", "s"), ("Starts", "n"), ("Record", "n"), ("Pts started", "n"), ("Total pts", "n"), ("Bench pts", "n"), ("FA pts", "n"), ("Left on bench", "n"), ("PPG", "n"), ("WAR", "n"), ("PAA", "n"), ("PAA/start", "n"), ("Week MVPs", "n"), ("Game MVPs", "n"), ("Drafted", "n"), ("Wks rostered", "n"), ("Wks on IR", "n")]
+        heads = [("Player", "s"), ("Pos", "s"), ("NFL", "s"), ("Current team", "s"), ("Starts", "n"), ("Record", "n"), ("Pts started", "n"), ("Total pts", "n"), ("Bench pts", "n"), ("FA pts", "n"), ("Left on bench", "n"), ("PPG", "n"), ("WAR", "n"), ("PAA", "n"), ("PAA/start", "n"), ("Win Impact", "n"), ("Support", "n"), ("Week MVPs", "n"), ("Game MVPs", "n"), ("Drafted", "n"), ("Wks rostered", "n"), ("Wks on IR", "n")]
         thead = "".join(f'<th class="{"" if k in (0, 3) else "c" if k in (1, 2, 5) else "r"} sortable"{" aria-sort=descending" if k == 6 else ""} data-k="{k}" data-t="{t}" tabindex="0" role="button">{h}</th>' for k, (h, t) in enumerate(heads))
         filt = ('<div class="pfilt"><div class="chips">' + "".join(f'<a href="#" class="pf{" nx" if p_ == "All" else ""}" data-pos="{p_}">{p_}</a>' for p_ in ["All", "QB", "RB", "WR", "TE", "K", "DEF"]) + '</div>'
                 '<select class="pown" aria-label="Roster status"><option value="all">Everyone</option><option value="1">On a roster</option><option value="0">Free agents</option></select></div>')
@@ -2463,7 +2480,7 @@ class Site:
                 t = team(i); locked = (t not in kick) or (g is not None and kick[t] <= g)
                 if locked: mu += act if t in kick else 0.0
                 else: mu += pj; var += (cv.get(s.pos(i), 0.6) * pj) ** 2
-            return mu, math.sqrt(var) * corr
+            return mu, math.sqrt(var) * corr * (_WPSD if g is not None else 1.0)
         def p_of(g):
             (ma, sa), (mb, sb) = state(A, g), state(B, g)
             if sa + sb == 0: return 1.0 if ma > mb else (0.0 if mb > ma else 0.5)
@@ -2490,7 +2507,7 @@ class Site:
                             if t not in kick: continue
                             if kick[t] <= g2: mu += act if fin[t] else pj
                             else: mu += pj; var += (cv.get(s.pos(i), 0.6) * pj) ** 2
-                        return mu, math.sqrt(var) * corr
+                        return mu, math.sqrt(var) * corr * _WPSD
                     (ma, sa), (mb, sb) = st2(A), st2(B)
                     pf = (1.0 if ma > mb else 0.0 if mb > ma else 0.5) if sa + sb == 0 else float(norm.cdf((ma - mb) / math.hypot(sa, sb)))
                     lk = lambda X: sum((act if fin[t] else pj) for i, act, pj in X for t in [team(i)] if t in kick and kick[t] <= g2)
@@ -3051,6 +3068,7 @@ class Site:
         for r_ in getattr(s, "livewp", []) or []:
             if int(r_[1]) != w or {int(r_[2]), int(r_[3])} != {a, b}: continue
             tm = pe(r_[0]); p = float(r_[4]); fl = int(r_[2]) == a
+            if done and any(kk <= tm < kk + datetime.timedelta(hours=3.5) for kk in kick.values()): continue   # finished week: mid-game snapshots were the live model of the day; the play-by-play redo is better
             sa_, sb_ = (float(r_[5]), float(r_[6])) if fl else (float(r_[6]), float(r_[5]))
             anc.append((tm, p if fl else 1 - p, sa_, sb_, f"Update, {tm.strftime('%a %-I:%M %p')}"))
         anc.sort()
@@ -3550,7 +3568,8 @@ class Site:
                            round(pts - s.pos_median(w)[s.pos(i)], 2) if started and pts is not None and s.pos(i) in s.pos_median(w) else None,
                            s_.wk_rank(w, i) if pts is not None else None, s_.st_rank(w, i) if started and pts is not None else None,
                            1 if i in s.NP.get(w, {}) else 0, INJ_SHORT.get(s_.gday_inj(w, i) or "", s_.gday_inj(w, i) or ""), s_.team_at(w, i) if i.isdigit() else i,
-                           s_.bench_gain(w, r_on).get(i) if (r_on and not started) else None])
+                           s_.bench_gain(w, r_on).get(i) if (r_on and not started) else None,
+                           round(s_.wi(pts - s.pos_median(w)[s.pos(i)]), 3) if started and pts is not None and s.pos(i) in s.pos_median(w) else None])
             LW = s.nxt
             PM_ = s_.prov_median(s) if hasattr(s_, "prov_median") else {}
             if s_.wk_live(LW):          # the week in progress: a start counts once his NFL game is final (PAA against a stand-in median until the week ends); W-L waits
@@ -3565,7 +3584,8 @@ class Site:
                 if r_on and not started and (t_ in (s.LIVE or {}).get("done", ())): fin = 1        # benched and his game is over: that week on the bench is locked too
                 wk.append([LW, r_on, started, pts, opp_of.get((LW, r_on), 0) if r_on else 0, s_.stat_short(LW, i) if fin else "", None, 1 if t_ in s.byes.get(LW, []) else 0, 2 if fin else 1,
                            round((pts - s.repl["val"].at(LW, s.pos(i))) * s.wpp, 3) if started and fin and pts is not None and s.pos(i) in s.repl["val"] else None,
-                           round(pts - PM_[s.pos(i)], 2) if started and fin and pts is not None and s.pos(i) in PM_ else None, s_.wk_rank(LW, i) if fin and pts is not None else None, None, 1, "", t_])
+                           round(pts - PM_[s.pos(i)], 2) if started and fin and pts is not None and s.pos(i) in PM_ else None, s_.wk_rank(LW, i) if fin and pts is not None else None, None, 1, "", t_, None,
+                           round(s_.wi(pts - PM_[s.pos(i)]), 3) if started and fin and pts is not None and s.pos(i) in PM_ else None])
             st_ = [x for x in wk if x[2] and x[3] is not None and x[8] != 1]; var = sum((x[3] or 0) - R.at(x[0], s.pos(i)) for x in st_)
             dx = dmap.get(i)
             P_ = s.PL.get(i, {})
@@ -3577,7 +3597,9 @@ class Site:
                               d=[dx["rd"], dx["slot"], dx["r"], round(dx["gap"], 2), s_.now_str(dx)] if dx else None,
                               w=wk, irw=[w for w in sorted(getattr(s, "reserve_wk", {})) if any(i in v for v in s.reserve_wk[w].values())], nt=[t for t in dict.fromkeys(s_.team_at(x[0], i) for x in wk) if t in NFL_NICK],
                               x=([[0, dx["r"], "+", "Draft", f'{dx["rd"]}.{dx["slot"]:02d}']] if dx else []) + tx.get(i, []), m=[[a["w"], a["mvp"][1]] for a in s.awards if a["mvp"][0] == i],
-                              s=[len(st_), round(sum(x[3] or 0 for x in st_), 2), round(var), round(var * wpp, 2), round(tot.get(i, 0), 1), mvp_rank.get(i, 0), wk_mvps.get(i, 0)] + s_.split_pts(wk, i))})
+                              s=[len(st_), round(sum(x[3] or 0 for x in st_), 2), round(var), round(var * wpp, 2), round(tot.get(i, 0), 1), mvp_rank.get(i, 0), wk_mvps.get(i, 0)] + s_.split_pts(wk, i)
+                                + [round(sum(x[17] or 0 for x in wk if x[2] and x[6] is not None), 3),
+                                   round(sum((x[6] or 0) - 0.5 - (x[17] or 0) for x in wk if x[2] and x[6] is not None), 3)])})
         # jersey badge snapshot per season (NFL team + number), so an old season keeps the look it had even after a trade or rebrand
         snp = os.path.join(getattr(s, "ddir", "data"), "badge_snap.txt"); keep = {}
         if os.path.exists(snp):
@@ -3989,13 +4011,13 @@ def bundle(files, s, logo_dir, font_dir, site=None):
       // two stints with the same manager are one row, as if the weeks were back to back
       var mg={}; runs=runs.filter(function(u){ var m=mg[u.r]; if(!m){ mg[u.r]=u; return true; } m.ws=m.ws.concat(u.ws); m.b=u.b; u.nts.forEach(function(n){ if(m.nts.indexOf(n)<0) m.nts.push(n); }); return false; });
       if(!runs.length) return; any=true;
-      var agg=function(ws){ var st=ws.filter(function(x){return x[2]&&x[8]!==1;}), o={wk:ws.length,gs:st.length,pts:0,war:0,edge:0,w:0,l:0};
-        st.forEach(function(x){ o.pts+=x[3]||0; o.war+=x[9]||0; o.edge+=x[10]||0; if(x[6]===1) o.w++; else if(x[6]===0) o.l++; }); return o; };
+      var agg=function(ws){ var st=ws.filter(function(x){return x[2]&&x[8]!==1;}), o={wk:ws.length,gs:st.length,pts:0,war:0,edge:0,wi:0,w:0,l:0};
+        st.forEach(function(x){ o.pts+=x[3]||0; o.war+=x[9]||0; o.edge+=x[10]||0; o.wi+=x[17]||0; if(x[6]===1) o.w++; else if(x[6]===0) o.l++; }); return o; };
       var X=pstats(d,y), M_=function(v,txt,k){ return mark(v,txt,k,y,d.p,FL); };
       var cells=function(o,top){ var c=function(v,txt,k){ return top?M_(v,txt,k):txt; };
         return '<td class="r">'+o.wk+'</td><td class="r">'+c(X.gs,o.gs,'gs')+'</td><td class="c">'+(o.w+o.l?c(X.w,o.w+'-'+o.l,'w'):'-')+'</td>'
         +'<td class="r">'+c(X.pts,fpt(o.pts),'pts')+'</td><td class="r">'+(o.gs?c(X.ppg,fpt(o.pts/o.gs),'ppg'):'-')+'</td>'
-        +'<td class="r '+(o.war>0.005?'pos':o.war<-0.005?'neg':'')+'">'+c(X.war,sgn(o.war.toFixed(2)),'war')+'</td><td class="r '+(o.edge>0.05?'pos':o.edge<-0.05?'neg':'')+'">'+c(X.edge,sgn(o.edge.toFixed(1)),'edge')+'</td>'; };
+        +'<td class="r '+(o.war>0.005?'pos':o.war<-0.005?'neg':'')+'">'+c(X.war,sgn(o.war.toFixed(2)),'war')+'</td><td class="r '+(o.edge>0.05?'pos':o.edge<-0.05?'neg':'')+'">'+c(X.edge,sgn(o.edge.toFixed(1)),'edge')+'</td><td class="r '+(o.wi>0.005?'pos':o.wi<-0.005?'neg':'')+'">'+(o.gs?sgn(o.wi.toFixed(2)):'-')+'</td>'; };
       var lg=function(L){ return L.map(function(t){ return '<a href="#/nfl/'+t+'" title="'+t+'"><i class="nfl nflm N'+t+'"></i></a>'; }).join(''); };
       var tnl=function(r){ return '<a class="tn" href="#/team/'+TM[r][1]+'"><i class="im lgs L'+r+'"></i><b><span class="nmf">'+esc(TM[r][0])+'</span><span class="nms">'+esc(TM[r][1])+'</span></b></a>'; };
       var yl=ys.length>1?'<a class="go" href="#/player/'+id+'/'+y+'">'+y+'</a>':y;
@@ -4005,7 +4027,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
       else { var u=runs[0]; body+='<tr class="sttot"><td>'+yl+'</td><td>'+tnl(u.r)+'</td><td class="c">'+lg(u.nts)+'</td>'+cells(agg(u.ws),1)+'</tr>'; }
     });
     var key=(FL.b||FL.i?'<div class="zkey" style="margin-top:8px">'+(FL.b?'<span><b class="ldr">Bold</b> led the league</span>':'')+(FL.i?'<span><i class="ldp">Italic</i> led all '+esc(d.p)+'s</span>':'')+'</div>':'');
-    return any?'<section><h2>'+(car?'By season':'Season')+'</h2><div class="scroll"><table class="stint" style="min-width:0"><thead><tr><th>Year</th><th>Team</th><th class="c">NFL</th><th class="r">Wks</th><th class="r">GS</th><th class="c">Record</th><th class="r">Pts</th><th class="r">PPG</th><th class="r">WAR</th><th class="r">PAA</th></tr></thead><tbody>'+body+'</tbody></table></div>'+key+'</section>':'';
+    return any?'<section><h2>'+(car?'By season':'Season')+'</h2><div class="scroll"><table class="stint" style="min-width:0"><thead><tr><th>Year</th><th>Team</th><th class="c">NFL</th><th class="r">Wks</th><th class="r">GS</th><th class="c">Record</th><th class="r">Pts</th><th class="r">PPG</th><th class="r">WAR</th><th class="r">PAA</th><th class="r">Win Impact</th></tr></thead><tbody>'+body+'</tbody></table></div>'+key+'</section>':'';
   }
   document.addEventListener('click',function(e){ var r=e.target.closest&&e.target.closest('tr.sty'); if(!r) return; var b=r.parentNode; b.classList.toggle('open'); r.setAttribute('aria-expanded',b.classList.contains('open')); }, true);
   document.addEventListener('keydown',function(e){ if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('sty')){ e.preventDefault(); e.target.click(); } });
@@ -4110,6 +4132,31 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     var me=war(d); if(me===null) return null; var r=1;
     Object.keys(PD).forEach(function(i){ var x=PD[i]; if(i===id||(!all&&x.p!==d.p)) return; var v=war(x); if(v!==null&&Math.round(v*100)>Math.round(me*100)) r++; });
     return all?r:d.p+r; }
+  function gameRecords(pg){       // a game page: every record (top 3, all-time) set in this game, from the Record Book's own data
+    var rp=document.querySelector('.pg[data-p="records"]'); if(!rp||typeof BOOK==='undefined') return '';
+    var u=pg.getAttribute('data-p')+'.html', D=recData(rp).L, X=D.all==='='?D[Object.keys(D).filter(function(k){return k!=='all';})[0]]:D.all, rows=[], ord=0;
+    var nth=function(n){ return n===1?'Record':n===2?'2nd all-time':'3rd all-time'; };
+    var scan=function(book,isP){ BOOK[book].forEach(function(g){ if(g[0]!=='Single game'&&g[0]!=='Biggest comebacks') return; g[1].forEach(function(c){
+      var keys=isP?['ALL','QB','RB','WR','TE','K','DEF']:[''], got={};
+      keys.forEach(function(ps){ var L=X[c[0]+(isP?'_'+ps:'')]; if(!L) return;
+        L.forEach(function(e,ix){ if(e[6]!==u) return; var id=(isP?e[2]:e[1])+'|'+c[0]; if(got[id]) return;
+          var first=0; while(first<L.length&&tv(L[first])!==tv(e)) first++; var rk=first+1; if(rk>3) return;
+          var shared=L.filter(function(x){return tv(x)===tv(e);}).length>1, d=isP&&PD[e[2]], lab=isP&&ps!=='ALL'?c[1].replace('the #1 at his position','the #1 '+ps)+' by a '+ps:c[1];
+          if(isP&&ps!=='ALL'&&rk>1) return;
+          got[id]=1;
+          var who=isP?(d?d.n:'')+' ('+TM[e[1]][1]+')':(OVER[c[0]]&&e[3]?TM[e[1]][1]+(SYM[c[0]]?' vs ':' over ')+TM[e[3]][1]:TM[e[1]][1]);
+          rows.push({rk:rk, o:ord++, h:'<a class="hrr" href="#/records/'+book+'/'+c[0]+(isP?'_'+ps:'')+'"><span class="hrn"><b>'+esc(lab)+'</b><small>'+esc(who)+', '+nth(rk)+(shared?'<i class="hrtie">Shared</i>':'')+'</small></span><span class="hrv">'+esc(e[0])+'</span></a>'}); }); }); }); }); };
+    scan('team',false); scan('player',true);
+    if(!rows.length) return '';
+    rows.sort(function(a,b){ return (a.rk-b.rk)||(a.o-b.o); });
+    var n1=rows.filter(function(r){return r.rk===1;}).length;
+    return '<section class="hrsec grec"><h2>Records from this game</h2><div class="hrstrip"><div><b>'+n1+'</b><span>Records set</span></div><div><b>'+(rows.length-n1)+'</b><span>Top 3 all-time</span></div></div><div class="hrl">'+rows.map(function(r){return r.h;}).join('')+'</div></section>';
+  }
+  function addGameRecords(){ var h=location.hash.replace(/^#\\//,''); if(!/^game\\/w\\d+-\\d+-\\d+$/.test(h)) return;
+    var pg=document.querySelector('.pg[data-p="'+h+'"]'); if(!pg||pg._gr) return; pg._gr=1;
+    var x=gameRecords(pg); if(!x) return; var f=pg.querySelector('footer'), box=document.createElement('div'); box.innerHTML=x;
+    var sec=box.firstChild; if(f&&f.parentNode) f.parentNode.insertBefore(sec,f); else pg.appendChild(sec); }
+  window.addEventListener('hashchange',function(){ setTimeout(addGameRecords,30); }); setTimeout(addGameRecords,80);
   function heldRecords(id,d,yr){
     var pg=document.querySelector('.pg[data-p="records"]'); if(!pg) return '';
     var D=recData(pg).L, X=D.all==='='?D[Object.keys(D).filter(function(k){return k!=='all';})[0]]:D.all;
@@ -4278,10 +4325,10 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('.tip'); if(t&&t.closest('th.sortable,th.srt')){ tipEl.hidden=true; return; } if(t){ showTip(t,1); } else if(!(e.target.closest&&e.target.closest('.tipbox')&&!e.target.closest('.cx'))) tipEl.hidden=true; },true);
   window.addEventListener('scroll',function(){tipEl.hidden=true;},{passive:true}); window.addEventListener('hashchange',function(){tipEl.hidden=true;});
   var BOOK={team:[['Single game',[['g_high','Highest score'],['g_low','Lowest score'],['g_blow','Biggest blowout'],['g_close','Closest game'],['g_comb','Most combined points'],['g_hiloss','Highest score in a loss'],['g_lowin','Lowest score in a win'],['g_upset','Biggest upset'],['g_excite','Most exciting game'],['g_dull','Least exciting game'],['g_bench','Most points lost to start/sit']]],['Biggest comebacks',[['g_improb','Lowest win chance overcome'],['g_down','Biggest deficit overcome']]],
-      ['Season',[['s_wins','Most wins'],['s_pf','Most points'],['s_pflow','Fewest points'],['s_pa','Most points against'],['s_xw','Most xWins'],['s_lucky','Luckiest'],['s_unlucky','Unluckiest'],['s_wstreak','Longest win streak'],['s_lstreak','Longest losing streak']],1]],
+      ['Season',[['s_pct','Best record'],['s_pctlo','Worst record'],['s_wins','Most wins'],['s_pf','Most points'],['s_pflow','Fewest points'],['s_pa','Most points against'],['s_xw','Most xWins'],['s_lucky','Luckiest'],['s_unlucky','Unluckiest'],['s_wstreak','Longest win streak'],['s_lstreak','Longest losing streak']],1]],
     player:[['Single game',[['p_start','Most points'],['p_startlo','Fewest points'],['p_pm','Best PAA'],['p_pmlo','Worst PAA'],['p_war1','Most WAR'],['p_war1lo','Fewest WAR'],['p_bench','Most bench points']]],
-      ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
-      ['Career',[['pc_pts','Most points'],['pc_ppg','Most points per game'],['pc_ptslo','Fewest points'],['pc_ppglo','Fewest points per game'],['pc_pm','Best PAA'],['pc_pmlo','Worst PAA'],['pc_war','Most WAR'],['pc_warlo','Fewest WAR'],['pc_wins','Most wins'],['pc_loss','Most losses'],['pc_wpct','Best win %'],['pc_wpctlo','Worst win %'],['pc_gs','Most starts'],['pc_top','Most weeks as the #1 at his position'],['pc_ben','Most bench points'],['pc_benppg','Most bench points per week']],0,1]],
+      ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_wi','Most Win Impact'],['py_wilo','Least Win Impact'],['py_luck','Best supporting cast'],['py_unluck','Worst supporting cast'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
+      ['Career',[['pc_pts','Most points'],['pc_ppg','Most points per game'],['pc_ptslo','Fewest points'],['pc_ppglo','Fewest points per game'],['pc_pm','Best PAA'],['pc_pmlo','Worst PAA'],['pc_war','Most WAR'],['pc_warlo','Fewest WAR'],['pc_wins','Most wins'],['pc_loss','Most losses'],['pc_wpct','Best win %'],['pc_wpctlo','Worst win %'],['pc_wi','Most Win Impact'],['pc_wilo','Least Win Impact'],['pc_luck','Best supporting cast'],['pc_unluck','Worst supporting cast'],['pc_gs','Most starts'],['pc_top','Most weeks as the #1 at his position'],['pc_ben','Most bench points'],['pc_benppg','Most bench points per week']],0,1]],
     mgr:[['Single week or move',[['l_add1','Most gut-call wins added'],['m_besttrade','Most wins gained in a trade'],['m_heist','Most lopsided trade'],['m_pick','Best pickup'],['m_drop','Worst drop']]],
       ['Season',[['m_total','Most total wins added'],['l_add','Most gut-call wins added'],['m_gm','Best GM'],['m_eff','Most efficient GM'],['m_trader','Best trader'],['m_treff','Most efficient trader'],['m_waiver','Best waiver work'],['m_wveff','Most efficient waiver work'],['m_dropcost','Costliest drops'],['m_draft','Best draft'],['l_eff','Best lineup efficiency'],['l_bench','Most points lost to start/sit'],['l_over','Most points over projection'],['w_high','Most weekly high scores'],['w_low','Most weekly low scores'],['w_mvp','Most weekly MVPs'],['m_trades','Most trades'],['m_moves','Most waiver and free-agent moves'],['m_allmv','Most total moves']],1],
       ['All-time',[['f_pct','Best win %'],['c_m_total','Most total wins added'],['c_l_add','Most gut-call wins added'],['c_m_gm','Best GM'],['c_m_eff','Most efficient GM'],['c_m_trader','Best trader'],['c_m_treff','Most efficient trader'],['c_m_waiver','Best waiver work'],['c_m_wveff','Most efficient waiver work'],['c_m_dropcost','Costliest drops'],['c_m_draft','Best drafter'],['c_l_eff','Best lineup efficiency'],['c_l_bench','Most points lost to start/sit'],['c_l_over','Most points over projection'],['c_w_high','Most weekly high scores'],['c_w_low','Most weekly low scores'],['c_w_mvp','Most weekly MVPs'],['c_m_trades','Most trades'],['c_m_moves','Most waiver and free-agent moves'],['c_m_allmv','Most total moves']],1,1]]};
@@ -4557,11 +4604,19 @@ def bundle(files, s, logo_dir, font_dir, site=None):
             "Best pickup": "Wins one pickup added: the team's best lineup with him minus with a replacement-level free agent instead, every week until he was let go.",
             "Worst drop": "Wins one cut cost: the team's best lineup with the cut minus without it (keeping him, minus its least useful bench player), every week until he came back.",
             "Best waiver work": "Wins added by every waiver and free-agent move (adds and drops together), each graded like a trade: best lineup with the move minus without it.",
-            "Best win %": "His fantasy team's record in weeks he started. At least 4 starts.",
+            "Best win %": "His fantasy team's record in weeks he started. No minimum; ties go to the player with more starts.",
+            "Win Impact": "How much his own play moved the odds of his team winning, in wins. Each start: the win chance his PAA alone gives an otherwise average lineup, minus 50%. An average game is 0, a +20 PAA game about +0.22, a dud about -0.15. Added up over his starts. Big games count less than a straight point total would, because one player can only swing a game so far.",
+            "Most Win Impact": "Win Impact added up over his starts: how much his own play moved the odds of his teams winning, in wins.",
+            "Least Win Impact": "Win Impact added up over his starts.",
+            "Support": "Supporting cast: wins in his starts minus what his own play earned (0.5 a start plus his Win Impact). + means his teammates won games beyond what he gave them; - means he produced and his team lost anyway (Dak and Kittle territory). Not a knock on the player either way.",
+            "Best supporting cast": "Wins in his starts minus what his own play earned (0.5 a start plus his Win Impact): how much his teammates won for him.",
+            "Worst supporting cast": "Wins in his starts minus what his own play earned: the most he produced in games his team lost anyway.",
+            "Best record": "Win % for the season. The same record is a shared record.",
+            "Worst record": "Win % for the season. The same record is a shared record.",
             "PPG": "Points per game started, in Super League starting lineups.",
             "Most points per game": "Points per game started. At least 4 starts.",
             "Fewest points per game": "Points per game started. At least 4 starts.",
-            "Worst win %": "His fantasy team's record in weeks he started. At least 4 starts.",
+            "Worst win %": "His fantasy team's record in weeks he started. No minimum; ties go to the player with more starts.",
             "Most weeks as the #1 at his position": "Weeks he outscored every other Super League starter at his position. Ties go to the player with fewer starts.",
             "Most wins": "Games his fantasy team won in weeks he started.",
             "Most bench points per week": "Bench points divided by weeks on a Super League bench. At least 4 bench weeks.",

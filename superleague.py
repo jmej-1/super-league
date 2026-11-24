@@ -909,6 +909,9 @@ def apply_live(s, T, TEAM, proj):
     LV = getattr(s, "LIVE", None)
     if not LV or LV["week"] != s.nxt: return
     w = s.nxt; f = T["line_factor"]; cv = T["cv"]
+    from pbp import script_mult, live_margins, WP_SD_SCALE
+    script_sd = lambda: WP_SD_SCALE
+    LM = live_margins(os.path.join(globals().get("DATA_DIR", "data"), "pbp"))
     ir = set().union(*[set(v) for v in getattr(s, "reserve", {}).values()]) if getattr(s, "reserve", None) else set()
     tm_of = lambda i: (s.PL.get(i, {}).get("team") if i.isdigit() else i) or ""
     for r, lu in LV["lu"].items():
@@ -920,7 +923,8 @@ def apply_live(s, T, TEAM, proj):
             if i != "0" and tm_of(i) in LV["done"]: locked += p; played[i] = p; slots[k] = i
             elif i != "0" and tm_of(i) in prog:         # game under way: points so far, plus his projection for the time that's left
                 left = 1 - prog[tm_of(i)]; pj = proj(i, w)[0]
-                locked += p; part += pj * left; pvar += (cv.get(s.pos(i), 0.6) * pj * left) ** 2; played[i] = p; slots[k] = i; inprog.add(i)
+                mg, fr = LM.get(tm_of(i), (0, 1 - left)); m = script_mult(s.pos(i), mg, fr)     # late, close game: trailing teams throw more
+                locked += p; part += pj * left * m; pvar += (cv.get(s.pos(i), 0.6) * pj * m) ** 2 * left; played[i] = p; slots[k] = i; inprog.add(i)
             else: open_.append(k)
         open_ += [k for k in range(len(lu), len(s.slots))]
         pool = [i for i in dict.fromkeys(list(s.rost.get(r, [])) + [i for i, _ in lu if i != "0" and (i in played or i in s.rost.get(r, []))] + list(t.get("adds", [])))
@@ -933,7 +937,7 @@ def apply_live(s, T, TEAM, proj):
             b = max(c, key=lambda x: x[2]); cand.remove(b); slots[k] = b[0]; pu += b[2]; var += (cv.get(b[1], 0.6) * b[2]) ** 2
         t["live"] = dict(locked=locked, played=played, inprog=inprog, starters=[i or "0" for i in slots], actual=[i for i, _ in lu if i != "0"])
         t["mu"] = (locked + f * pu) / f                    # site multiplies by f again: shows locked + f * projection still to play
-        t["sd"] = math.sqrt(var) * T["corr"]
+        t["sd"] = math.sqrt(var) * T["corr"] * (script_sd() if (played or inprog) else 1.0)     # wider spread only once his games are under way
         t["lineup"] = [i for i in slots if i]
 
 def live_history(s, T, TEAM, path):
@@ -1257,6 +1261,7 @@ def doc_power(s, TEAM, weeks_left, SIM):
 # ----------------------------------------------------------------------------- main
 def main():
     D = sys.argv[1] if len(sys.argv) > 1 else "data"; O = sys.argv[2] if len(sys.argv) > 2 else "out"
+    globals()["DATA_DIR"] = D
     os.makedirs(O, exist_ok=True)
     s = Ctx(load(D)); s.ddir = D
     # sanity: starter sums are the scores by construction; flag duplicate pairings

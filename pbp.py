@@ -136,8 +136,39 @@ def game_paths(G, w, actual, team_of, name_of, pos_of, extra=()):
                 seq = [v + miss * (f / (last_f or 1.0)) for v, f in zip(seq, fracs)]
             paths[pid] = seq
         for t_ in (g["away"], g["home"]): paths[("pa", t_)] = [x.get(t_, 0) for x in pas]
+        paths[("opp", g["away"])] = g["home"]; paths[("opp", g["home"])] = g["away"]
         rec = (times, fracs, paths, g.get("final"))
         out[g["away"]] = rec; out[g["home"]] = rec
+    return out
+
+SCRIPT_START = float(os.environ.get("SL_SCRIPT_START", "0.5"))     # fraction of the game played when the effect starts
+SCRIPT_SCALE = float(os.environ.get("SL_SCRIPT_SCALE", "1.5"))     # 1 = the sizes below at the final whistle. 1.5 fit best on Weeks 1-11 (calibration, Nov 24)
+WP_SD_SCALE = float(os.environ.get("SL_WP_SD", "1.1"))            # in-week win chances: spread x1.1. Fixes underdogs coming back more often than the model said, with no loss in overall accuracy (Weeks 1-11)
+
+def script_mult(pos, margin, f):
+    """Game script, late and close. Second half only, ramping to full strength at the final whistle.
+    Trailing by 1-16: passing game (QB/WR/TE) up to +20%, RB -10%, K +10%. Leading by 1-16: RB +10%, passing game -10%.
+    Blowouts (17+) get half of that. Tied, first half, defenses: no change."""
+    st, S = SCRIPT_START, SCRIPT_SCALE
+    if S == 0 or f <= st or margin == 0 or pos not in ("QB", "WR", "TE", "RB", "K"): return 1.0
+    late = min(1.0, (f - st) / (1 - st)) * (0.5 if abs(margin) > 16 else 1.0) * S
+    if margin < 0: d = {"QB": .20, "WR": .20, "TE": .20, "RB": -.10, "K": .10}[pos]
+    else: d = {"QB": -.10, "WR": -.10, "TE": -.10, "RB": .10, "K": 0.0}[pos]
+    return 1.0 + d * late
+
+def live_margins(pbp_dir):
+    """{team: (own score - opponent score, fraction of game played)} for games in progress, from the latest play."""
+    out = {}
+    for fn in glob.glob(os.path.join(pbp_dir, "*.json")):
+        try: g = json.load(open(fn))
+        except Exception: continue
+        if g.get("final") or not g.get("plays"): continue
+        p = g["plays"][-1]; a, h = p[5], p[6]
+        per, clk = p[1], p[2]
+        f = min(1.0, ((min(per, 4) - 1) * 900 + (900 - clk)) / 3600) if per else 0.0
+        out[g["away"]] = (a - h, f); out[g["home"]] = (h - a, f)
+        for x, y in (("WSH", "WAS"), ("WAS", "WSH")):
+            if x in out and y not in out: out[y] = out[x]
     return out
 
 def wp_timeline(sides, paths, kick, cv, corr, pos_of):
@@ -172,8 +203,10 @@ def wp_timeline(sides, paths, kick, cv, corr, pos_of):
                 et = exp_tier(pp[("pa", pid)][k], f)
                 mu += cur + et + (pj - E0) * left; var += (cv.get(pos_of(pid), 0.6) * pj) ** 2 * left; lk += cur + tier(pp[("pa", pid)][k])
             else:
-                mu += cur + pj * left; var += (cv.get(pos_of(pid), 0.6) * pj) ** 2 * left; lk += cur
-        return mu, math.sqrt(var) * corr, lk
+                o = pp.get(("opp", t)); mg = (pp[("pa", o)][k] - pp[("pa", t)][k]) if o else 0
+                m = script_mult(pos_of(pid), mg, f)
+                mu += cur + pj * left * m; var += (cv.get(pos_of(pid), 0.6) * pj * m) ** 2 * left; lk += cur
+        return mu, math.sqrt(var) * corr * (WP_SD_SCALE if st else 1.0), lk     # wider spread only once the week's games are under way
     out = []; prev = None
     for tm, t, k in tl:
         st[t] = k

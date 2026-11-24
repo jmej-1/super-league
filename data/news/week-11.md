@@ -1,5 +1,76 @@
 # Super League Desk, Week 11. One file per week; stories are separated by a line of five equals signs.
 =====
+slug: w11-weekly-recap
+title: Two Record Comebacks, One Walk-Off, Zero Tight Ends
+dek: Week 11 rewrote the comeback book twice. Harrison won with two empty slots on a 26-yard field goal at 0:00, Jesse escaped from 3.1%, and the bye race got blown wide open.
+week: 11
+kind: feature
+teams: 7,1,2,10,4,6,9,5
+date: 2026-11-23 23:58
+---
+Week 11 will be remembered as the week the win-probability chart stopped meaning anything. Two teams came back from under 5%. Before this week, the best comeback in Super League history started at 6.7%.
+
+## The walk-off
+
+{t:7} beat {t:1} **107.86 to 107.60**, and it took until the last snap of the season's most dramatic Monday night.
+
+Harrison played the entire week with **two empty starting slots**, no tight end and no kicker. That cost him roughly 14 projected points before anyone kicked off and made him a 25.8% underdog. He has now left a starting slot empty in three of the last four weeks and is 2-1 in those games. Nobody else in the league has ever done it once.
+
+It looked like it would finally catch up with him. Sammy led by 46 points at one stage, and It came down to {p:6770} vs. {p:11566}, LSU vs. LSU.
+
+Cincinnati's Evan McPherson hit a 56-yarder with 46 seconds left to put the Bengals up 20-19, and Sammy was ahead. Harrison's odds bottomed out right there, at **3.6%**. Then Daniels threw 22 and 42 yards to A. Williams, two plays and 64 yards worth 2.56 fantasy points. Stevens hit a 26-yarder at 0:00. Washington won 22-20, and so did Harrison.
+
+**The records:** closest game ever (0.26), biggest upset ever (25.8%), most exciting game ever (118.1, more than 27 clear of second). It's also the 2nd-biggest comeback ever, and only the 2nd-biggest of the week, because...
+
+## Jesse from the dead
+
+{t:2} beat {t:10} **92.86 to 86.10**, and Jesse was finished with this one on Sunday night. At 9:18 PM his chances sat at **3.1%**, the lowest a winner has ever come back from. Thomas needed 18.47 from {p:7564} and {p:9224} on Monday, and Chase had just put up 231 receiving yards on the Steelers. The two of them got 11.7. Thomas finished 6.76 short and his playoff odds fell nine points.
+
+## And a quieter one
+
+{t:4} beat {t:6} **91.38 to 84.34** after trailing by 20.8 and sitting at **15.2%** Sunday night. It came down to {p:4147} over {p:2449} on Monday, with Terry McLaurin out and Diggs supposedly set to eat. Perine had 9.8 at halftime and Diggs had 1.5. Nick did this while starting the Rams defense on their bye.
+
+Jason paid for it: his playoff odds dropped 16 points, to a coin flip at 50.4%.
+
+## The rest
+
+- {t:5} beat {t:3} **116.50 to 108.44**. Ben is 7-4 and his playoff odds jumped 16 points to 97.2%. The luck keeps cashing.
+- {t:9} hammered {t:8} **141.56 to 95.90**, the week's top score and 8th-highest ever. {p:3294} put up **35.9** for Beck in a loss, the most by any player this week. {p:8151} gave him a 0.0 after Kansas City ruled him out with a groin injury.
+
+## Player of the week
+
+{p:13345} for {t:9}: **32.9 points, +20.4 over the median RB**, about a third of a win above replacement, and the league MVP of the week. A fourth-round rookie has taken over Denver's backfield.
+
+## Race watch
+
+- **Rookie of the Year: new leader.** Coleman (+34.8) passed {p:13337} (+27.4), who led a week ago. Johnson put up 22.3 for Jesse with Walker out again, but Coleman's 32.9 jumped him.
+- **MVP:** {p:9221} holds (+129.3, 25.8 this week) over {p:9488} (+116.5).
+- **Comeback of the Year:** rewritten. 1st and 2nd are both from this week: Jesse 3.1%, Harrison 3.6%. The old record, 6.7% from Week 2, is now 3rd.
+- **Game of the Year:** Harrison over Sammy, 118.1. Second place is 90.6.
+- **Undrafted:** Matthew Golden (+38.5) still leads, but Coleman is 3.7 back.
+
+## Where it leaves everyone
+
+| Team | Record | Playoffs | Bye | Title |
+|---|---|---|---|---|
+| {t:7} | 8-3 | >99.9% | **75.4%** (+17) | 13.9% |
+| {t:2} | 7-4 | >99.9% | **62.9%** (+13) | 29.2% |
+| {t:1} | 7-4 | >99.9% | **50.9%** (-25) | 34.3% |
+| {t:5} | 7-4 | 97.2% (+16) | 10.5% | 4.7% |
+| {t:3} | 5-6 | 74.1% | 0.1% | 5.5% |
+| {t:10} | 5-6 | 65.0% (-9) | <0.1% | 5.4% |
+| {t:6} | 5-6 | 50.4% (-16) | <0.1% | 6.5% |
+| {t:9} | 4-7 | 9.1% (+5) | 0% | 0.4% |
+| {t:4} | 4-7 | 4.1% (+3) | 0% | 0.1% |
+| {t:8} | 3-8 | 0.2% | 0% | <0.1% |
+
+Sammy lost 25 points of bye odds on one walk-off and is still the title favorite. The power rankings have Jesse first, Sammy second and Harrison third, the reverse of the standings.
+
+## Week 12, Thanksgiving week
+
+Every bye race runs through Week 12. Sammy vs. Nick is worth 39 points of bye odds to Sammy. Jesse vs. Jason is worth 35 to Jesse, and 41 points of playoff odds to Jason. Harrison vs. Zack swings Harrison's bye by 30 and Zack's playoff odds by 32. The first kickoff is Wednesday night.
+
+=====
 slug: w11-monday-night
 title: Burrow vs. Daniels, and Everybody Has a Seat
 dek: Four Super League games are still alive for Bengals-Commanders. Sammy and Harrison get an LSU quarterback duel with a bye on the line, and Thomas needs one Ja'Marr Chase night.
