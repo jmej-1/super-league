@@ -385,8 +385,11 @@ if os.path.exists(os.path.join(avd, "urls.txt")) and os.path.exists(f"{D}/league
         cur = f"{D}/logos/{m_}.png"
         if first and os.path.exists(cur):                    # first look: only a logo that really differs from the one on file counts as a change
             try:
+                from PIL import ImageDraw
+                mk = Image.new("L", (48, 48), 0); ImageDraw.Draw(mk).ellipse((6, 6, 42, 42), fill=255)     # compare inside the circle the site shows
                 a_ = Image.open(cur).convert("RGB").resize((48, 48)); b_ = im.convert("RGB").resize((48, 48))
-                diff = sum(ImageChops.difference(a_, b_).convert("L").getdata()) / (48 * 48)
+                px = [v for v, m in zip(ImageChops.difference(a_, b_).convert("L").getdata(), mk.getdata()) if m]
+                diff = sum(px) / max(1, len(px))
             except Exception: diff = 0
             if diff < 25: known[user] = url; continue
         if os.path.exists(cur):
