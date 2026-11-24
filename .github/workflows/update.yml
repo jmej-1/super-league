@@ -1,13 +1,15 @@
 name: Update Super League
 
+# Every 15 minutes; ci_gate.py lets a run through when an NFL game is on (or about to be), and once an hour otherwise.
+# Only the data is committed. Vercel builds the site from it on every push.
 on:
   schedule:
-    - cron: "7 */3 * * *"        # baseline, every 3 hours
-    - cron: "*/20 17-23 * * 0"   # Sunday 12 PM - 7 PM ET
-    - cron: "*/20 0-5 * * 1"     # Sunday 7 PM - 1 AM ET (SNF)
-    - cron: "*/20 1-4 * * 2"     # Monday night
-    - cron: "*/20 1-4 * * 5"     # Thursday night
-  workflow_dispatch: {}          # "Run workflow" button for a manual update
+    - cron: "4-59/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Run even if no game is on"
+        default: "1"
 
 permissions:
   contents: write
@@ -22,23 +24,29 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Game on?
+        id: gate
+        env:
+          FORCE: ${{ github.event.inputs.force }}
+        run: python3 ci_gate.py
       - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == '1'
         with:
           python-version: "3.12"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - run: pip install -r requirements.txt
+          cache: pip
+      - if: steps.gate.outputs.run == '1'
+        run: pip install -r requirements.txt
       - name: Pull Sleeper + ESPN, rebuild
+        if: steps.gate.outputs.run == '1'
         env:
           CI: "1"
         run: bash update.sh
-      - name: Commit and push
+      - name: Commit the data
+        if: steps.gate.outputs.run == '1'
         run: |
           git config user.name "super-league-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data site
+          git add data
           git diff --cached --quiet && exit 0
           git commit -m "Auto update $(date -u +%Y-%m-%dT%H:%MZ)"
-          git pull --rebase -X ours origin main || git pull --rebase origin main
-          git push
+          for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && break; sleep 5; done

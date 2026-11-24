@@ -16,4 +16,4 @@ node --check /tmp/a.js
 grep -h "^done=\|^week=" data/live.txt | tr '\n' ' '
 echo; echo "OK $P/out/site/index.html"
 python3 desk_due.py data || true
-mkdir -p site && cp out/site/index.html site/index.html
+[ -n "$CI" ] || { mkdir -p site && cp out/site/index.html site/index.html; }
