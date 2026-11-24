@@ -1331,7 +1331,7 @@
 10919|Sydney Brown|DB|ATL||3|
 10920|Tyler Steen|OL|PHI||3|
 10921|Yaya Diaby|DL|TB||3|DL,LB
-10922|Wanya Morris|OL|DAL||3|
+10922|Wanya Morris|OL|IND||3|
 10923|Dorian Williams|LB|BUF|Out|3|
 10924|Zacch Pickens|DL|ATL||3|
 10925|Byron Young|DL|PHI||3|
@@ -1468,7 +1468,7 @@
 11257|Shedrick Jackson|WR|ARI||3|
 11261|Andre Szmyt|K|CLE||4|
 11263|Lorenz Metz|OL|NE||2|
-11273|Ben VanSumeren|RB|KC|Questionable|3|
+11273|Ben VanSumeren|RB|KC|IR|3|
 11280|Brady Russell|RB|SEA||3|
 11281|Liam Anderson|LB|MIA||3|
 11292|Tommy DeVito|QB|NE||3|
@@ -2358,7 +2358,7 @@
 13342|John Michael Gyllenborg|TE|KC|IR|0|
 13343|Vinny Anthony II|WR|ATL||0|
 13345|Jonah Coleman|RB|DEN||0|
-13346|Denzel Boston|WR|CLE||0|
+13346|Denzel Boston|WR|CLE|Questionable|0|
 13347|Demond Claiborne|RB|MIN|IR|0|
 13348|J'Mari Taylor|RB|JAX||0|
 13349|Eli Stowers|TE|PHI||0|
@@ -2542,7 +2542,7 @@
 13544|Domani Jackson|CB|GB||0|
 13545|Trey Smack|K|GB||0|
 13546|Brian Parker II|OT|CIN||0|
-13547|Skyler Gill-Howard|DT|DET|Questionable|0|
+13547|Skyler Gill-Howard|DT|DET|Out|0|
 13548|Gabriel Rubio|DL|PIT|Out|0|
 13550|Pat Coogan|C|TEN||0|
 13551|Karson Sharar|LB|ARI||0|
