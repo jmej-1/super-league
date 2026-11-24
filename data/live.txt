@@ -1,6 +1,6 @@
 # live week|teams whose games are final: 
 week=12
-ts=2026-11-24T17:54Z
+ts=2026-11-24T18:15Z
 done=
 prog=
 np=
