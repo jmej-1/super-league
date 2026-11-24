@@ -565,6 +565,9 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 """
 
 CSS += """
+.mnow{display:none}@media(max-width:700px){.dcls .mnow{display:block;color:var(--mute)}}
+"""
+CSS += """
 @media(max-width:640px){nav.menu{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}}
 """
 CSS += """
@@ -2212,7 +2215,7 @@ class Site:
             i = d["id"]; g_, p_, wr = st.get(i, [0, 0, 0]); now = owner.get(i)
             now_t = ('<span class="muted">Here</span>' if now == r else f'<a class="tn" href="{s_.turl(now, pre)}">{E(s_.TN(now))}</a>') if now else '<span class="muted">Free agent</span>'
             cvd = lambda v: "pos" if v > 0.005 else "neg" if v < -0.005 else "muted"; gp = dvp[d["pick"]]["gap"]
-            drows.append(f'<tr class="{"" if now == r else "gone"}"><td class="c">{(d["pick"] - 1) // len(s.R) + 1}.{(d["pick"] - 1) % len(s.R) + 1:02d}</td><td class="pl"><b>{s_.plink(i, pre, s.nm(i))}</b><small>{s.pos(i)}</small></td><td class="xd">{now_t}</td>'
+            drows.append(f'<tr class="{"" if now == r else "gone"}"><td class="c">{(d["pick"] - 1) // len(s.R) + 1}.{(d["pick"] - 1) % len(s.R) + 1:02d}</td><td class="pl"><b>{s_.plink(i, pre, s.nm(i))}</b><small>{s.pos(i)}</small><small class="mnow">{"Still here" if now == r else ("Now: " + E(s_.TN(now))) if now else "Now: free agent"}</small></td><td class="xd">{now_t}</td>'
                          f'<td class="r">{g_}</td><td class="r {cvd(wr)}">{wr:+.2f}</td><td class="r xd {cvd(war_any[i])}">{war_any[i]:+.2f}</td><td class="r xd">{s_.now_str(dvp[d["pick"]])}</td><td class="r big {cvd(gp)}">{gp:+.2f}</td></tr>')
         dtot = sum(st.get(d["id"], [0, 0, 0])[2] for d in s.draft if d["r"] == r)
         mine_ = [d for d in s.draft if d["r"] == r]
