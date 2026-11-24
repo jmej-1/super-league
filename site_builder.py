@@ -565,6 +565,9 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 """
 
 CSS += """
+.fo .fsl{grid-column:1/-1;order:9;display:block;margin-top:10px;color:#fff;font-size:14px;font-weight:600}.fo .fsl i{font-style:normal;color:var(--gold,#e0b43a);font-size:11px;font-weight:700;margin-right:8px;text-transform:none}
+"""
+CSS += """
 .mnow{display:none}@media(max-width:700px){.dcls .mnow{display:block;color:var(--mute)}}
 """
 CSS += """
@@ -1054,7 +1057,7 @@ class Site:
                     f'<span class="fm">{E(s_.M[r])}, {s_.rec_str(r)}</span></span><span class="fp">{big}{pj}</span></div>')
         return (f'<a class="fo" href="{s_.gurl(w, a, b, pre)}" aria-label="{E(s_.TN(a))} vs {E(s_.TN(b))}, preview">{side(a, A[0], "a")}'
                 f'<span class="fmid">{s_.rope(a, b, pa, "to win")}</span>'
-                f'{side(b, B[0], "b")}</a>')
+                f'{side(b, B[0], "b")}{s_.sline(w, a, b).replace("class=\"sline\"", "class=\"sline fsl\"")}</a>')
 
     matchup_card = faceoff
 
