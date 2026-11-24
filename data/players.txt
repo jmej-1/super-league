@@ -387,7 +387,7 @@
 5044|Isaiah Oliver|CB|TEN||8|
 5045|Courtland Sutton|WR|DEN||8|
 5047|Brian O'Neill|T|MIN||8|OL,OT
-5048|Isaac Yiadom|CB|WAS||8|
+5048|Isaac Yiadom|CB|||8|
 5049|Harrison Phillips|DT|NYJ||8|
 5051|Donte Jackson|CB|LAC||8|
 5054|Carlton Davis III|CB|NE|Out|8|
@@ -616,7 +616,7 @@
 6800|K'Lavon Chaisson|LB|WAS||6|DL,LB
 6801|Tee Higgins|WR|CIN||6|
 6802|A.J. Epenesa|DE|PHI||6|
-6803|Brandon Aiyuk|WR|SF|DNR|6|
+6803|Brandon Aiyuk|WR||DNR|6|
 6804|Jordan Love|QB|GB||6|
 6806|J.K. Dobbins|RB|DEN||6|
 6807|Patrick Queen|LB|PIT||6|
@@ -1463,7 +1463,7 @@
 11242|Chukwuebuka Godrick|OL|MIA||3|
 11243|David Agoha|DL|DEN||3|
 11248|Chris Stoll|LS|SEA||3|
-11251|Shaka Heyward|LB|MIA||3|
+11251|Shaka Heyward|LB|||3|
 11256|Tyson Bagent|QB|CHI||3|
 11257|Shedrick Jackson|WR|ARI||3|
 11261|Andre Szmyt|K|CLE||4|
@@ -1589,7 +1589,7 @@
 11644|Cody Schrader|RB|DEN||2|
 11646|Jalen Coker|WR|CAR|Questionable|2|
 11647|Kimani Vidal|RB|LAC||2|
-11648|Kedon Slovis|QB|BAL|Out|2|
+11648|Kedon Slovis|QB|||2|
 11649|Kendall Milton|RB|CIN||2|
 11650|Luke McCaffrey|WR|WAS||2|
 11651|Isaac Guerendo|RB|SF|PUP|2|
@@ -1783,7 +1783,7 @@
 11951|Beau Brade|DB|CIN||2|
 11954|Corey Bullock|OL|CAR||2|
 11959|Bryce Oliver|WR|HOU||2|
-11963|Chris Collier|RB|LV|Questionable|2|
+11963|Chris Collier|RB||Questionable|2|
 11972|Isaiah Iton|DL|||2|
 11993|Tyrek Funderburk|CB|DAL||2|
 11994|Kameron Johnson|WR|TB||2|
@@ -2242,7 +2242,7 @@
 13042|Xavier Guillory|WR|CLE||1|
 13045|Federico Maranges|OL|SEA||1|
 13047|Jacardia Wright|RB|SEA|Out|1|
-13048|Jared Ivey|DE|ATL||1|
+13048|Jared Ivey|DE|||1|
 13049|Alijah Huzzie|DB|JAX||1|
 13050|Austin Brinkman|LS|HOU||1|
 13051|K.C. Ossai|LB|HOU|IR|1|
@@ -2330,9 +2330,9 @@
 13305|Mike Washington Jr.|RB|LV||0|
 13307|Marlin Klein|TE|HOU||0|
 13308|Bauer Sharp|TE|TB||0|
-13310|Miller Moss|QB|CHI||0|
+13310|Miller Moss|QB|||0|
 13311|Chris Bell|WR|MIA|Questionable|0|
-13312|Josh Kattus|TE|CIN|Questionable|0|
+13312|Josh Kattus|TE||Questionable|0|
 13313|Emmanuel Henderson Jr.|WR|SEA||0|
 13314|Luke Altmyer|QB|DET||0|
 13315|Dean Connors|RB|LAR|IR|0|
@@ -2560,7 +2560,7 @@
 13563|Deven Eastern|DT|SEA||0|
 13564|Michael Dansby|DB|SEA||0|
 13565|Andre Fuller|CB|SEA||0|
-13566|Max Llewellyn|DE|MIA||0|
+13566|Max Llewellyn|DE|||0|
 13567|VJ Payne|DB|NYJ||0|
 13568|Tommy Doman Jr.|P|BUF||0|
 13569|Toriano Pride Jr.|CB|CLE||0|
