@@ -352,7 +352,7 @@ a.hrank{display:flex;flex-direction:column;color:#B8C2D6;font-size:13px;text-dec
 .rhold{min-width:0} .rhold b{display:block;font:800 24px/1.05 var(--disp);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .rhold small{display:block;color:#B8C2D6;font-size:13px;margin-top:3px}
 .rrow.rties .rholds{grid-column:2/4;grid-row:1} .rrow.rties .rval{grid-column:4;grid-row:1} .rrow.rties .rtie{grid-template-columns:52px minmax(0,1fr) 150px} .ryear{display:inline-flex!important;flex-direction:column;align-items:center!important;justify-self:start;justify-content:center} .ryear small{display:block;color:#fff;font:600 12px var(--body);margin-top:5px;text-align:center}
 @media (max-width:760px){.rrow.rties .rholds{grid-column:auto;grid-row:auto} .rrow.rties .rval{grid-column:auto;grid-row:auto} .rrow.rties .rtie{grid-template-columns:36px minmax(0,1fr)} .rrow.rties .rtie .ryear{grid-column:2}}
-.rlg2{position:relative;width:52px;height:52px;display:block} .rlg2 .im{position:absolute;width:34px;height:34px;box-shadow:0 0 0 2px var(--turf)} .rlg2 .im:first-child{left:0;top:0} .rlg2 .im:last-child{right:0;bottom:0}
+.rlg2{position:relative;width:52px;height:52px;display:block} .rlg2 .im{position:absolute;width:34px;height:34px;box-shadow:0 0 0 2px var(--turf)} .rlg2 .im:first-child{left:0;top:0} .rlg2 .im:nth-child(2){right:0;bottom:0}
 .ryear b{display:inline-block;font:900 20px/1 var(--disp);color:var(--flag);border:2px solid var(--flag);border-radius:4px;padding:4px 8px} .ryear small{display:block;color:#B8C2D6;font-size:12px;margin-top:5px;line-height:1.3}
 .rval{font:900 clamp(36px,4.6vw,52px)/1 var(--disp);color:var(--flag);text-align:right;white-space:nowrap}.rval .runit{display:block;font:600 12px var(--body);color:var(--mute);margin-top:4px;letter-spacing:0}
 @media (max-width:760px){
@@ -565,6 +565,8 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 """
 
 CSS += """
+.rlg2{position:relative;grid-area:lg;align-self:start}@media(max-width:760px){.rlg2{width:44px;height:44px}.rlg2 .im{width:29px;height:29px}.rtie .rlg2{width:36px;height:36px}.rtie .rlg2 .im{width:24px;height:24px}}.rtie .rlg2{grid-area:auto!important}.rlgn{position:absolute;right:-6px;bottom:-4px;background:var(--flag,#e0b43a);color:#0B1F44;font:800 11px/1 var(--body,inherit);border-radius:9px;padding:3px 5px;box-shadow:0 0 0 2px var(--field,#0b1a3a)}
+
 .stint .ofw{font-size:inherit;font-weight:500;color:var(--mute);white-space:nowrap}
 
 .ncard .kick,a.bseed .bn{color:#8A6A00}.field .ncard .kick,.dk .ncard .kick{color:var(--flag)}
@@ -4562,7 +4564,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     if(ts.length>1) return '<span class="rnfl" title="'+esc(ts.join(', then '))+'">'+ts.map(function(x){ return '<i class="nfl N'+x+'" aria-hidden="true"></i>'; }).join('')+'</span>';
     return '<span class="rnfl">'+(BY[h.nfl]!==undefined?'<i class="nfl N'+h.nfl+'" aria-hidden="true"></i>':'')+esc(h.nfl)+'</span>'; }
   function ychip(k,e,h){ return yrOf(k)&&!h.ym?'<b>'+e[5]+'</b>'+(h.st?'<small>'+esc(h.st)+'</small>':''):''; }
-  function rlogo(k,e,h){ if(h.one) return e[4]&&e[3]?'<i class="im rlg L'+(String(e[1])===String(RSC)?e[3]:e[1])+'"></i>':'<i class="im rlg L'+e[1]+'"></i>'; if(h.rsl) return '<span class="rlg2">'+h.rsl.slice(0,2).map(function(x){return '<i class="im L'+x+'"></i>';}).join('')+'</span>';
+  function rlogo(k,e,h){ if(h.one) return e[4]&&e[3]?'<i class="im rlg L'+(String(e[1])===String(RSC)?e[3]:e[1])+'"></i>':'<i class="im rlg L'+e[1]+'"></i>'; if(h.rsl) return '<span class="rlg2">'+h.rsl.slice(0,2).map(function(x){return '<i class="im L'+x+'"></i>';}).join('')+(h.rsl.length>2?'<b class="rlgn" title="'+h.rsl.length+' teams">+'+(h.rsl.length-2)+'</b>':'')+'</span>';
     return h.pair?'<span class="rlg2"><i class="im L'+e[1]+'"></i><i class="im L'+e[3]+'"></i></span>':'<i class="im rlg L'+e[1]+'"></i>'; }
   function rsm(h){ return (h.sub?'<small>'+esc(h.sub)+'</small>':'')+(h.det?'<small>'+esc(h.det)+'</small>':''); }
   function rrow(k,t,e,tag){ var h=hold(k,e);
