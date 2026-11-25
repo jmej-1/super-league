@@ -84,41 +84,41 @@ date: 2026-11-24 13:45
 **Hamish's path.** {p:6786} (16.4) on Thanksgiving afternoon, then {p:4046} (17.5) Thursday night in Buffalo, and last week's MVP {p:13345} (13.2) on Friday in Pittsburgh. Hamish is 20.9% to make the playoffs with a win and 1.4% with a loss.
 =====
 slug: w12-waivers-deadline
-title: The Deadline Is Monday Night. Walker, Cook and Lamb Are the Prizes.
-dek: Every bubble team has a running back or receiver slot dragging it down, three out-of-it teams are holding the fix, and Jason needs it more than anyone.
+title: The Deadline Is Monday Night. Everybody Wants Kenneth Walker.
+dek: Every bubble team has a running back or receiver slot dragging it down. Only two teams are really selling, and Jason needs what they have more than anyone.
 week: 12
 kind: feature
-teams: 6,10,3,8,9,4,7,1,2,5
+teams: 6,10,3,9,8,4,7,1,2,5
 pin: yes
 date: 2026-11-25 12:30
 ---
 Week 12 is the last week to trade. Sleeper closes the window when the final game ends, Panthers at Buccaneers on Monday night, and trades sit in a one-day review, so a deal agreed to Monday afternoon is living dangerously.
 
-Every number below is a player's average over his last six games, dropped into each team's best healthy lineup.
+Every number below is a player's average over his last six games, dropped into each team's best healthy lineup. For scale: 10 extra points a week turns a coin-flip game into roughly a 63-37 favorite.
+
+## Who's actually selling
+
+Not many. This is a redraft league, so an eliminated team has no future to sell for, and two of the three teams near the bottom are still pushing.
+
+- **{t:8}** (3-8, 0.1%) is the one true seller, and he has the best player on the market: {p:8151}, 21.7 a week. He's listed questionable this week. {p:8228} (14.8) is the cheaper option in the same backfield.
+- **{t:4}** (4-7, 6%) just picked up {p:3163} off waivers, so Nick isn't acting like a team that's done. But {p:8138} (19.5 a week) is the second-best piece any buyer could get, and Nick's real need is receivers. A Cook-for-receivers deal works for both sides.
+- **{t:9}** (4-7, 11%) is not selling. Hamish traded for {p:6786} in Week 10, and he's still playing for a spot. If anything he's a buyer: his flex is getting 10.0 a week from {p:8144}.
 
 ## The buyers
 
-| Team | Record | Playoffs | Weakest starter | Best fit |
+| Team | Record | Playoffs | Weakest starter | Best realistic fit |
 |---|---|---|---|---|
 | {t:6} | 5-6 | 48% | RB2 {p:8408}, 6.0 | {p:8151}, +15.7 a week |
-| {t:3} | 5-6 | 76% | WR2 {p:11620}, 8.2 | {p:6786}, +10.6 |
-| {t:10} | 5-6 | 61% | WR2 {p:8146}, 9.8 | {p:6786}, +9.0 |
+| {t:3} | 5-6 | 76% | WR2 {p:11620}, 8.2 | {p:8151}, +10.7 |
+| {t:10} | 5-6 | 61% | WR2 {p:8146}, 9.8 | {p:8151}, +9.4 |
 
-For scale: 10 extra points a week turns a coin-flip game into roughly a 63-37 favorite.
+**Jason needs it more than anyone.** {p:9221} is carrying the whole backfield at 25.6 a week, and the other running back slot is getting 6.0. Walker or Cook would add 13 to 16 points a week, the biggest upgrade available to any team in the league. He doesn't need a star to fix it, either: {p:8228} would add about 9. His Thanksgiving game against Jesse swings his playoff odds from 70% with a win to 27% with a loss, and Gibbs plays Thursday afternoon, so he'll know a lot with four days left to deal.
 
-**Jason needs it more than anyone.** {p:9221} is carrying the whole backfield at 25.6 a week, and the other running back slot is getting 6.0. Walker or {p:8138} would add 13 to 16 points a week, the biggest upgrade available to any team in the league. He doesn't need a star to fix it, either: {p:13345}, {p:8228} or {p:11586} would each add about 9. His Thanksgiving game against Jesse swings his playoff odds from 70% with a win to 27% with a loss, and Gibbs plays Thursday afternoon, so he'll know a lot with four days left to deal.
+**Zack** would get about 11 a week from Walker and 8.5 from Cook, but his bench is thin. Anything he gets, he'll probably have to pay for out of his starting lineup. He's 90% with a win over Harrison and 57% with a loss.
 
-**Thomas has the easiest trade to make.** His second receiver spot is the weak link, and he's sitting on spare running backs: {p:9224} and {p:8132} both average around 10 and can't crack his lineup. That's exactly what Hamish could use. Thomas is 82% with a win over Hamish this week and 37% with a loss.
+**Thomas** has the most to offer. {p:9224} and {p:8132} both average around 10 and can't crack his lineup, and that's the kind of depth a team like Nick's could start every week. Walker would add 9.4 a week and Cook 7.2. Thomas is 82% with a win over Hamish this week and 37% with a loss.
 
-**Zack has the hardest one.** {p:6786} or {p:8151} would add about 11 a week at a receiver or flex spot, but his bench is thin. Anything Zack gets, he'll probably have to pay for out of his starting lineup. He's 90% with a win over Harrison and 57% with a loss.
-
-## The sellers
-
-This is a redraft league, so a team that's out has nothing to gain from selling except a better consolation bracket. The two that are still breathing are the ones to call.
-
-- **{t:9}** (4-7, 11%) has the best piece on the market for two of the three buyers: {p:6786}, 18.8 a week, plus {p:6801} at 16.3. Hamish's own weak spot is his flex, where {p:8144} is getting 10.0 a week, and a spare running back from Thomas fits right in.
-- **{t:4}** (4-7, 6%) has {p:8138} at 19.5 a week and the worst lineup in the league around him. Nick needs receivers more than anything.
-- **{t:8}** (3-8, 0.1%) has {p:8151} at 21.7 a week, the best player any buyer could realistically get. He's listed questionable this week. Beck has no reason to sell except to make someone else's season.
+**Hamish and Thomas** also happen to fit each other: Thomas has spare running backs, Hamish has a weak flex, and they play each other Sunday. A deal between them before kickoff would be a strange one.
 
 ## The contenders
 
@@ -131,7 +131,7 @@ The top four are all 98% or better to make the playoffs. This is a fight for two
 | {t:2} | 7-4 | 55% | 72% | 37% |
 | {t:5} | 7-4 | 14% | 20% | 4% |
 
-Harrison's hole is tight end: {p:10236} has averaged 6.6 over his last six, the lowest of any contender's starter, and nobody selling has a tight end worth buying. He might have to live with it. Sammy has been part of 8 trades this season, twice as many as anyone else, and he could use another running back next to Bucky Irving. Every contender would get the most from Walker, so don't be surprised if the bubble teams are bidding against a 7-4 team with a bench to spare.
+Harrison's hole is tight end: {p:10236} has averaged 6.6 over his last six, the lowest of any contender's starter, and nobody selling has a tight end worth buying. Sammy has been part of 8 trades this season, twice as many as anyone else, and he could use another running back next to Bucky Irving. Walker would be the biggest upgrade for every contender too, so don't be surprised if the bubble teams end up bidding against a 7-4 team.
 
 ## Last night's wire
 
