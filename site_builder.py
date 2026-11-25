@@ -831,6 +831,12 @@ class Site:
         new = me + gain
         if me == op: return 0.5
         return 1.0 if new > op + 1e-9 else (0.5 if abs(new - op) < 1e-9 else 0.0)
+    def bench_by_player(s_):
+        """Benchwarmer counts the player, not the stint: every team he sat on the bench for, added up."""
+        bc_, _ = s_.cost_rows(); out = {}
+        for (i, r), x in bc_.items():
+            o = out.setdefault(i, dict(pts=0.0, by=Counter())); o["pts"] += x["pts"]; o["by"][r] += x["pts"]
+        return out
     def cost_rows(s_):
         """Benchwarmer and Worst Drop on one scale: what the player would have added to that team's actual lineup, week by week."""
         if getattr(s_, "_cr_k", None) == tuple(s_.s.weeks): return s_._cr
@@ -1164,12 +1170,13 @@ class Site:
                 opt, _ = s.best([(i, s.pos(i), p) for i, p in d["S"] + d["B"] if i != "0"]); left[r] += opt - s.G[w]["scores"][r]
         bw = sorted(left.items(), key=lambda x: -x[1])
         bench_c, drop_c = s_.cost_rows()
-        bwl = sorted(((k, x["pts"] * wpp) for k, x in bench_c.items()), key=lambda kv: -kv[1])[:10]
-        def bw_sub(k):
-            i, r = k
-            return (s_.logo(r, pre, "lg"), E(nm(i)), E(s_.TN(r)))
-        b4 = block("Benchwarmer of the Year race", "Wins a bench player would have added to his team.",
-                   bwl, lambda v: f"{v:+.2f}", "wins", bw_sub, lambda k: f"player/{k[0]}.html") if bwl else ""
+        bbp_ = s_.bench_by_player()
+        bwl = sorted(((k, x["pts"] * wpp) for k, x in bbp_.items()), key=lambda kv: -kv[1])[:10]
+        def bw_sub(i):
+            rs = [r for r, _ in bbp_[i]["by"].most_common()]
+            return (s_.logo(rs[0], pre, "lg"), E(nm(i)), f"{len(rs)} teams" if len(rs) > 2 else E(" / ".join(s_.TN(r) for r in rs)))
+        b4 = block("Benchwarmer of the Year race", "Wins a bench player would have added to the teams he sat on.",
+                   bwl, lambda v: f"{v:+.2f}", "wins", bw_sub, lambda i: f"player/{i}.html") if bwl else ""
         PARTS_ = [z for z in (getattr(s, "mparts", []) or []) if z[0]["w"] <= s.L.get("regular_season_weeks", 14)]
         wd = sorted((((z[0]["w"], z[1], z[2]), -z[5] / ppw) for z in PARTS_ if z[3] == "-" and z[5] < -0.05), key=lambda kv: -kv[1])[:10]
         def d_sub(k):
@@ -1190,10 +1197,10 @@ class Site:
                 for i, p in d["S"]:
                     if i != "0": sE[i] += p - med[s.pos(i)]; sN[i] += 1
                 for i, _ in d["S"] + d["B"]:
-                    if i != "0": sA[i] += 1; sR[i] = r
+                    if i != "0": sA[i] += 1; sR.setdefault(i, Counter())[r] += 1
         six = sorted(((i, v) for i, v in sE.items() if sN[i] and sN[i] * 2 <= sA[i] and v > 0), key=lambda kv: -kv[1])[:10]
         b6 = block("Sixth Man of the Year race", "Most PAA from a player who started half his rostered weeks or fewer.",
-                   six, lambda v: f"{v:+.1f}", "PAA", lambda i: (s_.logo(sR[i], pre, "lg"), E(nm(i)), f"Started {sN[i]} of {sA[i]}, {E(s_.TN(sR[i]))}"),
+                   six, lambda v: f"{v:+.1f}", "PAA", lambda i: (s_.logo(sR[i].most_common(1)[0][0], pre, "lg"), E(nm(i)), f"Started {sN[i]} of {sA[i]}, " + (f"{len(sR[i])} teams" if len(sR[i]) > 2 else E(" / ".join(s_.TN(r) for r, _ in sR[i].most_common())))),
                    lambda i: f"player/{i}.html") if six else ""
         s_._bench_block = b4 + b6
         dmap2 = {x["pick"]: x for x in drows}
@@ -1778,18 +1785,19 @@ class Site:
             t_, g_, p_, tm_, _ = s_.season_pm(s, pool)
             return "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre, s.nm(i) if bare else None)}</b><small>{tlinks(tm_[i])}</small></td><td class="r big">{t_[i]:+.1f}</td></tr>' for j, i in enumerate(sorted(t_, key=lambda i: -t_[i])[:k], 1))
         rook = {i for i, v in s.PL.items() if v.get("exp") == 0}; und = {i for i in s.PL if i not in s.dpick}
-        bc_, _ = s_.cost_rows()
-        bench_rows = "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre)}</b><small>{s_.tn(r_, pre)}</small></td><td class="r big">{v:+.2f}</td></tr>'
-                             for j, ((i, r_), v) in enumerate(sorted(((k, x["pts"] * s.wpp) for k, x in bc_.items()), key=lambda kv: -kv[1])[:10], 1))
-        avail = {}    # Sixth Man: every week he sat on a Super League roster
+        bbp_ = s_.bench_by_player()
+        rlinks = lambda rs: f"{len(rs)} teams" if len(rs) > 2 else " / ".join(s_.tn(r_, pre) for r_ in rs)
+        bench_rows = "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre)}</b><small>{rlinks([r_ for r_, _ in bbp_[i]["by"].most_common()])}</small></td><td class="r big">{v:+.2f}</td></tr>'
+                             for j, (i, v) in enumerate(sorted(((k, x["pts"] * s.wpp) for k, x in bbp_.items()), key=lambda kv: -kv[1])[:10], 1))
+        avail = {}; availT = {}    # Sixth Man: every week he sat on a Super League roster, and for whom
         for w in s.weeks:
             if w > s.L.get("regular_season_weeks", 14): continue
             for r in s.R:
                 for x in s.W[w][r]["S"] + s.W[w][r]["B"]:
                     i = x[0] if isinstance(x, (list, tuple)) else x
-                    if i and i != "0": avail[i] = avail.get(i, 0) + 1
+                    if i and i != "0": avail[i] = avail.get(i, 0) + 1; availT.setdefault(i, Counter())[r] += 1
         eff = sorted((i for i in tot if 0 < gs[i] and gs[i] * 2 <= avail.get(i, 0) and tot[i] > 0), key=lambda i: -tot[i])[:10]
-        six_rows = "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre)}</b><small>{tlinks(teams[i])}</small></td><td class="r muted">{gs[i]}/{avail[i]}</td><td class="r big">{tot[i]:+.1f}</td></tr>' for j, i in enumerate(eff, 1))
+        six_rows = "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre)}</b><small>{rlinks([r_ for r_, _ in availT[i].most_common()])}</small></td><td class="r muted">{gs[i]}/{avail[i]}</td><td class="r big">{tot[i]:+.1f}</td></tr>' for j, i in enumerate(eff, 1))
         nrs = len([w for w in s.weeks if w <= s.L.get("regular_season_weeks", 14)]); emin = 1      # Most Efficient: PAA per start, no minimum
         effp = sorted((i for i in tot if gs[i] >= emin), key=lambda i: -tot[i] / gs[i])[:10]
         eff_rows = "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre)}</b><small>{tlinks(teams[i])}</small></td><td class="r muted">{gs[i]}</td><td class="r big">{tot[i] / gs[i]:+.1f}</td></tr>' for j, i in enumerate(effp, 1))
@@ -1799,7 +1807,7 @@ class Site:
                        + (f' <b>MVP: {s_.plink(vote_, pre)}</b>' if vote_ in s.PL else "") + f'</p><div class="scroll"><table style="min-width:0"><thead><tr><th></th><th>Player</th><th class="r">PAA</th><th class="r">Starts</th><th class="r">Avg</th></tr></thead><tbody>{mvp_rows}</tbody></table></div></section>'
                        f'<div class="grid2"><section><h2>Rookie of the Year race</h2><p class="intro">PAA, NFL rookies only.</p><table class="pt"><tbody>{mini(rook)}</tbody></table></section>'
                        f'<section><h2>Undrafted Player of the Year race</h2><p class="intro">PAA, undrafted players only.</p><table class="pt"><tbody>{mini(und)}</tbody></table></section></div>'
-                       + f'<div class="grid2"><section><h2>Benchwarmer of the Year race</h2><p class="intro">Wins a bench player would have added to his team.</p><table class="pt"><tbody>{bench_rows}</tbody></table></section>'
+                       + f'<div class="grid2"><section><h2>Benchwarmer of the Year race</h2><p class="intro">Wins a bench player would have added to the teams he sat on.</p><table class="pt"><tbody>{bench_rows}</tbody></table></section>'
                        + f'<section><h2>Sixth Man of the Year race</h2><p class="intro">PAA, players who started half their rostered weeks or fewer.</p><table class="pt"><tbody>{six_rows}</tbody></table></section></div>'
                        + f'<section><h2>Most Efficient Player race</h2><p class="intro">PAA per start.</p><div class="scroll"><table style="min-width:0"><thead><tr><th></th><th>Player</th><th class="r">Starts</th><th class="r">PAA/start</th></tr></thead><tbody>{eff_rows}</tbody></table></div></section>'
 
