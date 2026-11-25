@@ -3885,7 +3885,7 @@ class Site:
         rk = lambda r: s_.stand.index(r) + 1
         tape = ('<div class="vs">' + f'<div class="a {"better" if s_.W0[a] > s_.W0[b] else ""}">{s_.rec_str(a)}</div><div class="k">Record</div><div class="b {"better" if s_.W0[b] > s_.W0[a] else ""}">{s_.rec_str(b)}</div>' + tape_row("Standings", rk(a), rk(b), lambda v: f"#{v}", False)
                 + tape_row("Points per week", pw[a]["ppg"], pw[b]["ppg"], lambda v: f"{v:.1f}") + tape_row("Last 3 weeks", pw[a]["l3"], pw[b]["l3"], lambda v: f"{v:.1f}")
-                + tape_row("Power", pw[a]["pw"], pw[b]["pw"], lambda v: f"{v:+.1f}") + tape_row("xWins", s_.xw[a], s_.xw[b], lambda v: f"{v:.1f}")
+                + tape_row("Power", s_.power[a][0], s_.power[b][0], lambda v: f"#{v}", False) + tape_row("xWins", s_.xw[a], s_.xw[b], lambda v: f"{v:.1f}")
                 + tape_row("Playoff odds", out[a]["po"], out[b]["po"], pct) + tape_row("Title odds", out[a]["ti"], out[b]["ti"], pct) + "</div>")
         ser = [w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b}]
         series = "".join(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if s.G[w2]["scores"][a] > s.G[w2]["scores"][b] else "l"}">{s_.logo(a, pre, "lgs")}<span class="t">{E(s_.TN(a))}</span><span class="s">{s.G[w2]["scores"][a]:.1f}</span></div>'
