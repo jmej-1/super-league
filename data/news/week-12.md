@@ -84,8 +84,8 @@ date: 2026-11-24 13:45
 **Hamish's path.** {p:6786} (16.4) on Thanksgiving afternoon, then {p:4046} (17.5) Thursday night in Buffalo, and last week's MVP {p:13345} (13.2) on Friday in Pittsburgh. Hamish is 20.9% to make the playoffs with a win and 1.4% with a loss.
 =====
 slug: w12-waivers-deadline
-title: Forget Quarterbacks. The Deadline Is for Running Backs.
-dek: Trades close Monday night. Every bubble team's real hole is a running back or receiver slot, Beck and Hamish are holding the cure, and Jason needs it more than anyone.
+title: The Deadline Is Monday Night. Walker, Cook and Lamb Are the Prizes.
+dek: Every bubble team has a running back or receiver slot dragging it down, three out-of-it teams are holding the fix, and Jason needs it more than anyone.
 week: 12
 kind: feature
 teams: 6,10,3,8,9,4,7,1,2,5
@@ -93,8 +93,6 @@ pin: yes
 date: 2026-11-25 12:30
 ---
 Week 12 is the last week to trade. Sleeper closes the window when the final game ends, Panthers at Buccaneers on Monday night, and trades sit in a one-day review, so a deal agreed to Monday afternoon is living dangerously.
-
-First, a myth to clear out. In a one-quarterback, 10-team league, quarterback is the last place to spend at the deadline. Only 10 start, so the guy on waivers is basically a starter. The 5th-best quarterback this season averages 20.5 points; the best one on waivers is around 17. At running back, the 5th-best averages 18.0 and the waiver wire tops out around 9. The points are in the backfield and at receiver, and that's where every buyer's hole is.
 
 Every number below is a player's average over his last six games, dropped into each team's best healthy lineup.
 
@@ -110,9 +108,9 @@ For scale: 10 extra points a week turns a coin-flip game into roughly a 63-37 fa
 
 **Jason needs it more than anyone.** {p:9221} is carrying the whole backfield at 25.6 a week, and the other running back slot is getting 6.0. Walker or {p:8138} would add 13 to 16 points a week, the biggest upgrade available to any team in the league. He doesn't need a star to fix it, either: {p:13345}, {p:8228} or {p:11586} would each add about 9. His Thanksgiving game against Jesse swings his playoff odds from 70% with a win to 27% with a loss, and Gibbs plays Thursday afternoon, so he'll know a lot with four days left to deal.
 
-**Thomas has the easiest trade to make.** His second receiver spot is the weak link, and he's sitting on spare running backs: {p:9224} and {p:8132} both average around 10 and can't crack his lineup. That's exactly what Hamish could use. The one place a quarterback does matter: {p:1166} has averaged 17.1 over his last six, the lowest of any bubble team's quarterback, so {p:3294} would be worth almost 7 a week to Thomas. It's still behind Lamb. Thomas is 82% with a win over Hamish this week and 37% with a loss.
+**Thomas has the easiest trade to make.** His second receiver spot is the weak link, and he's sitting on spare running backs: {p:9224} and {p:8132} both average around 10 and can't crack his lineup. That's exactly what Hamish could use. Thomas is 82% with a win over Hamish this week and 37% with a loss.
 
-**Zack has the hardest one.** {p:6786} or {p:8151} would add about 11 a week at a receiver or flex spot, but his bench is {p:11560} and not much else. A backup quarterback isn't currency. Anything Zack gets, he'll have to pay for out of his starting lineup. He's 90% with a win over Harrison and 57% with a loss.
+**Zack has the hardest one.** {p:6786} or {p:8151} would add about 11 a week at a receiver or flex spot, but his bench is thin. Anything Zack gets, he'll probably have to pay for out of his starting lineup. He's 90% with a win over Harrison and 57% with a loss.
 
 ## The sellers
 
