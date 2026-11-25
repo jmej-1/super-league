@@ -1432,7 +1432,7 @@
 11056|Jared Wayne|WR|MIA|Out|3|
 11058|Blake Grupe|K|LAR|IR|3|
 11062|Ali Gaye|DE|HOU|IR|3|
-11065|Adrian Martinez|QB|||3|
+11065|Adrian Martinez|QB|SEA||3|
 11066|Austin Ajiake|LB|IND||3|
 11068|Mitch Tinsley|WR|CIN||3|
 11082|Ben Sims|TE|SEA||3|
@@ -2738,7 +2738,7 @@
 13899|Amari McNeill|DT|NYJ||0|
 13900|Cole Brevard|DT|SEA||0|
 13903|D'Arco Perkins-McAllister|CB|KC||0|
-13904|Jacob De Jesus|WR|||0|
+13904|Jacob De Jesus|WR|SEA||0|
 13905|Omari Evans|WR|KC||0|
 13907|Dillon Wade|G|GB||0|
 13912|Niklas Henning|T|LV||0|
