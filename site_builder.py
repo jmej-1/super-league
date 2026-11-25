@@ -568,6 +568,9 @@ CSS += """
 .lu .pl .who > .mvpb{margin:2px 0 1px;vertical-align:0}.lu .pl .who b{white-space:normal;text-overflow:clip;overflow:visible;display:block}
 """
 CSS += """
+.ttabs .tvw{color:var(--ink);font-weight:700}.ttabs .tvw[aria-current=true]{border-color:var(--flag,#e0b43a)}.ttabs .tsep{flex:0 0 1px;background:var(--rule);margin:12px 0}.unx .faceoffs{background:var(--field,#0b1a3a);border-radius:10px;padding:6px 18px}@media(max-width:640px){.ttabs .wrap{gap:15px}.ttabs a{font-size:14px}}
+"""
+CSS += """
 .fo .fsl{grid-column:1/-1;order:9;display:block;margin-top:10px;color:#fff;font-size:14px;font-weight:600}.fo .fsl i{font-style:normal;color:var(--gold,#e0b43a);font-size:11px;font-weight:700;margin-right:8px;text-transform:none}
 """
 CSS += """
@@ -2157,8 +2160,12 @@ class Site:
             c = [x for x in allpm if x["w"] == w and x["r"] == r]
             if c: tm[max(c, key=lambda x: x["pm"])["i"]] += 1; tlo[min(c, key=lambda x: x["pm"])["i"]] += 1
         alist = lambda L_, k: ", ".join(f'<a class="go" href="{s_.gurl_r(a["w"], r, pre)}">Wk {a["w"]}</a> {s_.pa(a[k][0], nm(a[k][0]))}' for a in L_) or "—"
+        gmc = sorted(((i, c) for (i, r_), c in s_.mvp_counts()[3].items() if r_ == r and c), key=lambda ic: (-ic[1], s.nm(ic[0])))
+        topc = gmc[0][1] if gmc else 0; lead = [i for i, c in gmc if c == topc]
         aw = (f'<div class="recs"><div class="rec"><span class="k">League MVPs</span><span class="v">{len(mv)}</span><span class="w">{alist(mv, "mvp")}</span></div>'
-              f'<div class="rec"><span class="k">Most team MVPs</span><span class="v">{E(", ".join(f"{nm(i)} {c}" for i, c in tm.most_common(2)))}</span><span class="w">best PAA on the team that week</span></div></div>')
+              f'<div class="rec"><span class="k">Most game MVPs</span><span class="v">{topc}</span><span class="w">{", ".join(s_.pa(i, nm(i)) for i in lead) or "-"}{" (tied)" if len(lead) > 1 else ""}</span></div></div>'
+              + (f'<table class="pt" style="margin-top:12px"><thead><tr><th>Game MVPs <small>best starter in each win, by PAA</small></th><th class="r">Wins</th></tr></thead><tbody>'
+                 + "".join(f'<tr><td>{s_.pa(i, nm(i))}</td><td class="r big">{c}</td></tr>' for i, c in gmc) + '</tbody></table>' if gmc else ""))
         h = defaultdict(lambda: [0, 0, 0.0, []])
         for x in res: h[x["op"]][0 if x["win"] else 1] += 1; h[x["op"]][2] += x["me"] - x["th"]; h[x["op"]][3].append(x["w"])
         h2h = ('<thead><tr><th>Opponent</th><th class="c">Regular season</th><th class="c">Playoffs</th><th class="r">Point diff</th><th class="r">Games</th></tr></thead><tbody>' +
@@ -2249,7 +2256,7 @@ class Site:
         trec.append(("Best start", f"{nm(bs[2])}, {fp(bs[0])}", bs[1]))
         trecs = '<div class="recs">' + "".join(f'<a class="rec" href="{s_.gurl_r(w, r, pre)}"><span class="k">{E(k)}</span><span class="v">{E(v)}</span><span class="w">Week {w}, {yr}</span></a>' for k, v, w in trec) + "</div>"
         seasons_nav = '<div class="seasons">' + "".join(f'<a href="{s_.turl(r, pre)}" aria-current="page">{y}</a>' for y in seasons) + '</div>'
-        upnext = f'<p class="lede" style="margin-top:26px">Up next in Week {wk0}</p><div class="faceoffs" style="margin-top:10px">{s_.faceoff(wk0, *s_.game_of[(wk0, r)], pre)}</div>' if (wk0, r) in s_.game_of else ""
+        upnext = f'<section class="unx"><h2>Up next <small>Week {wk0}</small></h2><div class="faceoffs dk">{s_.faceoff(wk0, *s_.game_of[(wk0, r)], pre)}</div></section>' if (wk0, r) in s_.game_of else ""
         # ---- one season roster: everyone who was on the team this year
         on = defaultdict(list); stw = defaultdict(list); edg = Counter(); hi_ = {}; bpts = Counter()
         for w in s.weeks:
@@ -2325,9 +2332,11 @@ class Site:
         tabs = [("overview", "Overview"), ("schedule", "Schedule"), ("roster", "Roster"), ("moves", "Moves"), ("lineups", "Lineups")]
         tu = s_.turl(r, pre, True)
         def chips(cur):
-            return ('<nav class="subnav ychips" aria-label="Seasons"><div class="wrap">' + f'<a href="{tu}"{" aria-current=page" if cur == "all" else ""}>{E(M[r])}, all-time</a>'
-                    + "".join(f'<a href="{tu}#{y}"{" aria-current=page" if cur == str(y) else ""}>{y}</a>' for y in sorted(seasons, reverse=True)) + "</div></nav>")
-        tabbar = '<nav class="ttabs" aria-label="Team sections"><div class="wrap">' + "".join(f'<a href="{tu}#{yr}-{k}" data-tab="{k}">{t}</a>' for k, t in tabs) + "</div></nav>"
+            """One bar for both views: Career, each season, and (on a season) its sections. Same height either way, so switching doesn't jump."""
+            yrs_ = "".join(f'<a class="tvw" href="{tu}#{y}"{" aria-current=true" if cur == str(y) else ""}>{y} season</a>' for y in sorted(seasons, reverse=True))
+            sec = ('<span class="tsep" aria-hidden="true"></span>' + "".join(f'<a href="{tu}#{yr}-{k}" data-tab="{k}">{t}</a>' for k, t in tabs)) if cur != "all" else ""
+            return (f'<nav class="ttabs" aria-label="{E(M[r])} pages"><div class="wrap"><a class="tvw" href="{tu}"{" aria-current=true" if cur == "all" else ""}>Career</a>{yrs_}{sec}</div></nav>')
+        tabbar = ""
         names = " / ".join(f"{E(s_.TN(r))} ({y})" for y in sorted(seasons, reverse=True))
         olds = [o for ts, rr, o, n_ in s_.name_hist() if rr == r and o and o != s_.TN(r)]
         if olds: names += ", formerly " + " / ".join(E(o) for o in dict.fromkeys(reversed(olds)))
@@ -2339,7 +2348,7 @@ class Site:
         hero_yr = (f'<section class="field"><div class="wrap"><a class="back" href="../teams.html">All teams</a>'
                    f'<div class="hero">{s_.logo(r, pre, "lgh")}<div><h1>{E(s_.TN(r))}</h1><div class="sub">{E(M[r])}, {yr}{(", formerly " + " / ".join(E(o) for o in dict.fromkeys(reversed([o for ts, rr, o, n_ in s_.name_hist() if rr == r and o and o != s_.TN(r)])))) if any(rr == r for _, rr, *__ in s_.name_hist()) else ""}</div></div></div>'
                    f'<div class="herostats"><span><b>{s_.rec_str(r)}</b>record</span><span><b>{s_.xw[r]:.1f}</b>xWins</span><span><b>{ordn(rk)}</b>standings</span><span><b>{ordn(pw_k)}</b>power</span><span><b>{pct(o["po"])}</b>playoffs</span><span><b>{pct(o["ti"])}</b>title</span></div>'
-                   f'{upnext}</div></section>')
+                   f'</div></section>')
         byseason = (f'<div class="scroll"><table><thead><tr><th>Season</th><th>Team</th><th class="c">Record</th><th class="r">Points</th><th class="r">xWins</th><th class="r">Luck</th><th class="c">Finish</th></tr></thead><tbody>'
                     + "".join(f'<tr><td><a class="go" href="{tu}#{y}">{y}</a></td><td><b>{E(s_.TN(r))}</b></td><td class="c big">{s_.rec_str(r)}</td><td class="r">{s_.PF[r]:.1f}</td>'
                               f'<td class="r">{s_.xw[r]:.1f}</td><td class="r {"pos" if lk > 0.25 else "neg" if lk < -0.25 else ""}">{lk:+.1f}</td><td class="c">{ordn(rk)} <span class="muted">(Wk {s.last})</span></td></tr>' for y in sorted(seasons, reverse=True))
@@ -2348,37 +2357,31 @@ class Site:
 {hero_all}
 {chips("all")}
 <main class="wrap">
-<section><h2>All time</h2>{fr}</section>
-<section><h2>By season</h2>{byseason}</section>
-<section><h2>Team records</h2>{trecs}</section>
+<section><h2>Career</h2>{fr}</section>
+<section><h2>Seasons</h2>{byseason}</section>
 <section><h2>Head to head</h2><div class="scroll"><table>{h2h}</table></div></section>
-<section><h2>Luck <small>wins vs xWins after every game</small></h2>
-<div class="tog" role="group" aria-label="Luck view"><button type="button" data-v="all" aria-pressed="true">All-time</button>{"".join(f'<button type="button" data-v="{y}" aria-pressed="false">{y}</button>' for y in seasons)}</div>
-<div class="tv" data-v="all"><div class="stats" style="grid-template-columns:repeat(3,1fr)">{stat("Wins", str(s_.W0[r]))}{stat("xWins", f"{s_.xw[r]:.1f}")}{stat("Luck", f"{lk:+.1f}", f"{ordn(lrank)} luckiest of {len(s.R)}")}</div>
-{s_.luck_chart(luck_rows, f"{M[r]} all-time wins and xWins by game")}</div>
-{"".join(f'<div class="tv" data-v="{y}" hidden><div class="stats" style="grid-template-columns:repeat(3,1fr)">{stat("Wins", str(s_.W0[r]))}{stat("xWins", f"{s_.xw[r]:.1f}")}{stat("Luck", f"{lk:+.1f}", f"{ordn(lrank)} luckiest of {len(s.R)} in {y}")}</div>{s_.luck_chart(luck_rows, f"{M[r]} {y} wins and xWins by game")}</div>' for y in seasons)}
-</section>
-{s_.story_list(s_.stories_for(team=r), "")}
+<section><h2>Personal bests</h2>{trecs}</section>
+{"" if len(seasons) == 1 else f'<section><h2>Luck <small>wins vs xWins after every game</small></h2>{s_.luck_chart(luck_rows, f"{M[r]} all-time wins and xWins by game")}</section>'}
+{s_.story_list(s_.stories_for(team=r)[:3], "")}
 </main>
 </div>
 <div class="tview" data-v="{yr}" data-cur="1" hidden>
 {hero_yr}
 {chips(str(yr))}
-{tabbar}
 <main class="wrap">
 <div class="tpanel" data-t="overview">
+{upnext}
 <section><h2>{yr} season</h2>
 <div class="stats">{stat("Bye chance", pct(o["bye"]))}{stat("Projected wins", f'{o["pw"]:.1f}', "end of regular season")}{stat("Points for", f"{s_.PF[r]:.1f}", f"{s_.PF[r] / n:.1f} per week")}{stat("Points against", f"{PA_:.1f}", f"{PA_ / n:.1f} per week")}</div></section>
-<section><h2>Where they'll finish <small>chance of each seed</small></h2><div class="panel"><div class="seeds">{seeds}</div></div></section>
+<section><h2>Where they'll finish <small>seed odds</small></h2><div class="panel"><div class="seeds">{seeds}</div></div></section>
 <section><h2>Weekly scores</h2>{chart}</section>
 <section><h2>Luck <small>wins vs xWins after every game</small></h2><div class="stats" style="grid-template-columns:repeat(3,1fr)">{stat("Wins", str(s_.W0[r]))}{stat("xWins", f"{s_.xw[r]:.1f}")}{stat("Luck", f"{lk:+.1f}", f"{ordn(lrank)} luckiest of {len(s.R)}")}</div>{s_.luck_chart(luck_rows, f"{M[r]} {yr} wins and xWins by game")}</section>
-<section><h2>WAR by position</h2>{s_.war_pos_strip(r)}</section>
-<section><h2>Draft class</h2>{draft_t}</section>
-{f'<section><h2>Team records</h2>{trecs}</section><section><h2>Head to head</h2><div class="scroll"><table>{h2h}</table></div></section>' if len(seasons) == 1 else ""}
-{s_.story_list(s_.stories_for(team=r), "")}
+{s_.story_list(s_.stories_for(team=r)[:3], "")}
 </div>
 <div class="tpanel" data-t="schedule"><section><h2>Schedule</h2>{sched_t}</section></div>
-<div class="tpanel" data-t="roster"><section><h2>{yr} roster</h2>{roster_all}</section></div>
+<div class="tpanel" data-t="roster"><section><h2>{yr} roster</h2>{roster_all}</section>
+<section><h2>WAR by position</h2>{s_.war_pos_strip(r)}</section>
+<section><h2>Draft class</h2>{draft_t}</section></div>
 <div class="tpanel" data-t="moves">
 <section><h2>Trades</h2>{trades_t}</section>
 <div class="grid2"><section><h2>Best pickups</h2><table class="pt"><tbody>{picks_t}</tbody></table></section>
@@ -2387,7 +2390,7 @@ class Site:
 </div>
 <div class="tpanel" data-t="lineups">
 <section><h2>Lineup report</h2>{lineup}</section>
-<section><h2>Weekly awards</h2>{aw}</section>
+<section><h2>Team awards</h2>{aw}</section>
 </div>
 </main>
 </div>{s_.footer(pre)}"""
@@ -4018,7 +4021,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
       if(tp.length){
         var kk=(tab&&vw.querySelector('.tpanel[data-t="'+tab+'"]'))?tab:'overview';
         [].forEach.call(tp,function(x){x.hidden=x.getAttribute('data-t')!==kk;});
-        [].forEach.call(vw.querySelectorAll('.ttabs a'),function(x){x.setAttribute('aria-current',x.getAttribute('data-tab')===kk?'true':'false');});
+        [].forEach.call(vw.querySelectorAll('.ttabs a[data-tab]'),function(x){x.setAttribute('aria-current',x.getAttribute('data-tab')===kk?'true':'false');});
         var tb=vw.querySelector('.ttabs');
       }
       if(!same) window.scrollTo({top:0,left:0,behavior:'instant'}); return;
