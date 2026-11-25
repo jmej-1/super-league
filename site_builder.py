@@ -4221,7 +4221,14 @@ def bundle(files, s, logo_dir, font_dir, site=None):
       var yl=ys.length>1?'<a class="go" href="#/player/'+id+'/'+y+'">'+y+'</a>':y;
       if(runs.length>1){ var all=[], rs=[], nts=[]; runs.forEach(function(u){ all=all.concat(u.ws); if(rs.indexOf(u.r)<0) rs.push(u.r); u.nts.forEach(function(n){ if(nts.indexOf(n)<0) nts.push(n); }); });
         body+='<tr class="sttot"><td>'+yl+'</td><td>'+(rs.length>2?rs.length+' teams':rs.map(function(r){return esc(TM[r][1]);}).join(' / '))+'</td><td class="c">'+(nts.length>2?nts.length+' teams':lg(nts))+'</td>'+cells(agg(all),1)+'</tr>';
-        runs.forEach(function(u){ body+='<tr class="stsub2"><td></td><td>'+tnl(u.r)+'</td><td class="c">'+(nts.length>1?lg(u.nts):'')+'</td>'+cells(agg(u.ws))+'</tr>'; }); }
+        // the team rows always add up to the season row exactly: round the parts so they sum to the rounded whole
+        var T=agg(all), A=runs.map(function(u){ return agg(u.ws); });
+        [['pts',2],['war',2],['edge',1],['wi',2]].forEach(function(kd){ var k=kd[0], f=Math.pow(10,kd[1]);
+          var R=A.map(function(o){ return Math.round(o[k]*f); }), diff=Math.round((k==='pts'?T[k]:parseFloat(T[k].toFixed(kd[1])))*f)-R.reduce(function(a,b){return a+b;},0);
+          var ord=A.map(function(o,i){ return [o[k]*f-R[i],i]; }).sort(function(a,b){ return diff>0?b[0]-a[0]:a[0]-b[0]; });
+          for(var j=0;diff!==0&&j<ord.length*3;j++){ var i=ord[j%ord.length][1], st=diff>0?1:-1; R[i]+=st; diff-=st; }
+          A.forEach(function(o,i){ o[k]=R[i]/f; }); });
+        runs.forEach(function(u,i){ body+='<tr class="stsub2"><td></td><td>'+tnl(u.r)+'</td><td class="c">'+(nts.length>1?lg(u.nts):'')+'</td>'+cells(A[i])+'</tr>'; }); }
       else { var u=runs[0]; body+='<tr class="sttot"><td>'+yl+'</td><td>'+tnl(u.r)+'</td><td class="c">'+lg(u.nts)+'</td>'+cells(agg(u.ws),1)+'</tr>'; }
     });
     var key=(FL.b||FL.i?'<div class="zkey" style="margin-top:8px">'+(FL.b?'<span><b class="ldr">Bold</b> led the league</span>':'')+(FL.i?'<span><i class="ldp">Italic</i> led all '+esc(d.p)+'s</span>':'')+'</div>':'');
