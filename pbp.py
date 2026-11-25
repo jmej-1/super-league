@@ -120,6 +120,21 @@ def parse_game(g, cands):
         # spread over the game clock, instead of showing up as +10 at kickoff
         pa[home] = asc; pa[away] = hsc                     # points each defense has allowed so far
         times.append(wc); fracs.append(frac_of(per, clk)); cum.append(dict(run)); pas.append(dict(pa))
+    # ESPN sometimes leads a game with stray rows stamped at kickoff but carrying a later game clock (halftime, end of game).
+    # Drop any row whose clock is ahead of a later row's: the clock only moves forward.
+    # Keep the longest run of rows where the clock never goes backward (stray rows at the start or end fall out).
+    import bisect
+    tails = []; tix = []; par = [-1] * len(fracs)
+    for k, f_ in enumerate(fracs):
+        j = bisect.bisect_right(tails, f_ + 1e-9)
+        if j == len(tails): tails.append(f_); tix.append(k)
+        else: tails[j] = f_; tix[j] = k
+        par[k] = tix[j - 1] if j else -1
+    keep = []; k = tix[-1] if tix else -1
+    while k >= 0: keep.append(k); k = par[k]
+    keep.reverse()
+    if len(keep) < len(fracs):
+        times = [times[k] for k in keep]; fracs = [fracs[k] for k in keep]; cum = [cum[k] for k in keep]; pas = [pas[k] for k in keep]
     return times, fracs, cum, pas
 
 def game_paths(G, w, actual, team_of, name_of, pos_of, extra=()):
@@ -217,8 +232,9 @@ def wp_timeline(sides, paths, kick, cv, corr, pos_of):
                 mu += cur + pj * left * m; var += (cv.get(pos_of(pid), 0.6) * pj * m) ** 2 * left; lk += cur
         return mu, math.sqrt(var) * corr * (WP_SD_SCALE if st else 1.0), lk     # wider spread only once the week's games are under way
     out = []; prev = None
-    for tm, t, k in tl:
+    for j, (tm, t, k) in enumerate(tl):
         st[t] = k
+        if j + 1 < len(tl) and tl[j + 1][0] == tm: continue      # several plays at the same instant: one point, after all of them
         (ma, sa, la), (mb, sb, lb) = side_state(sides[0]), side_state(sides[1])
         p = (1.0 if ma > mb else 0.0 if mb > ma else 0.5) if sa + sb == 0 else float(norm.cdf((ma - mb) / math.hypot(sa, sb)))
         row = (tm, p, la, lb, ma, mb)              # time, A's win chance, points so far, projected finals

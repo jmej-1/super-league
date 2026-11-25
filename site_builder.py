@@ -133,7 +133,7 @@ tr.tstart td{border-top:2px solid var(--rule)}
 .h2hg{table-layout:fixed;min-width:860px} .h2hg col.h2n{width:120px} .h2hg col.h2t{width:72px} .h2hg th,.h2hg td{overflow:hidden;text-overflow:ellipsis} .h2hg{border-collapse:collapse} .h2hg tbody td{border:1px solid var(--ink)} .h2hg thead th:not(:first-child){border-bottom:1px solid var(--ink)} .dboard td.dc{border:1px solid var(--ink)} .dboard thead th:not(:first-child){border-bottom:1px solid var(--ink)}
 .kt{white-space:nowrap} .ksep{display:inline-block;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.55;margin:0 7px;vertical-align:middle} .lu .pl .who small .stg{margin-left:8px} .nflr{margin:0 0 0 5px}
 @media (max-width:760px){.lu .kt{display:block;margin:2px 0 0;white-space:normal} .lu .ksep{display:none} .lu .pl .who small .stg{margin-left:0}}
-.wpc{position:relative} .wpd{cursor:pointer;outline:none} .wpdv{pointer-events:none} .wpd:hover+.wpdv,.wpd.on+.wpdv{r:7} .wpcard{position:absolute;transform:translate(-50%,calc(-100% - 12px));background:var(--ink);color:var(--chalk);padding:10px 12px;border-radius:6px;font-size:13px;min-width:220px;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:3;display:flex;flex-direction:column;gap:4px;padding-right:30px}
+.wpc{position:relative} .gfv[data-g=wp] svg{touch-action:pan-y;cursor:crosshair;user-select:none;-webkit-user-select:none} .wphint{margin:2px 0 0;font-size:12px} .wpd{cursor:pointer;outline:none} .wpdv{pointer-events:none} .wpd:hover+.wpdv,.wpd.on+.wpdv{r:7} .wpcard{position:absolute;transform:translate(-50%,calc(-100% - 12px));background:var(--ink);color:var(--chalk);padding:10px 12px;border-radius:6px;font-size:13px;min-width:220px;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:3;display:flex;flex-direction:column;gap:4px;padding-right:30px}
 .wpcard b{font-weight:700} @media (max-width:760px){.wpcard{position:relative!important;left:auto!important;top:auto!important;transform:none!important;margin-top:8px;min-width:0}}
 .wcr{display:grid;grid-template-columns:1fr auto 64px;gap:10px;align-items:baseline} .wcr i{font-style:normal;color:#C9D1E1} .wcr em{font-style:normal;font:800 17px var(--disp)} .wcr strong{text-align:right;color:var(--flag)}
 .wprow{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:13px;color:var(--mute)} .wprow span{display:flex;gap:6px;align-items:baseline} .wprow b{color:var(--ink);font-weight:700} .wprow small{font-size:12px}
@@ -615,7 +615,7 @@ CSS += """
 .gft{margin:0 0 10px}.gfh{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin:2px 0 8px}.gft1{display:flex;align-items:center;gap:10px}.gft1.r{justify-content:flex-end}.gfh b{display:block;font:800 28px/1 var(--disp)}.gfh small{color:var(--mute);font-size:12px;display:inline-flex;align-items:center;gap:5px}.gfh .r{text-align:right}.gfh .r small{justify-content:flex-end}
 .gfm{text-align:center}.gfm b{font-size:22px}.gfl{display:inline-block;width:16px;border-top:3px solid var(--turf)}.gfl.d{border-top:3px dashed #C9A21A}
 .xcap{display:flex;align-items:center;gap:8px;margin:10px 0 26px;padding:0 2px;font-size:12px;color:var(--mute)}.xcap b{font:800 15px var(--disp);color:var(--ink)}.xcap small{margin-left:-6px}
-.xcap .xbr{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:12px;color:var(--mute)}.xcap .xbr i{font-style:normal}.xcap .xbr small{margin-left:3px;font-size:11px}.xcap .xbr b{color:var(--ink)}.exm{width:72px;height:5px;border-radius:3px;background:var(--rule);overflow:hidden}.exm i{display:block;height:100%;background:var(--flag)}.xcap{text-decoration:none;flex-wrap:wrap}.xcap .xrk{color:var(--ink)}.xcap .xgo{margin-left:auto;text-decoration:underline}.xcap:hover .xgo{color:var(--turf)}.tat2x{display:inline-flex;align-items:center;gap:8px}
+.xcap .xbr{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:12px;color:var(--mute)}.xcap .xbr i{font-style:normal}.xcap .xbr small{margin-left:3px;font-size:11px}.xcap .xbr b{color:var(--ink)}.exm{width:72px;height:5px;border-radius:3px;background:var(--rule);overflow:hidden}.exm i{display:block;height:100%;background:var(--flag)}.xcap{display:block;margin:12px 0 26px;padding:12px 14px;border:1px solid var(--rule);border-radius:10px;background:var(--paper)}.xcap .xhd{display:flex;align-items:center;gap:12px}.xcap .xl{font-weight:700;font-size:14px;color:var(--ink)}.xcap .xhd b{font:800 26px var(--disp);color:var(--ink);line-height:1}.xcap .exm{flex:1;width:auto;height:10px;border-radius:5px}.xcap .xft{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:13px}.xcap .xrk{color:var(--ink)}.xcap .xgo{margin-left:auto;color:var(--mute);text-decoration:underline}.xcap .xgo:hover{color:var(--turf)}.xcap .xdt{margin-top:8px}.xcap .xdt summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--mute)}.xcap .xdt[open] summary{color:var(--ink)}.xcap .xbr{margin-top:8px}.tat2x{display:inline-flex;align-items:center;gap:8px}
 .rhold b{display:inline-block;max-width:calc(100% - 64px);vertical-align:middle}.rnfl{display:inline-flex;align-items:center;gap:4px;margin-left:8px;font:600 12px var(--body);color:#8E99AF;vertical-align:middle}.rnfl .nfl{width:16px;height:16px;margin:0}
 .vs .gut{white-space:nowrap}.vs .gut small{font:700 13px var(--body);margin-left:5px}
 .gsx{display:flex;justify-content:space-between;gap:12px;margin:0;padding:0 0 10px;font-size:12px;color:var(--mute);border-bottom:1px solid var(--rule)}.gsr:has(+ .gsx){border-bottom:0;padding-bottom:4px}.vs .vsh{display:flex;align-items:center;gap:6px;font:700 13px var(--body);color:var(--mute);justify-content:flex-end}.vs .b.vsh{justify-content:flex-start}
@@ -3412,7 +3412,7 @@ class Site:
             else: lows = f'<div class="wlos">{low_(a)}{low_(b)}</div>'
         return (f'<section><h2>Win probability and game flow</h2><div class="panel wpc"><div class="rtog chips gft" role="group" aria-label="Chart">'
                 f'<button type="button" data-g="wp" aria-pressed="true">Win probability</button><button type="button" data-g="gf" aria-pressed="false">Game flow</button></div>'
-                f'<div class="wpcard" hidden></div><div class="gfv" data-g="wp"><svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Win probability by game time slot">{g}</svg>'
+                f'<div class="wpcard" hidden></div><div class="gfv" data-g="wp"><svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Win probability by game time slot">{g}<line class="wpg" x1="0" x2="0" y1="{T_}" y2="{Hd - B_}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0" pointer-events="none"/></svg><p class="note wphint">Press and drag across the chart to see every play.</p>'
                 f'<div class="wplg"><span><i class="sw" style="background:var(--turf)"></i>{E(s_.M[a])} favored</span><span><i class="sw" style="background:#C9A21A"></i>{E(s_.M[b])} favored</span>'
                 f'{"<span><i class=swd></i>Projection</span>" if fut else ""}</div>{lows}</div>'
                 f'<div class="gfv" data-g="gf" hidden>{fh}<svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Points by game time slot">{h2}</svg>'
@@ -3807,8 +3807,9 @@ class Site:
 <section><h2>Box score</h2>{lu}</section>
 <div class="grid2"><section>{bench(a)}</section><section>{bench(b)}</section></div>
 {s_.wp_chart(w, a, b, pre)}
-{(lambda x_, rk_: f'<a class="xcap" href="#/excitement"><span>Excitement</span><span class="exm" aria-hidden="true"><i style="width:{s_.exc_bar(x_)}%"></i></span><b>{x_:.1f}</b><span class="xrk">{rk_[0]} most exciting of {rk_[1]} games</span><span class="xgo">All games ranked</span>'
-                  + '<span class="xbr">' + "".join(f'<i>{E(k_)} <b>{v_:.1f}</b> <small>({int(dict(s_.EXW)[k_] * 100)}%)</small></i>' for k_, v_ in s_.exc_terms(s_._excp[(w, min(a, b), max(a, b))])) + '</span></a>')(s_.excitement(w, a, b), s_.exc_rank(w, a, b)) if s_.excitement(w, a, b) is not None else ""}
+{(lambda x_, rk_: f'<div class="xcap"><div class="xhd"><span class="xl">Excitement</span><b>{x_:.1f}</b><span class="exm" aria-hidden="true"><i style="width:{s_.exc_bar(x_)}%"></i></span></div>'
+                  + f'<div class="xft"><span class="xrk">{rk_[0]} most exciting of {rk_[1]} games this season</span><a class="xgo" href="#/excitement">All games ranked</a></div>'
+                  + '<details class="xdt"><summary>Score breakdown</summary><span class="xbr">' + "".join(f'<i>{E(k_)} <b>{v_:.1f}</b> <small>({int(dict(s_.EXW)[k_] * 100)}%)</small></i>' for k_, v_ in s_.exc_terms(s_._excp[(w, min(a, b), max(a, b))])) + '</span></details></div>')(s_.excitement(w, a, b), s_.exc_rank(w, a, b)) if s_.excitement(w, a, b) is not None else ""}
 {s_.game_stats_html(w, a, b)}
 {f'<section><h2>The pregame line <small>what the model expected before kickoff</small></h2><div class="panel">{pre_txt}</div></section>' if pre_txt else ""}
 {s_.odds_moves(w, a, b)}
@@ -4064,17 +4065,43 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   document.addEventListener('click',function(e){ var hz=e.target.closest&&e.target.closest('.hz'); if(e.target.closest&&e.target.closest('.lcard')&&!e.target.closest('.cx')) return; if(hz){showCard(hz);} else {[].forEach.call(document.querySelectorAll('.lcard:not([hidden])'),function(c){hideCard(c.closest('.lchart'));});} });
   document.addEventListener('click',function(e){
     if(e.target.closest&&e.target.closest('.wpcard')&&!e.target.closest('.cx')) return;
+    if(window._wpSkip) return;
     var d=e.target.closest&&e.target.closest('.wpd'); var open=document.querySelectorAll('.wpd.on');
-    if(!d){ [].forEach.call(open,function(x){x.classList.remove('on'); x.closest('.wpc').querySelector('.wpcard').hidden=true;}); return; }
+    if(!d){ [].forEach.call(open,function(x){x.classList.remove('on'); x.closest('.wpc').querySelector('.wpcard').hidden=true;}); [].forEach.call(document.querySelectorAll('.wpg'),function(l){l.setAttribute('opacity','0');}); return; }
     var box=d.closest('.wpc'), c=box.querySelector('.wpcard'), was=d.classList.contains('on');
     [].forEach.call(open,function(x){x.classList.remove('on'); x.closest('.wpc').querySelector('.wpcard').hidden=true;});
     if(was) return;
+    showWp(d);
+  });
+  function showWp(d){
+    var box=d.closest('.wpc'), c=box.querySelector('.wpcard');
+    [].forEach.call(box.querySelectorAll('.wpd.on'),function(x){x.classList.remove('on');});
     d.classList.add('on'); c.innerHTML=d.getAttribute('data-card')+'<button type="button" class="cx" aria-label="Close">&times;</button>'; c.hidden=false;
     var svg=d.ownerSVGElement||box.querySelector('svg'), r=svg.getBoundingClientRect(), br=box.getBoundingClientRect();
     var x=r.left-br.left+r.width*parseFloat(d.getAttribute('data-x'))/100, y=r.top-br.top+r.height*parseFloat(d.getAttribute('data-y'))/100;
     c.style.left=Math.min(Math.max(x,120),br.width-120)+'px'; c.style.top=y+'px';
     if(y<c.offsetHeight+16||c.getBoundingClientRect().top<0){ c.style.transform='translate(-50%,16px)'; } else c.style.transform='';
+    var gl=svg.querySelector('.wpg'); if(gl){ var vb=svg.viewBox.baseVal, gx=vb.width*parseFloat(d.getAttribute('data-x'))/100; gl.setAttribute('x1',gx); gl.setAttribute('x2',gx); gl.setAttribute('opacity','1'); }
+  }
+  // press and drag across the win probability chart: the card follows every play
+  var scr=null, scrMoved=false;
+  function scrubAt(svg,cx){
+    var r=svg.getBoundingClientRect(), fx=(cx-r.left)/r.width*100, best=null, bd=1e9;
+    [].forEach.call(svg.querySelectorAll('.wpd'),function(d){ var dx=Math.abs(parseFloat(d.getAttribute('data-x'))-fx); if(dx<bd){bd=dx;best=d;} });
+    if(best&&!best.classList.contains('on')) showWp(best);
+  }
+  document.addEventListener('pointerdown',function(e){
+    var svg=e.target.closest&&e.target.closest('.gfv[data-g="wp"] svg'); if(!svg||e.button>0) return;
+    scr=svg; scrMoved=false; scr._x0=e.clientX;
   });
+  document.addEventListener('pointermove',function(e){
+    if(!scr) return;
+    if(!scrMoved&&Math.abs(e.clientX-scr._x0)<6) return;
+    if(!scrMoved){ scrMoved=true; try{scr.setPointerCapture(e.pointerId);}catch(_){}} 
+    e.preventDefault(); scrubAt(scr,e.clientX);
+  });
+  document.addEventListener('pointerup',function(){ if(scr&&scrMoved){ window._wpSkip=1; setTimeout(function(){window._wpSkip=0;},50); } scr=null; });
+  document.addEventListener('pointercancel',function(){ scr=null; });
   document.addEventListener('keydown',function(e){ if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('wpd')){e.preventDefault(); e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));} });
   var pc=document.createElement('div'); pc.className='pcard'; pc.hidden=true; pc.innerHTML='<div class="in" role="dialog" aria-modal="true"></div>'; document.body.appendChild(pc);
   function openCard(el){ pc.firstChild.innerHTML=el.getAttribute('data-card')+'<button type="button" class="x">Close</button>'; pc.hidden=false; pc.querySelector('.x').focus(); }
