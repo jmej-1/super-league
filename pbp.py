@@ -63,6 +63,15 @@ def parse_game(g, cands):
     first = next((p[0] for p in plays if p[0]), None)
     for p in plays:
         if not p[0]: p[0] = first or g["kick"].replace("Z", ":00Z")
+    # ESPN sometimes stamps a game's last plays hours (or a day) late. A jump of more than 50 minutes between plays
+    # never happens in a real game (halftime is ~20), so pull everything after it back to a minute after the play before.
+    import datetime as _dt
+    fmt_ = "%Y-%m-%dT%H:%M:%SZ"; shift = _dt.timedelta(0); prev = None
+    for p in plays:
+        tt = _dt.datetime.strptime(p[0], fmt_) - shift
+        if prev is not None and tt - prev > _dt.timedelta(minutes=50):
+            shift += tt - prev - _dt.timedelta(minutes=1); tt = prev + _dt.timedelta(minutes=1)
+        p[0] = tt.strftime(fmt_); prev = tt
     run = defaultdict(float); times, fracs, cum, pas = [], [], [], []
     pa = {away: 0, home: 0}                      # points each defense has allowed
     for p in plays:
