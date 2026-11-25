@@ -1467,7 +1467,7 @@ class Site:
         def add(k, v, t, r, rs, p="", o=0, w=0, u="", x="", only=None, nfl=None, tb=0.0):      # tb: order inside a tie, for show only (it stays a tie)
             # e[9]: the NFL team a player record belongs to (that week's team for one game; for a season or career, the team he did most of it with)
             if p and nfl is None: nfl = s_.team_at(w if w else None, p)
-            E_[k].append(dict(v=v, tb=tb, e=[t, r, p, o, w, yr, u, x, round(v, 9), nfl or ""], rs=set(rs), y=yr, only=only))
+            E_[k].append(dict(v=v, tb=tb, e=[t, r, p, o, w, yr, u, x, round(v, 9), nfl or "", list(dict.fromkeys(rs))], rs=set(rs), y=yr, only=only))
         # ---- team: single game
         for w in s.weeks:
             g = s.G[w]; sc = g["scores"]
@@ -1592,14 +1592,17 @@ class Site:
             u = f"player/{i}.html"; g_ = X["g"]; pts_ = X["pts"]; gw_ = g_ - X.get("gl", 0)     # W-L only from finished weeks
             for P in ("ALL", s.pos(i)):
                 for pre_ in ("py", "pc"):       # season, career (the same while there is one season)
-                    A = lambda k, v, t, x, tb=0.0, sq="seq": add(f"{pre_}_{k}_{P}", v, t, r, rs, p=i, u=u, x=x, only=only, nfl=s_.nfl_seq(X, i, sq), tb=tb)
+                    rs_st = [t_ for t_, c_ in X["by"].most_common() if c_ > 0] or [r]       # starting records: only the teams that started him
+                    rs_bn = [t_ for t_, _ in X["by"].most_common()] or [r]                     # bench records: every team he sat on
+                    if only == "T": rs_st = rs_bn = [r]
+                    A = lambda k, v, t, x, tb=0.0, sq="seq": add(f"{pre_}_{k}_{P}", v, t, r, rs_bn if sq == "bseq" else rs_st, p=i, u=u, x=x, only=only, nfl=s_.nfl_seq(X, i, sq), tb=tb)
                     if g_:
                         gp = g_ * 1e-6          # ties on totals go to fewer games played; ties on rates go to more games played
                         A("pts", pts_ - gp, fp(pts_), f"{g_} starts"); A("pm", X["pm"] - gp, f"{X['pm']:+.1f}", f"{g_} starts"); A("war", X["war"] - gp, f"{X['war']:+.2f}", f"{g_} starts")
                         wl_ = f"{X['wins']}-{gw_ - X['wins']}"; wp_ = X["wins"] / gw_ if gw_ else 0.0; ls_ = gw_ - X["wins"]
                         A("wins", X["wins"] + wp_ * 1e-4, str(X["wins"]), wl_)                 # ties on wins: the better win % holds it
                         A("loss", ls_ + (1 - wp_) * 1e-4, str(ls_), wl_)                       # ties on losses: the worse win % holds it
-                        A("gs", g_, str(g_), f"{fp(pts_)} pts", tb=pts_)                      # a tie stays a tie; shown by points in those starts
+                        A("gs", g_, str(g_), "", tb=pts_)                                      # a tie stays a tie; listed by points in those starts
 
                         if g_ >= 4:
                             A("ppg", pts_ / g_ + gp * 1e-2, fp(pts_ / g_), f"{g_} starts"); A("ppglo", -pts_ / g_ + gp * 1e-2, fp(pts_ / g_), f"{g_} starts")
@@ -4549,16 +4552,18 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         if(x7) det.push(x7); }
       else { ym=yrOf(k)||RPER!=='all'; main=ym?String(e[5]):'All-time'; if(e[7]) det.push(e[7]); }
       return {main:main, short:main, sub:'', det:det.join(', '), pair:false, st:'', nfl:'', ym:ym, one:1}; }
-    if(d&&RSC==='L') det.push(tn(r)); if(e[4]) det.push('Week '+e[4]+(o&&!pair?' vs '+TM[o][1]:'')); if(e[7]&&!st&&!(e[4]&&/^(won |lost |tied )?[\d.]+ to [\d.]+$/.test(e[7]))) det.push(e[7]);     // whole league: the week and opponent are enough, no final score
+    var rsl=(d&&e[10]&&e[10].length>1)?e[10]:null;
+    if(d&&RSC==='L') det.push(rsl?(rsl.length>2?rsl.length+' teams':rsl.map(function(x){return tn(x);}).join(' / ')):tn(r)); if(e[4]) det.push('Week '+e[4]+(o&&!pair?' vs '+TM[o][1]:'')); if(e[7]&&!st&&!(e[4]&&/^(won |lost |tied )?[\d.]+ to [\d.]+$/.test(e[7]))) det.push(e[7]);     // whole league: the week and opponent are enough, no final score
     var nf=d&&e[9]&&e[9]!=='FA'?e[9]:'';
     var sh=main; if(d&&d.p!=='DEF'){ var nn=d.n.split(' '); if(nn.length>1) sh=main.replace(d.n, nn[0].charAt(0)+'. '+nn.slice(1).join(' ')); }
-    return {main:main, short:sh, sub:'', det:det.join(', '), pair:pair, st:st, nfl:nf}; }
+    return {main:main, short:sh, sub:'', det:det.join(', '), pair:pair, st:st, nfl:nf, rsl:(RSC==='L'?rsl:null)}; }
   function hname(h){ return h.short!==h.main?'<span class="nmf">'+esc(h.main)+'</span><span class="nms">'+esc(h.short)+'</span>':esc(h.main); }
   function nflc(h){ if(!h.nfl) return ''; var ts=String(h.nfl).split(',');
     if(ts.length>1) return '<span class="rnfl" title="'+esc(ts.join(', then '))+'">'+ts.map(function(x){ return '<i class="nfl N'+x+'" aria-hidden="true"></i>'; }).join('')+'</span>';
     return '<span class="rnfl">'+(BY[h.nfl]!==undefined?'<i class="nfl N'+h.nfl+'" aria-hidden="true"></i>':'')+esc(h.nfl)+'</span>'; }
   function ychip(k,e,h){ return yrOf(k)&&!h.ym?'<b>'+e[5]+'</b>'+(h.st?'<small>'+esc(h.st)+'</small>':''):''; }
-  function rlogo(k,e,h){ if(h.one) return e[4]&&e[3]?'<i class="im rlg L'+(String(e[1])===String(RSC)?e[3]:e[1])+'"></i>':'<i class="im rlg L'+e[1]+'"></i>'; return h.pair?'<span class="rlg2"><i class="im L'+e[1]+'"></i><i class="im L'+e[3]+'"></i></span>':'<i class="im rlg L'+e[1]+'"></i>'; }
+  function rlogo(k,e,h){ if(h.one) return e[4]&&e[3]?'<i class="im rlg L'+(String(e[1])===String(RSC)?e[3]:e[1])+'"></i>':'<i class="im rlg L'+e[1]+'"></i>'; if(h.rsl) return '<span class="rlg2">'+h.rsl.slice(0,2).map(function(x){return '<i class="im L'+x+'"></i>';}).join('')+'</span>';
+    return h.pair?'<span class="rlg2"><i class="im L'+e[1]+'"></i><i class="im L'+e[3]+'"></i></span>':'<i class="im rlg L'+e[1]+'"></i>'; }
   function rsm(h){ return (h.sub?'<small>'+esc(h.sub)+'</small>':'')+(h.det?'<small>'+esc(h.det)+'</small>':''); }
   function rrow(k,t,e,tag){ var h=hold(k,e);
     return '<'+tag+' class="rrow"'+(tag==='button'?' type="button" data-k="'+k+'" data-t="'+esc(t)+'"':' href="'+toHash(e[6])+'"')+'><span class="rlab">'+esc(t)+'</span>'+rlogo(k,e,h)
