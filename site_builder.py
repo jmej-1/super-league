@@ -1469,7 +1469,7 @@ class Site:
                 sc_ = s.G[w]["scores"]; wi = a if sc_[a] > sc_[b] else b; lo = b if wi == a else a
                 add("g_excite", ev, f"{ev:.1f}", wi, [wi, lo], o=lo, w=w, u=G_(w, wi, lo), x=f'{fp(sc_[wi])} to {fp(sc_[lo])}')
                 add("g_dull", -ev, f"{ev:.1f}", wi, [wi, lo], o=lo, w=w, u=G_(w, wi, lo), x=f'{fp(sc_[wi])} to {fp(sc_[lo])}')
-                fl_ = (getattr(s_, "_excp", {}).get((w, min(a, b), max(a, b))) or {}).get("flips", 0)
+                fl_ = (getattr(s_, "_excp", {}).get((w, min(a, b), max(a, b))) or {}).get("leads", 0)
                 if fl_: add("g_flips", fl_, str(fl_), wi, [wi, lo], o=lo, w=w, u=G_(w, wi, lo), x=f'{fp(sc_[wi])} to {fp(sc_[lo])}')
         for x in s_.improbable():
             sc_ = s.G[x["w"]]["scores"]
@@ -3060,7 +3060,7 @@ class Site:
         mrows = "".join(f'<tr><td class="rk">{k}</td><td><span class="tat2x">{s_.logo(r, pre, "lgs")}<a href="{s_.turl(r, pre)}"><b>{E(s_.TN(r))}</b></a> <small class="muted">{E(s.M[r])}</small></span></td>'
                         f'<td class="r"><b>{sum(per[r]) / len(per[r]):.1f}</b></td><td class="r">{max(per[r]):.1f}</td><td class="r">{sum(1 for v in per[r] if v >= 60)}</td></tr>'
                         for k, r in enumerate(mg, 1) if per[r])
-        return (f'<p class="intro">Every finished game, scored for drama from its play-by-play win chances. About 33 is a typical game, 70 or more is a classic.</p><details class="how"><summary>How it\'s scored</summary><p class="intro">Every finished game, rebuilt play by play. Excitement is a weighted average of six pieces, each a plain formula with no cap: Comeback 25% (60 x log10 of the odds against the winner at his lowest), Finish 20% (40 x win-chance movement in the last quarter of the game), Close 20% (100 minus 2.5 per point of margin), Drama 15% (20 x win-chance movement before that), Lead changes 10% (15 per favorite flip) and Scoring 10% (combined points minus 150). About 33 is a typical game, 70 or more a classic, and a blowout can dip below 0.</p></details>'
+        return (f'<p class="intro">Every finished game, scored for drama from its play-by-play win chances. About 33 is a typical game, 70 or more is a classic.</p><details class="how"><summary>How it\'s scored</summary><p class="intro">Every finished game, rebuilt play by play. Excitement is a weighted average of six pieces, each a plain formula with no cap: Comeback 25% (60 x log10 of the odds against the winner at his lowest), Finish 20% (40 x win-chance movement in the last quarter of the game), Close 20% (100 minus 2.5 per point of margin), Drama 15% (20 x win-chance movement before that), Lead changes 10% (15 each time the lead in points changes hands) and Scoring 10% (combined points minus 150). About 33 is a typical game, 70 or more a classic, and a blowout can dip below 0.</p></details>'
                 f'<div class="grid2"><section><h2>Most exciting</h2>{tbl(top)}</section><section><h2>Least exciting</h2>{tbl(bot)}</section></div>'
                 f'<section><h2>Managers <small>average excitement of their games</small></h2><div class="scroll"><table class="pt" style="min-width:0"><thead><tr><th></th><th>Team</th><th class="r">Average</th><th class="r">Best</th><th class="r">60 or higher</th></tr></thead><tbody>{mrows}</tbody></table></div></section>'
                 f'<section><h2>Every game</h2><p class="intro">Tap a column to sort. Each ring shows that piece as a share of the best ever in that piece.</p>{s_.exc_table(pre)}</section>')
@@ -3086,7 +3086,12 @@ class Site:
             sd_ = 1 if x > .55 else -1 if x < .45 else 0
             if sd_ and side_ and sd_ != side_: fl += 1
             if sd_: side_ = sd_
-        return dict(early=sum(mv[:-n4]), swing=sum(mv), low=min(q[:-1]), flips=fl,
+        lc, sg0 = 0, 0                                      # score lead changes: who's ahead in points so far, play by play
+        for r_ in (rows or []):
+            sg = (r_[2] > r_[3]) - (r_[2] < r_[3])
+            if sg and sg0 and sg != sg0: lc += 1
+            if sg: sg0 = sg
+        return dict(early=sum(mv[:-n4]), swing=sum(mv), low=min(q[:-1]), flips=fl, leads=lc,
                     late=sum(mv[-n4:]), close=-abs(sa - sb), pts=sa + sb, pdef=max(0.0, pdef))
     EXW = (("Comeback", .25), ("Finish", .20), ("Close", .20), ("Drama", .15), ("Lead changes", .10), ("Scoring", .10))
     def exc_terms(s_, p):
@@ -3096,12 +3101,12 @@ class Site:
         Finish        40 x win-chance movement in the last quarter of the game's plays (2.5 = 100 points of movement)
         Close         100 minus 2.5 per point of final margin (a tie = 100, a 40-point blowout = 0, worse below)
         Drama         20 x win-chance movement before that last quarter (five full swings = 100)
-        Lead changes  15 per time the favorite flipped (past 55% one way to past 55% the other)
+        Lead changes  15 per time the lead in points changed hands, play by play
         Scoring       combined points minus 150 (250 combined = 100)"""
         lo_ = p["low"]
         return [("Comeback", (60 * math.log10((1 - lo_) / lo_) if lo_ < 0.5 else 0.0)), ("Finish", 40 * p["late"]),
                 ("Close", 100 + 2.5 * p["close"]), ("Drama", 20 * p.get("early", p["swing"] - p["late"])),
-                ("Lead changes", 15 * p["flips"]), ("Scoring", p["pts"] - 150)]
+                ("Lead changes", 15 * p["leads"]), ("Scoring", p["pts"] - 150)]
     def excitement(s_, w, a, b):
         """Excitement: the weighted average of the pieces (Comeback 25%, Finish 20%, Close 20%, Drama 15%, Lead changes 10%, Scoring 10%).
         Open-ended, one decimal: about 33 is a typical game, 70+ is a top-tenth classic, a blowout can go below 0."""
@@ -3395,8 +3400,9 @@ class Site:
             sg = (xa > xb) - (xa < xb)
             if sg and prev and sg != prev: lc += 1
             if sg: prev = sg
+        if w in s_.s.G and s_.excitement(w, a, b) is not None: lc = s_._excp[(w, min(a, b), max(a, b))].get("leads", lc)   # every play, same count as the record
         fh = (f'<div class="gfh"><div class="gft1">{s_.logo(a, pre, "lgs")}<div><b>{fp(sa_[-1])}</b><small><i class="gfl"></i>{E(s_.M[a])}</small></div></div>'
-              f'<div class="gfm"><b>{lc}</b><small>Score lead change{"" if lc == 1 else "s"}</small></div>'
+              f'<div class="gfm"><b>{lc}</b><small>Lead change{"" if lc == 1 else "s"}</small></div>'
               f'<div class="gft1 r"><div><b>{fp(sb_[-1])}</b><small>{E(s_.M[b])}<i class="gfl d"></i></small></div>{s_.logo(b, pre, "lgs")}</div></div>')
         lows = ""
         if (w, a, b) in getattr(s_, "_wpos", {}) and len(pts) > 2:          # each side's low point, play by play
