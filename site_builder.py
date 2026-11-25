@@ -4027,10 +4027,24 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         pages.append(f'<div class="pg" data-p="{me}" data-t="{title}"{"" if me == "home" else " hidden"}>{body}</div>')
     js = """<script>
 (function(){
+  // Clean URLs: superleague.website/records. Old #/ links still work and get rewritten on arrival.
+  if(/^#\//.test(location.hash)) history.replaceState(null,'',location.hash.slice(1)||'/');
+  function RH(){ var p=location.pathname.replace(/\/+$/,''); return '#'+(p||'/'); }
+  function nav(u,rep){ var path=String(u).replace(/^#/,''); if(path.charAt(0)!=='/') path='/'+path;
+    if(path!==location.pathname){ history[rep?'replaceState':'pushState'](null,'',path); }
+    window.dispatchEvent(new Event('hashchange')); }
+  window.addEventListener('popstate',function(){ window.dispatchEvent(new Event('hashchange')); });
+  window.addEventListener('click',function(e){
+    if(e.defaultPrevented||e.button>0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
+    var a=e.target.closest&&e.target.closest('a[href]'); if(!a||a.target==='_blank') return;
+    var h=a.getAttribute('href'); if(!/^#\/|^\/(?!\/)/.test(h)) return;
+    e.preventDefault(); nav(h); });
+  function fixLinks(root){ [].forEach.call((root||document).querySelectorAll('a[href^="#/"]'),function(a){ a.setAttribute('href',a.getAttribute('href').slice(1)); }); }
+  fixLinks();
   var pgs=[].slice.call(document.querySelectorAll('.pg'));
   function go(){
-    var h=decodeURIComponent(location.hash.replace(/^#\\/?/,'')), p=h.split('/'), id, sub;
-    if(p[0]==='news'&&p[1]&&window.NG&&NG[p[1]]){ location.replace('#/'+NG[p[1]]); return; }
+    var h=decodeURIComponent(RH().replace(/^#\\/?/,'')), p=h.split('/'), id, sub;
+    if(p[0]==='news'&&p[1]&&window.NG&&NG[p[1]]){ nav('#/'+NG[p[1]],true); return; }
     if(p[0]==='player'&&window.PD){ renderPlayer(p[1],p[2]); id='player'; }
     else if(p[0]==='nfl'&&window.PD){ var nsame=(window._lastNFL===p[1]); window._lastNFL=p[1]; renderNFL(p[1],p[2]); id='nfl'; if(nsame) window._keepY=1; }
     else if(p[0]==='team'||p[0]==='game'||(p[0]==='news'&&p[1])){id=p[0]+'/'+p[1];sub=p[2];}else{id=p[0]||'home';sub=p[1];}
@@ -4349,12 +4363,12 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     var grp=function(mg,lab){ var L=rows.filter(function(x){return x.mg===mg;}); return L.length?'<h3 class="hrgh">'+lab+'</h3><div class="hrl">'+L.map(function(x){return x.h;}).join('')+'</div>':''; };
     return '<section class="hrsec"><h2>Records held</h2>'+strip+grp(false,'Team records')+grp(true,'Manager records')+'</section>';
   }
-  function addTeamRecords(){ var m=/^#\/team\/([^\/]+)$/.exec(location.hash); if(!m) return;
+  function addTeamRecords(){ var m=/^#\/team\/([^\/]+)$/.exec(RH()); if(!m) return;
     var pg=document.querySelector('.pg[data-p="team/'+m[1]+'"]'); if(!pg||pg._tr) return; var r=Object.keys(TM).filter(function(k){return TM[k][1]===decodeURIComponent(m[1]);})[0]; if(!r) return; pg._tr=1;
     var v=pg.querySelector('.tview[data-v="all"] main'); if(!v) return; var box=document.createElement('div'); box.innerHTML=teamRecords(r);
     var first=v.querySelector('section'); if(first&&first.nextSibling) v.insertBefore(box.firstChild, first.nextSibling); else v.appendChild(box.firstChild); }
   window.addEventListener('hashchange',function(){ setTimeout(addTeamRecords,30); }); setTimeout(addTeamRecords,80);
-  function addGameRecords(){ var h=location.hash.replace(/^#\\//,''); if(!/^game\\/w\\d+-\\d+-\\d+$/.test(h)) return;
+  function addGameRecords(){ var h=RH().replace(/^#\\//,''); if(!/^game\\/w\\d+-\\d+-\\d+$/.test(h)) return;
     var pg=document.querySelector('.pg[data-p="'+h+'"]'); if(!pg||pg._gr) return; pg._gr=1;
     var x=gameRecords(pg); if(!x) return; var f=pg.querySelector('footer'), box=document.createElement('div'); box.innerHTML=x;
     var sec=box.firstChild; if(f&&f.parentNode) f.parentNode.insertBefore(sec,f); else pg.appendChild(sec); }
@@ -4773,7 +4787,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     ov.innerHTML='<div class="nvp" role="dialog" aria-modal="true" aria-label="Menu and search"><div class="nvh"><input type="search" placeholder="Search players, teams, pages, stories" aria-label="Search" autocomplete="off"><button type="button" class="nvx" aria-label="Close">&times;</button></div><div class="nvb"><div class="nvr" hidden></div><div class="nvgs"></div></div></div>';
     document.body.appendChild(ov);
     var inp=ov.querySelector('input'), res=ov.querySelector('.nvr'), gs=ov.querySelector('.nvgs');
-    function drawGroups(){ var cur=(location.hash.replace(/^#\\/?/,'').split('/')[0])||'';
+    function drawGroups(){ var cur=(RH().replace(/^#\\/?/,'').split('/')[0])||'';
       gs.innerHTML=GR.map(function(g){ return '<div class="nvg"><h3>'+g[0]+'</h3>'+g[1].map(function(x){ return '<a href="#/'+x[0]+'"'+(x[0]===cur?' aria-current="page"':'')+'>'+x[1]+'</a>'; }).join('')+'</div>'; }).join(''); }
     var IDX=null;
     function build(){ IDX=[];
@@ -4794,7 +4808,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     function open(focus){ drawGroups(); ov.hidden=false; document.body.style.overflow='hidden'; if(focus){ inp.focus(); } else ov.querySelector('.nvx').focus(); }
     function close(){ ov.hidden=true; document.body.style.overflow=''; inp.value=''; search(); }
     inp.addEventListener('input',search);
-    inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ var a=res.querySelector('a'); if(a){ location.hash=a.getAttribute('href'); close(); } } });
+    inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ var a=res.querySelector('a'); if(a){ nav(a.getAttribute('href')); close(); } } });
     document.addEventListener('click',function(e){
       var b=e.target.closest&&e.target.closest('.tbtn'); if(b){ open(b.classList.contains('tsrch')); return; }
       if(ov.hidden) return;
