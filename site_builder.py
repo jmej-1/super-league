@@ -4343,7 +4343,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         +tile('WAR',sgn(T[3].toFixed(2)),T[3]>0?'pos':T[3]<0?'neg':'')+tile('PAA',sgn(T[4].toFixed(1)),T[4]>0?'pos':T[4]<0?'neg':'')+tile('Weekly MVPs',nmv);
       var SP=[0,0,0,0,0,0]; yrs.forEach(function(y){ if(Y&&y!==Y) return; var s_=d.sea[y].s; SP[0]+=s_[7]||0; SP[1]+=s_[1]||0; SP[2]+=s_[8]||0; SP[3]+=s_[9]||0; SP[4]+=s_[10]||0; SP[5]+=s_[11]||0; });
       var spl='';
-      if(SP[0]>0){ var oth=Math.max(0,SP[0]-SP[1]-SP[2]-SP[3]), seg=function(v,c,l){ return v>0?'<i class="'+c+'" style="flex:'+v.toFixed(2)+'" title="'+l+' '+fpt(v)+'"></i>':''; };
+      if(SP[0]>0){ var oth=Math.max(0,SP[0]-SP[1]-SP[2]-SP[3]), seg=function(v,c,l){ return v>0.05?'<i class="'+c+'" style="flex:'+v.toFixed(2)+'" title="'+l+' '+fpt(v)+'"></i>':''; };
         spl='<div class="psplit"><div class="psh"><span><b>'+fpt(SP[0])+'</b> total pts</span>'+(SP[4]>0.05?'<span class="plob">'+fpt(SP[4])+' left on the bench<small>, should have started '+SP[5]+' time'+(SP[5]===1?'':'s')+'</small></span>':'')+'</div>'
           +'<div class="pbar">'+seg(SP[1],'zs','Started')+seg(SP[2],'zn','Bench')+seg(SP[3],'zf','Free agent')+seg(oth,'zi','IR')+'</div>'
           +'<div class="pkey"><span class="zk zs">Started '+fpt(SP[1])+'</span><span class="zk zn">Bench '+fpt(SP[2])+'</span><span class="zk zf">Free agent '+fpt(SP[3])+'</span>'+(oth>0.05?'<span class="zk zi">IR '+fpt(oth)+'</span>':'')+'</div></div>'; }
