@@ -206,6 +206,14 @@
 10|free_agent|complete|9|9753:9|11563:9|2026-11-11T17:47Z
 10|free_agent|complete|6|7600:6|10232:6|2026-11-11T08:22Z
 10|free_agent|complete|10|13424:10|11625:10|2026-11-11T08:21Z
+11|free_agent|complete|2||12474:2|2026-11-25T08:07Z
+11|waiver|complete|2|13301:2|BUF:2|2026-11-25T08:12Z
+11|waiver|complete|4|3163:4|96:4|2026-11-25T08:12Z
+11|waiver|complete|3|CIN:3|SEA:3|2026-11-25T08:12Z
+11|waiver|complete|3|13346:3|8136:3|2026-11-25T08:12Z
+11|waiver|failed|10|13301:10||2026-11-25T08:12Z
+11|waiver|complete|10|10219:10|13424:10|2026-11-25T08:12Z
+11|waiver|failed|10|13301:10||2026-11-25T08:12Z
 11|free_agent|complete|4||8161:4|2026-11-22T17:30Z
 11|free_agent|complete|7||5119:7|2026-11-22T16:50Z
 11|free_agent|complete|3||9493:3|2026-11-22T01:17Z
