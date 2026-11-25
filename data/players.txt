@@ -866,7 +866,7 @@
 7722|Bobby Brown III|DT|CAR||5|
 7726|Derrick Barnes|LB|DET||5|DL,LB
 7728|James Hudson III|OT|TEN||5|OL,OT
-7730|Darren Hall|CB|||5|
+7730|Darren Hall|CB|WAS||5|
 7746|Austin Trammell|WR|JAX||5|
 7750|Grant Stuard|LB|LAR||5|
 7756|Khyiris Tonga|DT|KC||5|
@@ -990,7 +990,7 @@
 8188|Tyquan Thornton|WR|KC|IR|4|
 8194|Jashaun Corbin|RB|DAL||4|
 8195|Ronnie Rivers|RB|LAR||4|
-8200|Kevin Austin|WR|||4|
+8200|Kevin Austin Jr.|WR|NO||4|
 8204|Bo Melton|WR|GB|Questionable|4|
 8205|Isiah Pacheco|RB|DET|IR|4|
 8206|Skylar Thompson|QB|BAL|IR|4|
@@ -1862,7 +1862,7 @@
 12382|Jake Kubas|OG|DAL||2|
 12384|Kingsley Eguakun|OL|ARI||2|
 12389|Hayden Rucci|TE|PHI||2|
-12391|Kenny Dyson|LB|MIN||2|
+12391|Kenny Dyson Jr.|LB|MIN||2|
 12397|Joe Andreessen|LB|BUF||2|
 12412|Terrell Jennings|RB|NE||2|
 12427|Dondrea Tillman|DT|DEN||3|
@@ -2723,7 +2723,7 @@
 13868|Thaddeus Dixon|CB|NYG|IR|0|
 13870|Quentin Moore|TE|WAS||0|
 13871|Tanoa Togiai|G|WAS||0|
-13872|Jaxson Moi|DT|||0|
+13872|Jaxson Moi|DT|LAR||0|
 13874|Mory Bamba|CB|NYJ||0|
 13877|Maximus Pulley|DB|LAR||0|
 13879|Jameson Geers|TE|||0|
