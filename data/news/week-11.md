@@ -1,7 +1,6 @@
 # Super League Desk, Week 11. One file per week; stories are separated by a line of five equals signs.
 =====
 slug: w11-weekly-recap
-pin: yes
 title: Two Record Comebacks, One Walk-Off, Zero Tight Ends
 dek: Week 11 rewrote the comeback book twice. Harrison won with two empty slots on a 26-yard field goal at 0:00, Jesse escaped from 3.1%, and the bye race got blown wide open.
 week: 11

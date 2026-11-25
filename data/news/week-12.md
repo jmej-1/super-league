@@ -82,3 +82,62 @@ date: 2026-11-24 13:45
 **Thomas's stakes are huge.** 82.5% to make the playoffs with a win, 38.5% with a loss, a 44-point swing. {p:7564} (16.9) and {p:9224} (13.9) both play Sunday at 1 PM, home against New Orleans. {p:6790} (15.1) goes Thursday at Detroit.
 
 **Hamish's path.** {p:6786} (16.4) on Thanksgiving afternoon, then {p:4046} (17.5) Thursday night in Buffalo, and last week's MVP {p:13345} (13.2) on Friday in Pittsburgh. Hamish is 20.9% to make the playoffs with a win and 1.4% with a loss.
+=====
+slug: w12-waivers-deadline
+title: Jesse Wins the Williams Sweepstakes. Now Comes the Deadline.
+dek: Thomas put in for the hottest receiver on the wire twice and came up empty both times. Trades shut down Monday night, and three 5-6 teams still have a quarterback problem.
+week: 12
+kind: feature
+teams: 2,10,3,6,8,4,9,7
+pin: yes
+date: 2026-11-25 12:30
+---
+The wire cleared at 3 AM and the biggest name on it went to the team that needed him least. {p:13301} is headed to {t:2}.
+
+Williams was the waiver prize of the week for a reason. He led everyone on Monday night with 11 targets, 9 catches and 122 yards, he has played at least 80% of Washington's snaps four weeks running, and with McLaurin done he is the closest thing the Commanders have to a top target. Jesse dropped the Bills defense to make room (Kansas City on Thanksgiving night was not a matchup he wanted) and cut {p:12474} loose a few minutes earlier.
+
+**The team that wanted him most got nothing.** {t:10} put in for Williams twice. Both claims failed. Thomas settled for {p:10219} and let {p:13424} go. For a 5-6 team sitting at 61% to make the playoffs, that is a miss that stings.
+
+The rest of the wire:
+
+- **{t:4}** swapped {p:96} for {p:3163}, which gives Nick a Thanksgiving quarterback against Chicago. Rodgers is now on waivers for anyone who wants him.
+- **{t:3}** made two moves: {p:13346} in for {p:8136}, and the Bengals defense in for Seattle's. Cincinnati hosts the Saints.
+
+## The deadline
+
+Week 12 is the last week to trade. Sleeper closes the window when the final game ends, which is Panthers at Buccaneers on Monday night. Trades sit in a one-day review, so a deal agreed to on Monday afternoon is living dangerously.
+
+## The buyers: three 5-6 teams, one shared problem
+
+| Team | Record | Playoffs | Biggest hole |
+|---|---|---|---|
+| {t:3} | 5-6 | 76% | QB (-0.13 WAR) |
+| {t:10} | 5-6 | 61% | QB (-0.29 WAR) |
+| {t:6} | 5-6 | 48% | TE (-0.25), QB (-0.11) |
+
+Every bubble team has gotten negative value from the most important position on the field. Zack has been splitting between {p:9758} and {p:11560}. Thomas has {p:1166}. Jason has bounced between {p:7523} and {p:9228}. None of them has fixed it.
+
+And this week decides a lot of it before the deadline even hits:
+
+- **Jason** is 70% to make it with a win over Jesse on Thanksgiving and 27% with a loss. That is the biggest swing in the league, and Gibbs plays Thursday afternoon, so Jason will have a good idea where he stands with four days left to deal.
+- **Thomas** is 82% with a win over Hamish and 37% with a loss.
+- **Zack** is 90% with a win over Harrison and 57% with a loss.
+
+## The sellers
+
+- **{t:8}** (3-8, 0.1%) has the one quarterback every buyer should be calling about: {p:3294}, +0.45 WAR. Beck also has {p:8151} (+1.57) and {p:8228} (+0.89) in the backfield. If he is going to sell, it is now.
+- **{t:4}** (4-7, 6%) just added Goff, so Nick now has two quarterbacks and a team playing for draft position. {p:8138} (+1.45) and {p:8150} (+1.00) are two starting running backs on a roster with nothing to start them for.
+- **{t:9}** (4-7, 11%) is still breathing, but the receiver room is a contender's wish list: {p:6786} (+1.55), {p:6801} (+0.99) and {p:8144} (+0.69).
+
+## The contenders: it's about the bye now
+
+The top four are all 98% or better to make the playoffs. This is a fight for two byes.
+
+| Team | Record | Bye now | With a win | With a loss |
+|---|---|---|---|---|
+| {t:7} | 8-3 | 75% | 92% | 63% |
+| {t:1} | 7-4 | 55% | 67% | 25% |
+| {t:2} | 7-4 | 55% | 72% | 37% |
+| {t:5} | 7-4 | 14% | 20% | 4% |
+
+Harrison leads the race and still has the worst quarterback production of any contender: -0.42 WAR out of {p:11566}. Sammy has been part of 8 trades this season, twice as many as anyone else, and his bye odds get cut by more than half with a loss to Nick. If anybody is making a call this weekend, the smart money says it starts with him.
