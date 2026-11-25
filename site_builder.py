@@ -565,6 +565,9 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 """
 
 CSS += """
+.lu .pl .who > .mvpb{margin:2px 0 1px;vertical-align:0}.lu .pl .who b{white-space:normal;text-overflow:clip;overflow:visible;display:block}
+"""
+CSS += """
 .fo .fsl{grid-column:1/-1;order:9;display:block;margin-top:10px;color:#fff;font-size:14px;font-weight:600}.fo .fsl i{font-style:normal;color:var(--gold,#e0b43a);font-size:11px;font-weight:700;margin-right:8px;text-transform:none}
 """
 CSS += """
@@ -3453,11 +3456,11 @@ class Site:
                 return (f'<div class="pl {"right" if right else ""}"><div class="who"><b>{s_.pa(i, s.nm(i))}</b><small>{s_.nl_r(team) if right else s_.nl(team)}</small></div>'
                         f'<div class="pts"><span class="byec">BYE</span></div></div>')
             if wk is not None and sub[0] not in ("proj", "projlive") and s_.dnp(wk, i):          # didn't take a snap: a chip, worth 0
-                small_ = (sub[1] + s_.nl_r(team)) if right else (s_.nl(team) + sub[1])
+                small_ = (s_.nl_r(team) + sub[1]) if right else (s_.nl(team) + sub[1])
                 return (f'<div class="pl {"right" if right else ""}"><div class="who"><b>{s_.pa(i, s.nm(i))}</b><small>{small_}</small></div>'
                         f'<div class="pts"><span class="byec dnp" title="Did not play (0 snaps), 0 points">DNP</span></div></div>')
-            small = ((f'{sub[1]}<span class="kt">{kt}</span>{dot}' if kt else sub[1]) + s_.nl_r(team)) if right else (s_.nl(team) + (f'{dot}<span class="kt">{kt}</span>' if kt else "") + sub[1])
-            return (f'<div class="pl {"right" if right else ""} {"up" if up else ""}{" tap" if card else ""}"{card}><div class="who"><b>{s_.pa(i, s.nm(i))}{badge}</b><small>{small}</small></div>'
+            small = (s_.nl_r(team) + (f'{dot}<span class="kt">{kt}</span>' if kt else "") + sub[1]) if right else (s_.nl(team) + (f'{dot}<span class="kt">{kt}</span>' if kt else "") + sub[1])   # same order both sides: team, then kickoff
+            return (f'<div class="pl {"right" if right else ""} {"up" if up else ""}{" tap" if card else ""}"{card}><div class="who"><b>{s_.pa(i, s.nm(i))}</b>{badge}<small>{small}</small></div>'
                     + (f'<div class="pts pj">{fmt.format(p) if fmt else fp(p)}<small>proj</small></div></div>' if sub[0] == "projlive" else
                        f'<div class="pts">{fp(p) if fmt is None else fmt.format(p)}</div></div>'))
         ok = lambda x, y: hl          # green only on finished games, never on projections or live games
