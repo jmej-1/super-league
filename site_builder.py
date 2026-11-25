@@ -565,6 +565,12 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 """
 
 CSS += """
+.top .wrap{flex-wrap:nowrap}.tact{display:flex;gap:6px;margin-left:auto}.tbtn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid rgba(255,255,255,.18);color:#DCE3F0;border-radius:999px;padding:7px 12px;font:600 14px var(--body,inherit);cursor:pointer}.tbtn:hover,.tbtn:focus-visible{color:#fff;border-color:var(--flag)}
+.nvo{position:fixed;inset:0;z-index:60;background:rgba(6,14,34,.55);display:flex;justify-content:flex-end}.nvo[hidden]{display:none}.nvp{width:min(440px,100%);height:100%;background:var(--paper);color:var(--ink);display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(0,0,0,.25)}
+.nvh{display:flex;gap:8px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--rule)}.nvh input{flex:1;font:500 16px inherit;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--chalk,#fff);color:var(--ink)}.nvh input:focus{outline:2px solid var(--flag);outline-offset:0}.nvx{background:none;border:0;font-size:26px;line-height:1;color:var(--mute);cursor:pointer;padding:4px 8px}.nvx:hover{color:var(--ink)}
+.nvb{overflow-y:auto;padding:8px 16px 24px;flex:1}.nvg h3{font:700 12px inherit;color:var(--mute);margin:18px 0 6px;letter-spacing:.02em}.nvg a,.nvr a{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:8px;text-decoration:none;color:var(--ink);font-weight:600}.nvg a:hover,.nvr a:hover,.nvr a.on{background:var(--rule)}.nvg a small,.nvr a small{margin-left:auto;color:var(--mute);font-weight:500;font-size:12px;white-space:nowrap}.nvg a[aria-current=page]{box-shadow:inset 3px 0 0 var(--flag)}.nvr .none{color:var(--mute);padding:14px 8px}.nvr .im{width:24px;height:24px;flex:none}
+@media(max-width:760px){.top .wrap{flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;padding-top:10px}.tact{margin-left:auto}.menu{order:3;width:100%;flex:0 0 100%}.tbtn span{display:none}.tbtn{padding:8px}}
+
 .lu .pl .who > .mvpb{margin:2px 0 1px;vertical-align:0}.lu .pl .who b{white-space:normal;text-overflow:clip;overflow:visible;display:block}
 """
 CSS += """
@@ -577,7 +583,7 @@ CSS += """
 .mnow{display:none}@media(max-width:700px){.dcls .mnow{display:block;color:var(--mute)}}
 """
 CSS += """
-@media(max-width:640px){nav.menu{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}}
+
 """
 CSS += """
 .gbt{display:inline-block;min-width:84px;text-align:center}.swg{display:block;font-size:11px;color:var(--mute);font-weight:500;white-space:nowrap}.nw{white-space:nowrap}.trm{display:none;font-size:13px;margin-top:4px;color:var(--mute)}@media(max-width:640px){.trtab{min-width:0!important}.trtab .trx{display:none}.trtab .trm{display:block}.trtab td.c,.trtab th.c,.trtab td.rk,.trtab th:first-child{display:none}.trtab td.r{white-space:nowrap}}details.how{margin:-4px 0 18px}details.how summary{cursor:pointer;font-weight:600;font-size:14px}@media(max-width:640px){.exctop .exmb{display:none!important}.exctop td,.exctop th{padding-left:6px;padding-right:6px}.exctop td:nth-child(3){font-size:12px;white-space:nowrap}}
@@ -686,11 +692,18 @@ NAV = [("index.html", "Home", "home"), ("news.html", "News", "news"), ("standing
        ("transactions.html", "Transactions", "transactions"), ("trades.html", "Trades", "trades"), ("analyzer.html", "Analyzer", "analyzer"), ("draft.html", "Draft", "draft")]   # this week, then people, then honors, then the front office
 
 
+PRIMARY = ("home", "standings", "schedule", "teams", "players", "news")
+ICON_S = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'
+ICON_M = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'
+
+
 def page(title, body, pre="", active=None):
-    nav = "".join(f'<a href="{pre}{u}"{" aria-current=page" if k == active else ""}>{t}</a>' for u, t, k in NAV)
+    links = [x for x in NAV if x[2] in PRIMARY or x[2] == active]
+    nav = "".join(f'<a href="{pre}{u}"{" aria-current=page" if k == active else ""}>{t}</a>' for u, t, k in links)
     return (f'<!DOCTYPE html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<title>{E(title)}</title>{FONTS(pre)}<style>{CSS}</style></head><body>\n'
-            f'<div class="top"><div class="wrap"><a class="mark" href="{pre}index.html"><i class="brandlogo" aria-hidden="true"></i>Super League</a><nav class="menu" aria-label="Site">{nav}</nav></div></div>\n{body}\n</body></html>')
+            f'<div class="top"><div class="wrap"><a class="mark" href="{pre}index.html"><i class="brandlogo" aria-hidden="true"></i>Super League</a><nav class="menu" aria-label="Site">{nav}</nav>'
+            f'<div class="tact"><button type="button" class="tbtn tsrch" aria-label="Search">{ICON_S}<span>Search</span></button><button type="button" class="tbtn tmenu" aria-label="All pages">{ICON_M}<span>Menu</span></button></div></div></div>\n{body}\n</body></html>')
 
 
 NFL_CITY = {"ARI": "Arizona", "ATL": "Atlanta", "BAL": "Baltimore", "BUF": "Buffalo", "CAR": "Carolina", "CHI": "Chicago", "CIN": "Cincinnati", "CLE": "Cleveland",
@@ -4719,6 +4732,51 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         tip.style.left=Math.max(4,Math.min(bb.width-190,x-95))+'px'; tip.style.top=Math.max(0,y-74)+'px'; } });
     [].forEach.call(document.querySelectorAll('.ohc'),function(c){ draw(c.closest('section')); });
   })();
+
+  (function(){   // menu and search: every page in one panel, plus teams, players, NFL teams, stories and records
+    var GR=[['This week',[['','Home'],['news','News'],['schedule','Schedule'],['playoffs','Playoffs']]],
+            ['Standings and honors',[['standings','Standings'],['races','Awards'],['records','Records'],['excitement','Excitement']]],
+            ['Teams and players',[['teams','Teams'],['players','Players'],['h2h','Head to head']]],
+            ['Front office',[['transactions','Transactions'],['trades','Trades'],['analyzer','Trade analyzer'],['draft','Draft']]]];
+    var ov=document.createElement('div'); ov.className='nvo'; ov.hidden=true;
+    ov.innerHTML='<div class="nvp" role="dialog" aria-modal="true" aria-label="Menu and search"><div class="nvh"><input type="search" placeholder="Search players, teams, pages, stories" aria-label="Search" autocomplete="off"><button type="button" class="nvx" aria-label="Close">&times;</button></div><div class="nvb"><div class="nvr" hidden></div><div class="nvgs"></div></div></div>';
+    document.body.appendChild(ov);
+    var inp=ov.querySelector('input'), res=ov.querySelector('.nvr'), gs=ov.querySelector('.nvgs');
+    function drawGroups(){ var cur=(location.hash.replace(/^#\\/?/,'').split('/')[0])||'';
+      gs.innerHTML=GR.map(function(g){ return '<div class="nvg"><h3>'+g[0]+'</h3>'+g[1].map(function(x){ return '<a href="#/'+x[0]+'"'+(x[0]===cur?' aria-current="page"':'')+'>'+x[1]+'</a>'; }).join('')+'</div>'; }).join(''); }
+    var IDX=null;
+    function build(){ IDX=[];
+      GR.forEach(function(g){ g[1].forEach(function(x){ IDX.push([x[1],'Page','#/'+x[0],'']); }); });
+      Object.keys(TM).forEach(function(r){ IDX.push([TM[r][0],'Team, '+TM[r][1],'#/team/'+TM[r][1]+'/'+YR,'<i class="im lgs L'+r+'"></i>',TM[r][1]]); });
+      if(window.PD) Object.keys(PD).forEach(function(i){ var d=PD[i]; IDX.push([d.n,(d.p||'')+(d.t?', '+d.t:''),'#/player/'+i,'']); });
+      if(window.NFLN) Object.keys(NFLN).forEach(function(t){ IDX.push([NFLN[t],'NFL team','#/nfl/'+t,'',t]); });
+      if(window.NWS) NWS.forEach(function(n){ IDX.push([n[0],'Story'+(n[2]?', Week '+n[2]:''),'#/news/'+n[1],'']); });
+      if(typeof BOOK!=='undefined') Object.keys(BOOK).forEach(function(b){ BOOK[b].forEach(function(g){ g[1].forEach(function(x){ IDX.push([x[1],'Record','#/records/'+b,'']); }); }); });
+    }
+    function norm(t){ return String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,''); }
+    function search(){ var q=norm(inp.value).trim(); if(!q){ res.hidden=true; gs.hidden=false; return; }
+      if(!IDX) build(); var ws=q.split(/\\s+/), out=[];
+      IDX.forEach(function(e){ var hay=norm(e[0]+' '+(e[4]||'')+' '+e[1]); if(ws.every(function(w){return hay.indexOf(w)>=0;})){ var n=norm(e[0]), sc=(n===q?0:n.indexOf(q)===0?1:(' '+n).indexOf(' '+ws[0])>=0?2:3); out.push([sc,e]); } });
+      out.sort(function(a,b){return a[0]-b[0]||a[1][0].length-b[1][0].length;}); out=out.slice(0,30);
+      res.innerHTML=out.length?out.map(function(x,k){ var e=x[1]; return '<a href="'+e[2]+'"'+(k===0?' class="on"':'')+'>'+e[3]+'<span>'+esc(e[0])+'</span><small>'+esc(e[1])+'</small></a>'; }).join(''):'<div class="none">Nothing matches "'+esc(inp.value)+'"</div>';
+      res.hidden=false; gs.hidden=true; }
+    function open(focus){ drawGroups(); ov.hidden=false; document.body.style.overflow='hidden'; if(focus){ inp.focus(); } else ov.querySelector('.nvx').focus(); }
+    function close(){ ov.hidden=true; document.body.style.overflow=''; inp.value=''; search(); }
+    inp.addEventListener('input',search);
+    inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ var a=res.querySelector('a'); if(a){ location.hash=a.getAttribute('href'); close(); } } });
+    document.addEventListener('click',function(e){
+      var b=e.target.closest&&e.target.closest('.tbtn'); if(b){ open(b.classList.contains('tsrch')); return; }
+      if(ov.hidden) return;
+      if(e.target===ov||(e.target.closest&&e.target.closest('.nvx'))){ close(); return; }
+      if(e.target.closest&&e.target.closest('.nvo a')) close();
+    });
+    function navInView(){ setTimeout(function(){ [].forEach.call(document.querySelectorAll('.pg:not([hidden]) .menu a[aria-current=page]'),function(a){ var m=a.parentNode; if(m.scrollWidth>m.clientWidth) m.scrollLeft=Math.max(0,a.offsetLeft-m.offsetLeft-m.clientWidth/2+a.offsetWidth/2); }); },0); }
+    window.addEventListener('hashchange',navInView); navInView();
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Escape'&&!ov.hidden){ close(); return; }
+      if(e.key==='/'&&ov.hidden&&!(e.target.matches&&e.target.matches('input,textarea,select'))){ e.preventDefault(); open(true); }
+    });
+  })();
   window.addEventListener('hashchange',go); go();
   (function(){ var pg=document.querySelector('.pg[data-p="records"]'); if(pg&&!pg.hidden){pg._done=1; renderRec(pg);} })();
   document.addEventListener('click',function(e){
@@ -4737,7 +4795,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         import json as _json
         teams = {r: [site.TN(r), s.M[r]] for r in s.R}
         pdata = ("<script>var TA=" + _json.dumps(site.ta_data(), separators=(",", ":")) + ";</script>" + open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "ta.js")).read() + "<script>var WKD=" + _json.dumps(site.week_data(), separators=(",", ":")) + ";var PD=" + _json.dumps(site.players_data(), separators=(",", ":")) + ";var TM=" + _json.dumps(teams, separators=(",", ":")) + ";var TMW=" + _json.dumps(site.names_js(), separators=(",", ":")) +
-                 ";var NG=" + _json.dumps({n["slug"]: "game/w%s-%s-%s" % ((lambda w, a, b: (w, min(a, b), max(a, b)))(*(int(x) for x in n["game"].split("-")))) for n in site.news_list() if n.get("kind") not in ("feature", "cover") and n.get("game")}, separators=(",", ":")) + ";var NFLN=" + _json.dumps({k: f"{NFL_CITY[k]} {NFL_NICK[k]}" for k in NFL_NICK if k in NFL_CITY}, separators=(",", ":")) + ";var NFLK=" + _json.dumps(NFL_NICK, separators=(",", ":")) + ";var OH=" + _json.dumps([[lab, ts, {str(r): [round(v[0], 4), round(v[1], 4), round(v[2], 4)] + ([round(v[3], 3)] if len(v) > 3 and v[3] is not None else []) for r, v in d.items()}] for lab, ts, d in site.oh_ext()], separators=(",", ":")) + ";var YR=" + _json.dumps(str(site.yr)) + ";var BY=" + _json.dumps({t: 0 for t in NFL_NICK} | {t: w for w, ts in s.byes.items() for t in ts}) + ";</script>")
+                 ";var NG=" + _json.dumps({n["slug"]: "game/w%s-%s-%s" % ((lambda w, a, b: (w, min(a, b), max(a, b)))(*(int(x) for x in n["game"].split("-")))) for n in site.news_list() if n.get("kind") not in ("feature", "cover") and n.get("game")}, separators=(",", ":")) + ";var NFLN=" + _json.dumps({k: f"{NFL_CITY[k]} {NFL_NICK[k]}" for k in NFL_NICK if k in NFL_CITY}, separators=(",", ":")) + ";var NFLK=" + _json.dumps(NFL_NICK, separators=(",", ":")) + ";var OH=" + _json.dumps([[lab, ts, {str(r): [round(v[0], 4), round(v[1], 4), round(v[2], 4)] + ([round(v[3], 3)] if len(v) > 3 and v[3] is not None else []) for r, v in d.items()}] for lab, ts, d in site.oh_ext()], separators=(",", ":")) + ";var NWS=" + _json.dumps([[n["title"], n["slug"], n.get("week")] for n in site.news_list()], separators=(",", ":")) + ";var YR=" + _json.dumps(str(site.yr)) + ";var BY=" + _json.dumps({t: 0 for t in NFL_NICK} | {t: w for w, ts in s.byes.items() for t in ts}) + ";</script>")
         chrome = first[first.index("<body>") + 6:first.index("</div></div>", first.index('class="top"')) + 12]
         chrome = re.sub(r' aria-current=page', '', chrome)
         chrome = re.sub(r'href="(index|news|standings|playoffs|schedule|teams|players|h2h|draft|races|awards|trades|transactions|excitement|analyzer|records)\.html"', lambda m: f'href="#/{"" if m.group(1) == "index" else m.group(1)}"', chrome)
