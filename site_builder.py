@@ -565,6 +565,10 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 """
 
 CSS += """
+.ncard .kick,a.bseed .bn{color:#8A6A00}.field .ncard .kick,.dk .ncard .kick{color:var(--flag)}
+
+.ptable .psub{display:none}@media(max-width:760px){.ptable .psub{display:block;color:var(--mute);font-size:12px;font-weight:500;margin-top:2px;white-space:normal;max-width:150px}.ptable th:nth-child(2),.ptable td:nth-child(2),.ptable th:nth-child(3),.ptable td:nth-child(3),.ptable th:nth-child(4),.ptable td:nth-child(4){display:none}}
+
 .top .wrap{flex-wrap:nowrap}.tact{display:flex;gap:6px;margin-left:auto}.tbtn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid rgba(255,255,255,.18);color:#DCE3F0;border-radius:999px;padding:7px 12px;font:600 14px var(--body,inherit);cursor:pointer}.tbtn:hover,.tbtn:focus-visible{color:#fff;border-color:var(--flag)}
 .nvo{position:fixed;inset:0;z-index:60;background:rgba(6,14,34,.55);display:flex;justify-content:flex-end}.nvo[hidden]{display:none}.nvp{width:min(440px,100%);height:100%;background:var(--paper);color:var(--ink);display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(0,0,0,.25)}
 .nvh{display:flex;gap:8px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--rule)}.nvh input{flex:1;font:500 16px inherit;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--chalk,#fff);color:var(--ink)}.nvh input:focus{outline:2px solid var(--flag);outline-offset:0}.nvx{background:none;border:0;font-size:26px;line-height:1;color:var(--mute);cursor:pointer;padding:4px 8px}.nvx:hover{color:var(--ink)}
@@ -2071,13 +2075,18 @@ class Site:
             q = E((d["n"] + " " + d["p"] + " " + d["t"] + " " + d["tf"] + " " + (s_.TN(d["o"]) + " " + s_.M[d["o"]] if d["o"] else "free agent")).lower())
             cell = lambda v, txt, cls="r", na=False: f'<td class="{cls}" data-v="{v}"{" data-na=1" if na else ""}>{txt}</td>'
             return (f'<tr data-id="{i}" data-q="{q}" data-pos="{d["p"]}" data-own="{1 if d["o"] else 0}">'
-                    f'<td data-v="{E(d["n"].lower())}"><a class="pn" href="player/{i}.html"><b>{E(d["n"])}</b></a></td>{cell(d["p"], E(d["pd"].replace(", ", "/")), "c")}{cell(d["t"], s_.nl(d["t"]), "c")}'
+                    f'<td data-v="{E(d["n"].lower())}"><a class="pn" href="player/{i}.html"><b>{E(d["n"])}</b></a><small class="psub">{E(d["p"])}, {E(d["t"] or "FA")}, {E(s_.TN(d["o"])) if d["o"] else "free agent"}</small></td>{cell(d["p"], E(d["pd"].replace(", ", "/")), "c")}{cell(d["t"], s_.nl(d["t"]), "c")}'
                     f'{cell(E(s_.TN(d["o"]).lower()) if d["o"] else "zzz", s_.tn(d["o"], pre) if d["o"] else "<span class=muted>FA</span>", "")}'
                     f'{cell(st[0], st[0])}{cell(rkey, f"{wn}-{ls}" if wn + ls else "-", "c", na=not (wn + ls))}{cell(st[1], fp(st[1]), "r big")}{cell(st[7], fp(st[7]) if st[7] else "-", na=not st[7])}{cell(st[8], fp(st[8]) if st[8] else "-", na=not st[8])}{cell(st[9], fp(st[9]) if st[9] else "-", na=not st[9])}{cell(st[10], f"+{st[10]:.1f}" if st[10] else "-", na=not st[10])}{cell(round(per, 2), fp(round(per, 2)) if st[0] else "-", na=not st[0])}{cell(st[3], f"{st[3]:+.2f}" if st[0] else "-", na=not st[0])}{cell(st[4], f"{st[4]:+.1f}" if st[0] else "-", na=not st[0])}{cell(round(st[4] / st[0], 2) if st[0] else 0, f"{st[4] / st[0]:+.1f}" if st[0] else "-", na=not st[0])}{cell(st[12], f"{st[12]:+.2f}" if wn + ls else "-", na=not (wn + ls))}{cell(st[13], f"{st[13]:+.1f}" if wn + ls else "-", na=not (wn + ls))}{cell(MC_[0][i], MC_[0][i] or "-")}{cell(MC_[2][i], MC_[2][i] or "-")}'
                     f'{cell(-pick, f"{dd[0]}.{dd[1]:02d}" if dd else "-", na=not dd)}{cell(d["wr"], d["wr"])}{cell(len(S_["irw"]), len(S_["irw"]) or "-")}</tr>')
-        prow = "".join(prow_(i, d) for i, d in plist)
+        # column order by importance: who and where, production, value, results, then the bookkeeping
+        PORD = [0, 1, 2, 3, 6, 11, 12, 13, 14, 4, 5, 15, 16, 17, 18, 7, 8, 9, 10, 19, 20, 21]
+        def preorder(row):
+            i0 = row.index("<td"); head, cells = row[:i0], row[i0:-5].split("<td")[1:]
+            return head + "".join("<td" + cells[j] for j in PORD) + "</tr>"
+        prow = "".join(preorder(prow_(i, d)) for i, d in plist)
         heads = [("Player", "s"), ("Pos", "s"), ("NFL", "s"), ("Current team", "s"), ("Starts", "n"), ("Record", "n"), ("Pts started", "n"), ("Total pts", "n"), ("Bench pts", "n"), ("FA pts", "n"), ("Left on bench", "n"), ("PPG", "n"), ("WAR", "n"), ("PAA", "n"), ("PAA/start", "n"), ("Win Impact", "n"), ("Support", "n"), ("Week MVPs", "n"), ("Game MVPs", "n"), ("Drafted", "n"), ("Wks rostered", "n"), ("Wks on IR", "n")]
-        thead = "".join(f'<th class="{"" if k in (0, 3) else "c" if k in (1, 2, 5) else "r"} sortable"{" aria-sort=descending" if k == 6 else ""} data-k="{k}" data-t="{t}" tabindex="0" role="button">{h}</th>' for k, (h, t) in enumerate(heads))
+        thead = "".join(f'<th class="{"" if o in (0, 3) else "c" if o in (1, 2, 5) else "r"} sortable"{" aria-sort=descending" if o == 6 else ""} data-k="{k}" data-t="{heads[o][1]}" tabindex="0" role="button">{heads[o][0]}</th>' for k, o in enumerate(PORD))
         filt = ('<div class="pfilt"><div class="chips">' + "".join(f'<a href="#" class="pf{" nx" if p_ == "All" else ""}" data-pos="{p_}">{p_}</a>' for p_ in ["All", "QB", "RB", "WR", "TE", "K", "DEF"]) + '</div>'
                 '<select class="pown" aria-label="Roster status"><option value="all">Everyone</option><option value="1">On a roster</option><option value="0">Free agents</option></select></div>')
         P["players.html"] = page(f"Players, Super League {yr}", s_.head("Players", "Everyone who has been on a Super League roster this season.") +
@@ -3005,7 +3014,7 @@ class Site:
         def shade(col, r):          # rank within the column: 1st is darkest, last is lightest
             rk = sorted(s.R, key=lambda x: -col[x]).index(r)
             a_ = 0.62 - 0.58 * rk / max(n_ - 1, 1)
-            return f"background:rgba(30,123,74,{a_:.2f});color:{'#fff' if a_ > 0.42 else '#0B1F44'}"
+            return f"background:rgba(30,123,74,{a_:.2f});color:#0B1F44"
         cols = {P: {r: wp[r][P] for r in s.R} for P in PO}
         def cell(r, P):
             v = wp[r][P]
@@ -4014,7 +4023,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     if(p[0]==='players'&&p[1]){ var sec=hit.querySelector('.psearch').closest('section');
       sec.querySelector('.psearch').value=''; sec.querySelector('.pown').value='all';
       [].forEach.call(sec.querySelectorAll('.pf'),function(x){x.classList.toggle('nx',x.getAttribute('data-pos')===p[1]);}); pfilter(sec);
-      var th=sec.querySelector('.ptable th[data-k="12"]'); th.removeAttribute('aria-sort'); psort(th);
+      var th=sec.querySelector('.ptable th[data-k="6"]'); th.removeAttribute('aria-sort'); psort(th);
       var row=p[3]&&sec.querySelector('tr[data-id="'+p[3]+'"]');
       if(row){ row.scrollIntoView({block:'center',behavior:'instant'}); row.classList.add('flash'); setTimeout(function(){row.classList.remove('flash');},2200); return; }
       window.scrollTo({top:0,left:0,behavior:'instant'}); return; }
