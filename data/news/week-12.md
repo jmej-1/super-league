@@ -85,7 +85,7 @@ date: 2026-11-24 13:45
 =====
 slug: w12-waivers-deadline
 title: Jesse Wins the Williams Sweepstakes. Now Comes the Deadline.
-dek: Thomas put in for the hottest receiver on the wire twice and came up empty both times. Trades shut down Monday night, and three 5-6 teams still have a quarterback problem.
+dek: Thomas put in for the hottest receiver on the wire and came up empty. Trades shut down Monday night, and three 5-6 teams still have a quarterback problem.
 week: 12
 kind: feature
 teams: 2,10,3,6,8,4,9,7
@@ -96,7 +96,7 @@ The wire cleared at 3 AM and the biggest name on it went to the team that needed
 
 Williams was the waiver prize of the week for a reason. He led everyone on Monday night with 11 targets, 9 catches and 122 yards, he has played at least 80% of Washington's snaps four weeks running, and with McLaurin done he is the closest thing the Commanders have to a top target. Jesse dropped the Bills defense to make room (Kansas City on Thanksgiving night was not a matchup he wanted) and cut {p:12474} loose a few minutes earlier.
 
-**The team that wanted him most got nothing.** {t:10} put in for Williams twice. Both claims failed. Thomas settled for {p:10219} and let {p:13424} go. For a 5-6 team sitting at 61% to make the playoffs, that is a miss that stings.
+**The team that wanted him most got nothing.** {t:10} put in for Williams too, and Jesse's claim came first. Thomas settled for {p:10219} and let {p:13424} go. For a 5-6 team sitting at 61% to make the playoffs, that is a miss that stings.
 
 The rest of the wire:
 
