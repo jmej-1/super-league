@@ -1065,7 +1065,7 @@ class Site:
         s = s_.s
         if done:
             sa, sb = s.G[w]["scores"][a], s.G[w]["scores"][b]
-            row = lambda r, sc, won: f'<div class="row {"w" if won else "l"}">{s_.logo(r, pre, "lgs")}<span class="t">{E(s_.TN(r))}</span><span class="s">{fp(sc)}</span></div>'
+            row = lambda r, sc, won: f'<div class="row {"w" if won else "l"}">{s_.logo(r, pre, "lgs", w)}<span class="t">{E(s_.TN(r, w))}</span><span class="s">{fp(sc)}</span></div>'
             return f'<a class="gm" href="{s_.gurl(w, a, b, pre)}">{row(a, sa, sa > sb)}{row(b, sb, sb > sa)}<div class="foot">Final</div></a>'
         A, B = s_.upcoming(w, a), s_.upcoming(w, b); pa = s_.win_p(A, B)
         row = lambda r, mu, p: f'<div class="row">{s_.logo(r, pre, "lgs")}<span class="t">{E(s_.TN(r))}</span><span class="s">{pct(p)}</span></div>'
@@ -1397,7 +1397,7 @@ class Site:
         weeks = sorted({n["week"] for n in NL if n.get("game")}, reverse=True)
         def grow(n):
             gw, ga, gb = (int(x) for x in n["game"].split("-"))
-            return (f'<a class="grow" href="{s_.gurl(gw, ga, gb, pre)}"><span class="kick">{s_.KIND[n["kind"]]}</span>{s_.logo(ga, pre, "lgs")}{s_.logo(gb, pre, "lgs")}'
+            return (f'<a class="grow" href="{s_.gurl(gw, ga, gb, pre)}"><span class="kick">{s_.KIND[n["kind"]]}</span>{s_.logo(ga, pre, "lgs", gw)}{s_.logo(gb, pre, "lgs", gw)}'
                     f'<b>{E(n["title"])}</b></a>')
         games = '<div class="gweeks">' + "".join(f'<div><h3 class="wsub">Week {w}</h3><div class="glist">' + "".join(grow(n) for n in NL if n.get("game") and n["week"] == w) + "</div></div>" for w in weeks) + '</div>'
         P["news.html"] = page(f"News, Super League {yr}", s_.head("News", "") +
@@ -2830,13 +2830,13 @@ class Site:
             if x["type"] == "trade":
                 vet = any(j.get("vetoed") for j in getattr(s, "trades_meta", []) if False)
                 body = '<div class="txsides">' + "".join(
-                    f'<div class="txside"><div class="txt">{s_.logo(r, pre, "lgs")}<a href="{s_.turl(r, pre)}"><b>{E_(s_.TN(r))}</b></a> gets{grade(x, r)}</div><ul>'
+                    f'<div class="txside"><div class="txt">{s_.logo(r, pre, "lgs", x["w"])}<a href="{s_.turl(r, pre)}"><b>{E_(s_.TN(r, x["w"]))}</b></a> gets{grade(x, r)}</div><ul>'
                     + "".join(prow(i, "+", since_add(x, i, r)) for i in sorted((i for i, rr in x["adds"] if rr == r), key=lambda i: (-pts_for(x, i, r), -sum(s.NP[w_].get(i, 0) for w_ in s.weeks)))) + '</ul></div>' for r in rs) + '</div>'
                 head = " and ".join(E_(s_.M[r]) for r in rs)
             else:
                 r = rs[0] if rs else None
                 body = '<ul>' + "".join(prow(i, "+", since_add(x, i, r) if not failed else "Claim lost") for i, _ in x["adds"]) + "".join(prow(i, "−", since_drop(x, i, r)) for i, _ in x["drops"] if not failed) + '</ul>'
-                head = (f'{s_.logo(r, pre, "lgs")}<a href="{s_.turl(r, pre)}"><b>{E_(s_.TN(r))}</b></a><small>{E_(s_.M[r])}</small>' + (grade(x, r) if not failed else "")) if r else ""
+                head = (f'{s_.logo(r, pre, "lgs", x["w"])}<a href="{s_.turl(r, pre)}"><b>{E_(s_.TN(r, x["w"]))}</b></a><small>{E_(s_.M[r])}</small>' + (grade(x, r) if not failed else "")) if r else ""
             chip = "Lost claim" if failed else TYP.get(x["type"], x["type"].title())
             wk = f'<h3 class="txw">Week {x["w"]}</h3>' if x["w"] != lastw else ""; lastw = x["w"]
             cards.append(f'{wk}<article class="txc {kind}{" lost" if failed else ""}" data-k="{kind}" data-r="{",".join(str(r) for r in rs)}" data-lost="{1 if failed else 0}">'
@@ -2845,7 +2845,7 @@ class Site:
         def mline(v, x, r):
             got = [s.nm(i) for i, rr in x["adds"] if rr == r]; gave = [s.nm(i) for i, rr in x["drops"] if rr == r]
             what = ("+" + ", ".join(got) if got else "") + (" / " if got and gave else "") + ("−" + ", ".join(gave) if gave else "")
-            return (f'<li><span class="tat2x">{s_.logo(r, pre, "lgs")}<span><b>{E_(s.M[r])}</b> <small class="muted">Week {x["w"]}, {E_(TYP.get(x["type"], ""))}</small><br><small>{E_(what)}</small></span></span>'
+            return (f'<li><span class="tat2x">{s_.logo(r, pre, "lgs", x["w"])}<span><b>{E_(s.M[r])}</b> <small class="muted">Week {x["w"]}, {E_(TYP.get(x["type"], ""))}</small><br><small>{E_(what)}</small></span></span>'
                     f'<b class="{"pos" if v > 0 else "neg"}">{v:+.1f}</b></li>')
         best = sorted(allg, key=lambda z: -z[0])[:5]; worst = sorted(allg, key=lambda z: z[0])[:5]
         top = (f'<div class="grid2 txbw" style="margin-top:22px"><section><h2>Best moves</h2><ol class="txbl">{"".join(mline(*z) for z in best)}</ol></section>'
@@ -3790,8 +3790,8 @@ class Site:
         outsc = lambda r: sum(G["scores"][r] > G["scores"][x] for x in s.R if x != r)
         extra = {r: [("outscored", f"{outsc(r)} of {n9}"), (f"of best possible ({fp(opt[r])})", pct(G["scores"][r] / opt[r] if opt[r] else 1))] for r in (a, b)}
         ser = [w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b}]
-        series = "".join(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if s.G[w2]["scores"][a] > s.G[w2]["scores"][b] else "l"}">{s_.logo(a, pre, "lgs")}<span class="t">{E(s_.TN(a))}</span><span class="s">{s.G[w2]["scores"][a]:.1f}</span></div>'
-                         f'<div class="row {"w" if s.G[w2]["scores"][b] > s.G[w2]["scores"][a] else "l"}">{s_.logo(b, pre, "lgs")}<span class="t">{E(s_.TN(b))}</span><span class="s">{s.G[w2]["scores"][b]:.1f}</span></div><div class="foot">Week {w2}</div></a>' for w2 in ser)
+        series = "".join(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if s.G[w2]["scores"][a] > s.G[w2]["scores"][b] else "l"}">{s_.logo(a, pre, "lgs", w2)}<span class="t">{E(s_.TN(a, w2))}</span><span class="s">{s.G[w2]["scores"][a]:.1f}</span></div>'
+                         f'<div class="row {"w" if s.G[w2]["scores"][b] > s.G[w2]["scores"][a] else "l"}">{s_.logo(b, pre, "lgs", w2)}<span class="t">{E(s_.TN(b, w2))}</span><span class="s">{s.G[w2]["scores"][b]:.1f}</span></div><div class="foot">Week {w2}</div></a>' for w2 in ser)
         mid = f'<span class="tag">Final</span><div style="margin-top:8px">by {fp(abs(sa - sb))}</div>'
         body = f"""<section class="field"><div class="wrap"><a class="back" href="../schedule.html#wk{w}">Week {w} schedule</a>
 {s_.board(w, a, b, pre, fp(sa), fp(sb), mid, True, extra)}</div></section>
@@ -3888,8 +3888,8 @@ class Site:
                 + tape_row("Power", s_.power[a][0], s_.power[b][0], lambda v: f"#{v}", False) + tape_row("xWins", s_.xw[a], s_.xw[b], lambda v: f"{v:.1f}")
                 + tape_row("Playoff odds", out[a]["po"], out[b]["po"], pct) + tape_row("Title odds", out[a]["ti"], out[b]["ti"], pct) + "</div>")
         ser = [w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b}]
-        series = "".join(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if s.G[w2]["scores"][a] > s.G[w2]["scores"][b] else "l"}">{s_.logo(a, pre, "lgs")}<span class="t">{E(s_.TN(a))}</span><span class="s">{s.G[w2]["scores"][a]:.1f}</span></div>'
-                         f'<div class="row {"w" if s.G[w2]["scores"][b] > s.G[w2]["scores"][a] else "l"}">{s_.logo(b, pre, "lgs")}<span class="t">{E(s_.TN(b))}</span><span class="s">{s.G[w2]["scores"][b]:.1f}</span></div><div class="foot">Week {w2}</div></a>' for w2 in ser) or '<p class="muted">First meeting this season.</p>'
+        series = "".join(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if s.G[w2]["scores"][a] > s.G[w2]["scores"][b] else "l"}">{s_.logo(a, pre, "lgs", w2)}<span class="t">{E(s_.TN(a, w2))}</span><span class="s">{s.G[w2]["scores"][a]:.1f}</span></div>'
+                         f'<div class="row {"w" if s.G[w2]["scores"][b] > s.G[w2]["scores"][a] else "l"}">{s_.logo(b, pre, "lgs", w2)}<span class="t">{E(s_.TN(b, w2))}</span><span class="s">{s.G[w2]["scores"][b]:.1f}</span></div><div class="foot">Week {w2}</div></a>' for w2 in ser) or '<p class="muted">First meeting this season.</p>'
         is_live = s_.wk_live(w)
         mid = ('<span class="livedot">LIVE</span>' if is_live else f'<span class="tag soft">{"Up next" if w == s.nxt else "Upcoming"}</span><div style="margin-top:8px">Projected</div>')
         split = s_.rope(a, b, pa, "chance to win")
