@@ -565,6 +565,8 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 """
 
 CSS += """
+@media(min-width:701px){.dcls .mnow{display:none!important}}
+
 .rlg2{position:relative;grid-area:lg;align-self:start}@media(max-width:760px){.rlg2{width:44px;height:44px}.rlg2 .im{width:29px;height:29px}.rtie .rlg2{width:36px;height:36px}.rtie .rlg2 .im{width:24px;height:24px}}.rtie .rlg2{grid-area:auto!important}.rlgn{position:absolute;right:-6px;bottom:-4px;background:var(--flag,#e0b43a);color:#0B1F44;font:800 11px/1 var(--body,inherit);border-radius:9px;padding:3px 5px;box-shadow:0 0 0 2px var(--field,#0b1a3a)}
 
 .stint .ofw{font-size:inherit;font-weight:500;color:var(--mute);white-space:nowrap}
