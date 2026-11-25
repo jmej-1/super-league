@@ -1469,6 +1469,8 @@ class Site:
                 sc_ = s.G[w]["scores"]; wi = a if sc_[a] > sc_[b] else b; lo = b if wi == a else a
                 add("g_excite", ev, f"{ev:.1f}", wi, [wi, lo], o=lo, w=w, u=G_(w, wi, lo), x=f'{fp(sc_[wi])} to {fp(sc_[lo])}')
                 add("g_dull", -ev, f"{ev:.1f}", wi, [wi, lo], o=lo, w=w, u=G_(w, wi, lo), x=f'{fp(sc_[wi])} to {fp(sc_[lo])}')
+                fl_ = (getattr(s_, "_excp", {}).get((w, min(a, b), max(a, b))) or {}).get("flips", 0)
+                if fl_: add("g_flips", fl_, str(fl_), wi, [wi, lo], o=lo, w=w, u=G_(w, wi, lo), x=f'{fp(sc_[wi])} to {fp(sc_[lo])}')
         for x in s_.improbable():
             sc_ = s.G[x["w"]]["scores"]
             add("g_improb", -x["low"], pct(x["low"]), x["wi"], [x["wi"], x["lo"]], o=x["lo"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=(("at " + x["at"][1:].replace("Live, ", "") + ", ") if x["at"].startswith("@") else "") + f'won {fp(sc_[x["wi"]])} to {fp(sc_[x["lo"]])}')
@@ -3394,7 +3396,7 @@ class Site:
             if sg and prev and sg != prev: lc += 1
             if sg: prev = sg
         fh = (f'<div class="gfh"><div class="gft1">{s_.logo(a, pre, "lgs")}<div><b>{fp(sa_[-1])}</b><small><i class="gfl"></i>{E(s_.M[a])}</small></div></div>'
-              f'<div class="gfm"><b>{lc}</b><small>Lead change{"" if lc == 1 else "s"}</small></div>'
+              f'<div class="gfm"><b>{lc}</b><small>Score lead change{"" if lc == 1 else "s"}</small></div>'
               f'<div class="gft1 r"><div><b>{fp(sb_[-1])}</b><small>{E(s_.M[b])}<i class="gfl d"></i></small></div>{s_.logo(b, pre, "lgs")}</div></div>')
         lows = ""
         if (w, a, b) in getattr(s_, "_wpos", {}) and len(pts) > 2:          # each side's low point, play by play
@@ -4476,7 +4478,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   document.addEventListener('mouseout',function(e){ var t=e.target.closest&&e.target.closest('.tip'); if(t&&!tipEl.classList.contains('pin')) tipEl.hidden=true; });
   document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('.tip'); if(t&&t.closest('th.sortable,th.srt')){ tipEl.hidden=true; return; } if(t){ showTip(t,1); } else if(!(e.target.closest&&e.target.closest('.tipbox')&&!e.target.closest('.cx'))) tipEl.hidden=true; },true);
   window.addEventListener('scroll',function(){tipEl.hidden=true;},{passive:true}); window.addEventListener('hashchange',function(){tipEl.hidden=true;});
-  var BOOK={team:[['Single game',[['g_high','Highest score'],['g_low','Lowest score'],['g_blow','Biggest blowout'],['g_close','Closest game'],['g_comb','Most combined points'],['g_hiloss','Highest score in a loss'],['g_lowin','Lowest score in a win'],['g_upset','Biggest upset'],['g_excite','Most exciting game'],['g_dull','Least exciting game'],['g_bench','Most points lost to start/sit']]],['Biggest comebacks',[['g_improb','Lowest win chance overcome'],['g_down','Biggest deficit overcome']]],
+  var BOOK={team:[['Single game',[['g_high','Highest score'],['g_low','Lowest score'],['g_blow','Biggest blowout'],['g_close','Closest game'],['g_comb','Most combined points'],['g_hiloss','Highest score in a loss'],['g_lowin','Lowest score in a win'],['g_upset','Biggest upset'],['g_excite','Most exciting game'],['g_flips','Most lead changes'],['g_dull','Least exciting game'],['g_bench','Most points lost to start/sit']]],['Biggest comebacks',[['g_improb','Lowest win chance overcome'],['g_down','Biggest deficit overcome']]],
       ['Season',[['s_pct','Best record'],['s_pctlo','Worst record'],['s_wins','Most wins'],['s_pf','Most points'],['s_pflow','Fewest points'],['s_pa','Most points against'],['s_xw','Most xWins'],['s_lucky','Luckiest'],['s_unlucky','Unluckiest'],['s_wstreak','Longest win streak'],['s_lstreak','Longest losing streak']],1]],
     player:[['Single game',[['p_start','Most points'],['p_startlo','Fewest points'],['p_pm','Best PAA'],['p_pmlo','Worst PAA'],['p_war1','Most WAR'],['p_war1lo','Fewest WAR'],['p_bench','Most bench points']]],
       ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_wi','Most Win Impact'],['py_wilo','Least Win Impact'],['py_luck','Best supporting cast'],['py_unluck','Worst supporting cast'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
@@ -4484,14 +4486,14 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     mgr:[['Single week or move',[['l_add1','Most gut-call wins added'],['m_besttrade','Most wins gained in a trade'],['m_heist','Most lopsided trade'],['m_pick','Best pickup'],['m_drop','Worst drop']]],
       ['Season',[['m_total','Most total wins added'],['l_add','Most gut-call wins added'],['m_gm','Best GM'],['m_eff','Most efficient GM'],['m_trader','Best trader'],['m_treff','Most efficient trader'],['m_waiver','Best waiver work'],['m_wveff','Most efficient waiver work'],['m_dropcost','Costliest drops'],['m_draft','Best draft'],['l_eff','Best lineup efficiency'],['l_bench','Most points lost to start/sit'],['l_over','Most points over projection'],['w_high','Most weekly high scores'],['w_low','Most weekly low scores'],['w_mvp','Most weekly MVPs'],['m_trades','Most trades'],['m_moves','Most waiver and free-agent moves'],['m_allmv','Most total moves']],1],
       ['All-time',[['f_pct','Best win %'],['c_m_total','Most total wins added'],['c_l_add','Most gut-call wins added'],['c_m_gm','Best GM'],['c_m_eff','Most efficient GM'],['c_m_trader','Best trader'],['c_m_treff','Most efficient trader'],['c_m_waiver','Best waiver work'],['c_m_wveff','Most efficient waiver work'],['c_m_dropcost','Costliest drops'],['c_m_draft','Best drafter'],['c_l_eff','Best lineup efficiency'],['c_l_bench','Most points lost to start/sit'],['c_l_over','Most points over projection'],['c_w_high','Most weekly high scores'],['c_w_low','Most weekly low scores'],['c_w_mvp','Most weekly MVPs'],['c_m_trades','Most trades'],['c_m_moves','Most waiver and free-agent moves'],['c_m_allmv','Most total moves']],1,1]]};
-  var OVER={g_blow:1,g_close:1,g_comb:1,g_upset:1,g_improb:1,g_down:1,g_excite:1,g_dull:1,m_heist:1}, RBOOK='team', RPOS='ALL';
+  var OVER={g_blow:1,g_close:1,g_comb:1,g_upset:1,g_improb:1,g_down:1,g_excite:1,g_dull:1,g_flips:1,m_heist:1}, RBOOK='team', RPOS='ALL';
   function toHash(u){ var m;
     if((m=/^game\\/(.+)\\.html$/.exec(u))) return '#/game/'+m[1];
     if((m=/^player\\/(.+)\\.html$/.exec(u))) return '#/player/'+m[1];
     if((m=/^team\\/([^.#]+)\\.html(?:#(.+))?$/.exec(u))) return '#/team/'+m[1]+(m[2]?'/'+m[2]:'');
     return '#/'+u.replace(/\\.html$/,''); }
   function recData(pg){ if(!pg._rd) pg._rd=JSON.parse(pg.querySelector('.rdata').textContent); return pg._rd; }
-  var SYM={g_comb:1,g_close:1}, RPER='all', RSC='L'; function tv(e){ return e.length>8?e[8]:e[0]; }
+  var SYM={g_comb:1,g_close:1,g_flips:1}, RPER='all', RSC='L'; function tv(e){ return e.length>8?e[8]:e[0]; }
   // a season chip only where the record belongs to one season (a game, a season, a trade, a draft); never on all-time totals, and not inside a one-season view
   function yrOf(k){ return RPER==='all' && !/^(pc_|f_|c_)/.test(k); }
   function hold(k,e){ var r=e[1], p=e[2], o=e[3], d=p&&PD[p], tn=function(x){ var nm_=(e[5]==YR&&e[4])?tmAt(x,e[4])[0]:TM[x][0]; return RBOOK==='mgr'?TM[x][1]:nm_+' ('+TM[x][1]+')'; };          // manager records: just the manager
@@ -4523,7 +4525,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   function rrow(k,t,e,tag){ var h=hold(k,e);
     return '<'+tag+' class="rrow"'+(tag==='button'?' type="button" data-k="'+k+'" data-t="'+esc(t)+'"':' href="'+toHash(e[6])+'"')+'><span class="rlab">'+esc(t)+'</span>'+rlogo(k,e,h)
       +'<span class="rhold"><b>'+hname(h)+'</b>'+nflc(h)+rsm(h)+'</span><span class="ryear">'+ychip(k,e,h)+'</span><span class="rval">'+esc(e[0])+(RUNIT[k]?'<small class="runit">'+RUNIT[k]+'</small>':'')+'</span></'+tag+'>'; }
-  var RUNIT={g_excite:'excitement score',g_dull:'excitement score'};
+  var RUNIT={g_excite:'excitement score',g_dull:'excitement score',g_flips:'lead changes'};
   function trow(k,t,L){ var T=L.filter(function(e){return tv(e)===tv(L[0]);}), nT=T.length, more=''; T=T.slice(0,4);
     if(nT<2) return rrow(k,t,L[0],'button');
     var hs='', ys='';
