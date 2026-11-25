@@ -567,9 +567,9 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 CSS += """
 @media(min-width:701px){.dcls .mnow{display:none!important}}
 
-.rlg2{position:relative;grid-area:lg;align-self:start}@media(max-width:760px){.rlg2{width:44px;height:44px}.rlg2 .im{width:29px;height:29px}.rtie .rlg2{width:36px;height:36px}.rtie .rlg2 .im{width:24px;height:24px}}.rtie .rlg2{grid-area:auto!important}.rlgn{position:absolute;right:-6px;bottom:-4px;background:var(--flag,#e0b43a);color:#0B1F44;font:800 11px/1 var(--body,inherit);border-radius:9px;padding:3px 5px;box-shadow:0 0 0 2px var(--field,#0b1a3a)}
+.rlg2{position:relative}@media(max-width:760px){.rlg2{grid-area:lg;align-self:start;width:44px;height:44px}.rlg2 .im{width:29px;height:29px}.rtie .rlg2{width:36px;height:36px}.rtie .rlg2 .im{width:24px;height:24px}}.rtie .rlg2{grid-area:auto!important}.rlgn{position:absolute;right:-6px;bottom:-4px;background:var(--flag,#e0b43a);color:#0B1F44;font:800 11px/1 var(--body,inherit);border-radius:9px;padding:3px 5px;box-shadow:0 0 0 2px var(--field,#0b1a3a)}
 
-.stint .ofw{font-size:inherit;font-weight:500;color:var(--mute);white-space:nowrap}
+.stint .ofw{display:inline!important;margin:0!important;font-size:inherit;font-weight:500;color:var(--mute)}.stint td:has(.ofw){white-space:nowrap}
 
 .ncard .kick,a.bseed .bn{color:#8A6A00}.field .ncard .kick,.dk .ncard .kick{color:var(--flag)}
 
@@ -4342,9 +4342,12 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     ['mgr','team'].forEach(function(book){ if(!BOOK[book]) return; BOOK[book].forEach(function(g){ g[1].forEach(function(c){ var L=X[c[0]]; if(!L||!L.length) return;
       L.forEach(function(e){ if(tv(e)!==tv(L[0])||+e[1]!==+r) return; var shared=L.filter(function(x){return tv(x)===tv(L[0]);}).length>1;
         var when=e[4]?'Week '+e[4]+(e[5]?', '+e[5]:''):(e[5]||''); if(seen[c[1]+'|'+e[0]]) return; seen[c[1]+'|'+e[0]]=1;   // one season so far: season and all-time are the same record
-        rows.push('<a class="hrr" href="#/records/'+book+'/'+c[0]+'"><span class="hrn"><b>'+esc(c[1])+'</b><small>'+esc(g[0])+(when?', '+esc(when):'')+(shared?'<i class="hrtie">Shared</i>':'')+'</small></span><span class="hrv">'+esc(e[0])+'</span></a>'); }); }); }); });
+        rows.push({sh:shared, mg:book==='mgr', h:'<a class="hrr" href="#/records/'+book+'/'+c[0]+'"><span class="hrn"><b>'+esc(c[1])+'</b><small>'+esc(g[0])+(when?', '+esc(when):'')+(shared?'<i class="hrtie">Shared</i>':'')+'</small></span><span class="hrv">'+esc(e[0])+'</span></a>'}); }); }); }); });
     if(!rows.length) return '<section class="hrsec"><h2>Records held</h2><p class="intro">None yet.</p></section>';
-    return '<section class="hrsec"><h2>Records held</h2><div class="hrl">'+rows.join('')+'</div></section>';
+    var nS=rows.filter(function(x){return x.sh;}).length, nM=rows.filter(function(x){return x.mg;}).length;
+    var strip='<div class="hrstrip"><div><b>'+rows.length+'</b><span>Total</span></div><div><b>'+(rows.length-nM)+'</b><span>Team records</span></div><div><b>'+nM+'</b><span>Manager records</span></div>'+(nS?'<div><b>'+nS+'</b><span>Shared</span></div>':'')+'</div>';
+    var grp=function(mg,lab){ var L=rows.filter(function(x){return x.mg===mg;}); return L.length?'<h3 class="hrgh">'+lab+'</h3><div class="hrl">'+L.map(function(x){return x.h;}).join('')+'</div>':''; };
+    return '<section class="hrsec"><h2>Records held</h2>'+strip+grp(false,'Team records')+grp(true,'Manager records')+'</section>';
   }
   function addTeamRecords(){ var m=/^#\/team\/([^\/]+)$/.exec(location.hash); if(!m) return;
     var pg=document.querySelector('.pg[data-p="team/'+m[1]+'"]'); if(!pg||pg._tr) return; var r=Object.keys(TM).filter(function(k){return TM[k][1]===decodeURIComponent(m[1]);})[0]; if(!r) return; pg._tr=1;
