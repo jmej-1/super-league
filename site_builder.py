@@ -141,6 +141,7 @@ tr.tstart td{border-top:2px solid var(--rule)}
 .wpcard .sbw .im{width:18px;height:18px}.wpcard .sbw .nfl{width:15px;height:15px;margin:0}.wpcard .sbwn{font-weight:600}.wpcard .sbw b.up{color:#8FD6A4}.wpcard .sbw b.dn{color:#F08F8F}
 .wpcard .sbh{display:block;font-size:12px;font-weight:600;color:#AFC0DA;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wpcard .sbd{font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;text-align:left;color:transparent}.wpcard .sbd.up{color:#8FD6A4}.wpcard .sbd.dn{color:#F08F8F}
+.wpcard .sbx{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:5px;font-size:11.5px;color:#8FA0BC}.wpcard .sbx b{font-weight:700;color:#DCE3F0}.wpcard .sbx b.up{color:#8FD6A4}
 .wpcard .sbv{display:flex;align-items:baseline;justify-content:flex-end;gap:6px}.wpcard .sbv .sbd{min-width:38px}
 .wpcard .sbr{display:grid;grid-template-columns:4px 24px 1fr auto 96px;align-items:center;gap:8px;padding:3px 0}.wpcard .sbc{width:4px;height:22px;border-radius:2px}
 .wpcard .sbr .im{width:24px;height:24px}.wpcard .sbn{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}.wpcard .sbr.lead .sbn{opacity:1}
@@ -3438,11 +3439,11 @@ class Site:
         return FR, FF, ticks
 
     def wp_chart(s_, w, a, b, pre):
-        def sb(when, xa, xb, p, proj=False, ev=None, nev=None, prv=None):
+        def sb(when, xa, xb, p, proj=False, ev=None, nev=None, prv=None, p_row=None):
             """The scoreboard over the charts: when, both teams' points so far and win chances, what each gained on this play, and the play."""
             def dl(v, f, pctg=False):
                 if prv is None or abs(v) < (0.0005 if pctg else 0.005): return '<small class="sbd"></small>'
-                return f'<small class="sbd {"up" if v > 0 else "dn"}">{v * 100:+.1f}</small>' if pctg else f'<small class="sbd {"up" if v > 0 else "dn"}">{v:+.{f}f}</small>'
+                return f'<small class="sbd {"up" if v > 0 else "dn"}">{v * 100:+.1f}%</small>' if pctg else f'<small class="sbd {"up" if v > 0 else "dn"}">{v:+.{f}f}</small>'
             def row(r, x, q, col, x0, q0):
                 return (f'<span class="sbr{" lead" if q > 0.5 else ""}"><i class="sbc" style="background:{col}"></i>{s_.logo(r, pre, "lgs", w)}'
                         f'<span class="sbn">{E(s_.TN(r, w))}</span><span class="sbv"><b class="sbs">{(f"{x:.1f}" if proj else fp(x))}</b>{dl(x - x0, 2) if prv else dl(0, 2)}</span>'
@@ -3451,7 +3452,13 @@ class Site:
             if ev:                                     # the points this play was worth to each side, same as the chips
                 ga = sum(x[2] for e in ev for x in e["who"] if x[1] == 0); gb = sum(x[2] for e in ev for x in e["who"] if x[1] == 1)
                 xa0, xb0 = xa - ga, xb - gb
-            left = f'<span class="sbL"><span class="sbh">{E(when)}</span>{row(a, xa, p, "#DCE3F0", xa0, p0)}{row(b, xb, 1 - p, "#C9A21A", xb0, 1 - p0)}</span>'
+            split = ""
+            if ev and prv and p_row is not None and abs(p_row - p0) >= 0.003:   # the move since the last play shown = the clock running + this play
+                def part(lbl, d):
+                    if abs(d) < 0.0005: return f'<span>{lbl} <b>even</b></span>'
+                    return f'<span>{lbl} <b class="{"up"}">{E(s_.M[a] if d > 0 else s_.M[b])} {abs(d) * 100:+.1f}%</b></span>'
+                split = f'<span class="sbx">{part("Clock since last play", p_row - p0)}{part("This play", p - p_row)}</span>'
+            left = f'<span class="sbL"><span class="sbh">{E(when)}</span>{row(a, xa, p, "#DCE3F0", xa0, p0)}{row(b, xb, 1 - p, "#C9A21A", xb0, 1 - p0)}{split}</span>'
             return left + (play(ev, nev) if PBP_ else "")
         def nfl_(t): return f'<i class="nfl N{t}" role="img" aria-label="{t}"></i>' if t in NFL_NICK else ""
         import pbp as _pb
@@ -3461,7 +3468,7 @@ class Site:
             t = re.split(r"\s\*\*\s|\.?\s*PENALTY on|\.?\s*Penalty on|\.?\s*The Replay Official", t or "")[0]
             t = re.sub(r"\s*\((?:[^()]*)\)", "", t)                              # (Shotgun), (B.Branch, D.Moore), (Aborted)
             t = re.sub(r"\s*\[[^\]]*\]", "", t)                                   # [D.Olajiga]
-            t = re.sub(r",?\s*(?:Center|Holder)-[^,.]*", "", t)
+            t = re.sub(r",?\s*(?:Center|Holder)-(?:[A-Z][A-Za-z'\-]*\.)?[A-Za-z'\-]+", "", t)
             t = re.sub(r"\s+", " ", t).strip()
             ks = {_pb.key_of(s_.s.PL.get(i, {}).get("name", "")) for i in who if i.isdigit()} - {None}
             has = lambda x: any(re.search(r"(?<![A-Za-z])" + re.escape(k) + r"(?![a-z])", x) for k in ks)
@@ -3492,6 +3499,10 @@ class Site:
             return f'<span class="sbpl">{gl}<span class="sbt">{E(ptxt(g0["txt"], [x[0] for x in g0["who"]]))}</span><span class="sbws">{who}</span></span>'
         pts = s_.wp_series(w, a, b)
         PBP_ = (w, a, b) in getattr(s_, "_wpos", {})
+        if pts:
+            shw = [not (x[0] == "·" and PBP_ and not (len(x) > 5 and x[5]) and k != len(pts) - 1) for k, x in enumerate(pts)]   # points the drag stops on
+            sh_, last_ = [], None
+            for k in range(len(pts)): sh_.append(last_); last_ = k if shw[k] else last_
         if not pts or len(pts) < 2: return ""
         fut = getattr(s_, "_fut", {}).get((w, a, b), [])
         Wd, Hd, L, R, T_, B_ = 680, 268, 118, 44, 18, 58
@@ -3570,7 +3581,7 @@ class Site:
                   ''
                   )
         for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
-            card = sb(when, xa, xb, p, prv=((pts[k - 1][3][0], pts[k - 1][3][1], pts[k - 1][1]) if k else None), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Time slot check-in"))
+            card = sb(when, xa, xb, p, prv=((pts[sh_[k]][3][0], pts[sh_[k]][3][1], pts[sh_[k]][1]) if sh_[k] is not None else None), p_row=(pts[k - 1][1] if k else None), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Final" if "final" in str(when) else "Time slot check-in"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})          # a play-by-play point: no dot, a small tap target
             if pl_ and not (ev_ and ev_[0]) and k != len(pts) - 1: continue      # nobody in the matchup scored on it: the line keeps it, dragging skips it
             g += (f'<circle class="wpd" cx="{X[k]:.1f}" cy="{Y[k]:.1f}" r="{6 if pl_ else 22}" fill="transparent" '
@@ -3607,7 +3618,7 @@ class Site:
         h2 += (f'<polyline points="{ln(sb_, XF)}" fill="none" stroke="#C9A21A" stroke-width="3" stroke-dasharray="7 4" stroke-linejoin="round"/>'
                f'<polyline points="{ln(sa_, XF)}" fill="none" stroke="var(--turf)" stroke-width="3.2" stroke-linejoin="round"/>')
         for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
-            card = sb(when, xa, xb, p, prv=((pts[k - 1][3][0], pts[k - 1][3][1], pts[k - 1][1]) if k else None), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Time slot check-in"))
+            card = sb(when, xa, xb, p, prv=((pts[sh_[k]][3][0], pts[sh_[k]][3][1], pts[sh_[k]][1]) if sh_[k] is not None else None), p_row=(pts[k - 1][1] if k else None), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Final" if "final" in str(when) else "Time slot check-in"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})
             if pl_ and not (ev_ and ev_[0]) and k != len(pts) - 1: continue
             if pl_:                                  # play-by-play points: no dot, but dragging across the chart stops on each one

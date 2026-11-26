@@ -97,8 +97,8 @@ def parse_game(g, cands):
             if rc and rc != qb: run[rc] += 0.5 + yd * 0.1 + (6 if td else 0)
         elif typ in ("Rush", "Rushing Touchdown") and names:
             run[names[0]] += yd * 0.1 + (6 if td else 0)
-        elif typ in ("Pass Interception Return", "Interception Return Touchdown") and names:
-            run[names[0]] += -2
+        elif typ in ("Pass Interception Return", "Interception Return Touchdown"):
+            if names: run[names[0]] += -2
             if dfn: run[dfn] += 2 + (6 if td else 0)
         elif typ in ("Sack",) and dfn:
             run[dfn] += 1
@@ -120,10 +120,18 @@ def parse_game(g, cands):
             if " pass to " in m2.group(1): h2 = h2[:2]
             else: h2 = h2[:1]
             for x in dict.fromkeys(h2): run[x] += 2
-        if tov and "FUMBLES" in txt and names:
+        if tov and "FUMBLES" in txt:
             fb = fumbler(txt, hits)                          # whoever had the ball, not just the first name on the play
             if fb: run[fb] += -2
             if dfn: run[dfn] += 2 + (6 if td else 0)
+        # the rest of the league's defense / special teams rules
+        if dfn and "sacked" in txt.split("TWO-POINT")[0] and typ not in ("Sack", "Safety"): run[dfn] += 1          # a sack logged under another play type (a sack fumble)
+        if dfn and re.search(r"FUMBLES \((?!Aborted)[^)]*\)", txt): run[dfn] += 1         # forced fumble, whoever recovers
+        if dfn and (typ.startswith("Blocked") or "extra point is BLOCKED" in txt or re.search(r"[Pp]unt is BLOCKED", txt)) and typ != "Blocked Field Goal":
+            run[dfn] += 1                                                                  # blocked punt or extra point (field goals above)
+        if typ in ("Kickoff Return Touchdown", "Punt Return Touchdown", "Blocked Punt Touchdown") or (typ.endswith("Return Touchdown") and "Interception" not in typ and not tov):
+            scr = away if asc > pa[home] else home if hsc > pa[away] else None             # whoever's score went up returned it
+            if scr: run[scr] += 6
         # a defense's points-allowed bonus is settled at the final, so it isn't counted mid-game: it rides in with the anchor,
         # spread over the game clock, instead of showing up as +10 at kickoff
         pa[home] = asc; pa[away] = hsc                     # points each defense has allowed so far
@@ -267,14 +275,15 @@ def wp_timeline(sides, paths, kick, cv, corr, pos_of):
         v = pp.get(pid, [0.0] * (k + 1))[k]
         if not pid.isdigit() and ("pa", pid) in pp: v += tier(pp[("pa", pid)][k])
         return v
-    gid = lambda t: id(paths[t]) if t in paths else t
+    gid = lambda t: (paths[t][2].get(("game",)) or id(paths[t][2])) if t in paths else t     # the NFL game a team is in
     out = []; prev = None; ev = []; seen_k = {}
     for j, (tm, t, k) in enumerate(tl):
         before = st.get(t); st[t] = k
         # what this play did for anyone in the matchup
         pp = paths[t][2]; inf = (pp.get(("info",)) or [None] * (k + 1))
-        if gid(t) not in seen_k or seen_k[gid(t)] != k:
-            seen_k[gid(t)] = k
+        pk = (gid(t),) + tuple(inf[k][:3]) if k < len(inf) and inf[k] else (gid(t), k)
+        if pk not in seen_k:                       # each play once, though both of its NFL teams have players in the matchup
+            seen_k[pk] = 1
             who = []
             if k < len(inf) and inf[k]:
                 q, clk, txt, asc, hsc = inf[k][:5]; dl = inf[k][5] if len(inf[k]) > 5 else {}
