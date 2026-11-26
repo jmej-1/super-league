@@ -436,7 +436,7 @@
 5445|George Odum|DB|HOU||8|
 5454|Coleman Shelton|OL|LAR|Out|8|
 5461|Trent Sieg|LS|DAL||8|
-5466|John Franklin-Myers|DT|TEN|Questionable|8|DL,LB
+5466|John Franklin-Myers|DT|TEN||8|DL,LB
 5493|Charvarius Ward|CB|IND|Questionable|8|
 5519|Tavierre Thomas|DB|NYG||8|
 5520|Jonathan Owens|DB|IND||8|
@@ -2210,7 +2210,7 @@
 12939|Anthony Tyus III|RB|CAR||1|
 12941|Bryson Nesbit|TE|||1|
 12942|Zemaiah Vaughn|CB|MIN||1|
-12944|Dorian Mausi|LB|TEN||1|
+12944|Dorian Mausi|LB|TEN|Questionable|1|
 12946|Dontae Fleming|WR|NYG||1|
 12948|Austin Keys|LB|WAS||1|
 12955|Sebastian Castro|DB|PIT||1|
