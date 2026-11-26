@@ -133,8 +133,12 @@ tr.tstart td{border-top:2px solid var(--rule)}
 .h2hg{table-layout:fixed;min-width:860px} .h2hg col.h2n{width:120px} .h2hg col.h2t{width:72px} .h2hg th,.h2hg td{overflow:hidden;text-overflow:ellipsis} .h2hg{border-collapse:collapse} .h2hg tbody td{border:1px solid var(--ink)} .h2hg thead th:not(:first-child){border-bottom:1px solid var(--ink)} .dboard td.dc{border:1px solid var(--ink)} .dboard thead th:not(:first-child){border-bottom:1px solid var(--ink)}
 .kt{white-space:nowrap} .ksep{display:inline-block;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.55;margin:0 7px;vertical-align:middle} .lu .pl .who small .stg{margin-left:8px} .nflr{margin:0 0 0 5px}
 @media (max-width:760px){.lu .kt{display:block;margin:2px 0 0;white-space:normal} .lu .ksep{display:none} .lu .pl .who small .stg{margin-left:0}}
-.wpc{position:relative} .gfv[data-g=wp] svg{touch-action:pan-y;cursor:crosshair;user-select:none;-webkit-user-select:none} .wphint{margin:2px 0 0;font-size:12px} .wpd{cursor:pointer;outline:none} .wpdv{pointer-events:none} .wpd:hover+.wpdv,.wpd.on+.wpdv{r:7} .wpcard{position:absolute;transform:translate(-50%,calc(-100% - 12px));background:var(--ink);color:var(--chalk);padding:10px 12px;border-radius:6px;font-size:13px;min-width:220px;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:3;display:flex;flex-direction:column;gap:4px;padding-right:30px}
-.wpcard b{font-weight:700} @media (max-width:760px){.wpcard{position:relative!important;left:auto!important;top:auto!important;transform:none!important;margin-top:8px;min-width:0}}
+.wpc{position:relative} .wpc .gfv svg{touch-action:pan-y;cursor:crosshair;user-select:none;-webkit-user-select:none} .wphint{margin:2px 0 0;font-size:12px} .wpd{cursor:pointer;outline:none} .wpdv{pointer-events:none} .wpd:hover+.wpdv,.wpd.on+.wpdv{r:7} .wpcard{display:block;background:var(--field,#0b1a3a);color:#EEF2F8;border-radius:12px;padding:10px 14px 8px;margin:10px 0 6px;max-width:420px;margin-left:auto;font-size:14px}
+.wpcard .sbh{display:block;font-size:12px;font-weight:600;color:#AFC0DA;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wpcard .sbr{display:grid;grid-template-columns:4px 24px 1fr auto 52px;align-items:center;gap:8px;padding:3px 0}.wpcard .sbc{width:4px;height:22px;border-radius:2px}
+.wpcard .sbr .im{width:24px;height:24px}.wpcard .sbn{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}.wpcard .sbr.lead .sbn{opacity:1}
+.wpcard .sbs{font:800 20px/1 var(--disp,inherit);font-variant-numeric:tabular-nums;text-align:right}.wpcard .sbp{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:#AFC0DA}.wpcard .sbr.lead .sbp{color:var(--flag,#e0b43a)}
+@media (max-width:760px){.wpcard{max-width:none;margin-left:0}}
 .wcr{display:grid;grid-template-columns:1fr auto 64px;gap:10px;align-items:baseline} .wcr i{font-style:normal;color:#C9D1E1} .wcr em{font-style:normal;font:800 17px var(--disp)} .wcr strong{text-align:right;color:var(--flag)}
 .wprow{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:13px;color:var(--mute)} .wprow span{display:flex;gap:6px;align-items:baseline} .wprow b{color:var(--ink);font-weight:700} .wprow small{font-size:12px}
 .nfl{display:inline-block;width:18px;height:18px;background:center/contain no-repeat;vertical-align:-4px;margin-right:5px;flex:none}
@@ -3347,6 +3351,11 @@ class Site:
         return FR, FF, ticks
 
     def wp_chart(s_, w, a, b, pre):
+        def sb(when, xa, xb, p, proj=False):
+            """The scoreboard over the charts: when, both teams' points so far and win chances."""
+            row = lambda r, x, q, col: (f'<span class="sbr{" lead" if q > 0.5 else ""}"><i class="sbc" style="background:{col}"></i>{s_.logo(r, pre, "lgs", w)}'
+                                        f'<span class="sbn">{E(s_.TN(r, w))}</span><b class="sbs">{(f"{x:.1f}" if proj else fp(x))}</b><span class="sbp">{pct(q)}</span></span>')
+            return f'<span class="sbh">{E(when)}</span>{row(a, xa, p, "#DCE3F0")}{row(b, xb, 1 - p, "#C9A21A")}'
         pts = s_.wp_series(w, a, b)
         if not pts or len(pts) < 2: return ""
         fut = getattr(s_, "_fut", {}).get((w, a, b), [])
@@ -3415,8 +3424,7 @@ class Site:
             g += f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in zip(fx, fy))}" fill="none" stroke="#9AA3B2" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round"/>'
             for x, y, f in zip(fx[1:], fy[1:], fut):
                 tl_ = f[2].strftime("%-I:%M %p").replace(":00", ""); xa, xb = f[3]
-                card = (f'<b>After the {tl_} game{"s" if f[4] > 1 else ""}, {f[2].strftime("%a %b %-d")} (projected)</b><span class="wcr"><i>{E(s_.M[a])}</i><em>{xa:.1f}</em><strong>{pct(f[1])}</strong></span>'
-                        f'<span class="wcr"><i>{E(s_.M[b])}</i><em>{xb:.1f}</em><strong>{pct(1 - f[1])}</strong></span>')
+                card = sb(f'After the {tl_} game{"s" if f[4] > 1 else ""}, {f[2].strftime("%a %b %-d")} (projected)', xa, xb, f[1], True)
                 g += (f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.5" fill="var(--paper)" stroke="#9AA3B2" stroke-width="1.5"/>'
                       f'<circle class="wpd" cx="{x:.1f}" cy="{y:.1f}" r="22" fill="transparent" data-x="{x / Wd * 100:.2f}" data-y="{y / Hd * 100:.2f}" data-card="{E(card)}" tabindex="0" role="button"/>')
         g += f'<path d="{path}" fill="none" stroke="url(#{gid})" stroke-width="3.5" stroke-linecap="round"/>'
@@ -3427,8 +3435,7 @@ class Site:
                   ''
                   )
         for k, (lab, p, _, (xa, xb), when) in enumerate(pts):
-            card = (f'<b>{E(when)}</b><span class="wcr"><i>{E(s_.M[a])}</i><em>{fp(xa)}</em><strong>{pct(p)}</strong></span>'
-                    f'<span class="wcr"><i>{E(s_.M[b])}</i><em>{fp(xb)}</em><strong>{pct(1 - p)}</strong></span>')
+            card = sb(when, xa, xb, p)
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})          # a play-by-play point: no dot, a small tap target
             g += (f'<circle class="wpd" cx="{X[k]:.1f}" cy="{Y[k]:.1f}" r="{6 if pl_ else 22}" fill="transparent" '
                   f'data-x="{X[k] / Wd * 100:.2f}" data-y="{Y[k] / Hd * 100:.2f}" data-card="{E(card)}"{"" if pl_ else ' tabindex="0" role="button"'}/>'
@@ -3464,10 +3471,11 @@ class Site:
         h2 += (f'<polyline points="{ln(sb_, XF)}" fill="none" stroke="#C9A21A" stroke-width="3" stroke-dasharray="7 4" stroke-linejoin="round"/>'
                f'<polyline points="{ln(sa_, XF)}" fill="none" stroke="var(--turf)" stroke-width="3.2" stroke-linejoin="round"/>')
         for k, (lab, p, _, (xa, xb), when) in enumerate(pts):
-            card = (f'<b>{E(when)}</b><span class="wcr"><i>{E(s_.M[a])}</i><em>{fp(xa)}</em><strong>{pct(p)}</strong></span>'
-                    f'<span class="wcr"><i>{E(s_.M[b])}</i><em>{fp(xb)}</em><strong>{pct(1 - p)}</strong></span>')
+            card = sb(when, xa, xb, p)
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})
-            if pl_: continue                         # play-by-play points: the line only, taps live on the win probability chart
+            if pl_:                                  # play-by-play points: no dot, but dragging across the chart stops on each one
+                h2 += f'<circle class="wpd wpq" cx="{XF[k]:.1f}" cy="{fy_(max(xa, xb)):.1f}" r="0" data-x="{XF[k] / Wd * 100:.2f}" data-card="{E(card)}"/>'
+                continue
             for v in (xa, xb):
                 h2 += f'<circle class="wpd" cx="{XF[k]:.1f}" cy="{fy_(v):.1f}" r="{5 if pl_ else 16}" fill="transparent" data-x="{XF[k] / Wd * 100:.2f}" data-y="{fy_(v) / Hd * 100:.2f}" data-card="{E(card)}"{"" if pl_ else ' tabindex="0" role="button"'}/>'
             if not pl_:
@@ -3496,13 +3504,14 @@ class Site:
                 wi_ = a if s_.s.G[w]["scores"][a] > s_.s.G[w]["scores"][b] else b
                 lows = f'<div class="wlos one">{low_(wi_)}</div>'
             else: lows = f'<div class="wlos">{low_(a)}{low_(b)}</div>'
+        _lp = pts[-1]; sbdef = sb(("Now, " if (w not in s_.s.G and s_.wk_live(w)) else "") + str(_lp[4]), _lp[3][0], _lp[3][1], _lp[1])
         return (f'<section><h2>Win probability and game flow</h2><div class="panel wpc"><div class="rtog chips gft" role="group" aria-label="Chart">'
                 f'<button type="button" data-g="wp" aria-pressed="true">Win probability</button><button type="button" data-g="gf" aria-pressed="false">Game flow</button></div>'
-                f'<div class="wpcard" hidden></div><div class="gfv" data-g="wp"><svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Win probability by game time slot">{g}<line class="wpg" x1="0" x2="0" y1="{T_}" y2="{Hd - B_}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0" pointer-events="none"/></svg><p class="note wphint">Press and drag across the chart to see every play.</p>'
+                f'<div class="wpcard" data-def="{E(sbdef)}">{sbdef}</div><div class="gfv" data-g="wp"><svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Win probability by game time slot">{g}<line class="wpg" x1="0" x2="0" y1="{T_}" y2="{Hd - B_}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0" pointer-events="none"/></svg><p class="note wphint">Press and drag across either chart to see every play.</p>'
                 f'<div class="wplg"><span><i class="sw" style="background:var(--turf)"></i>{E(s_.M[a])} favored</span><span><i class="sw" style="background:#C9A21A"></i>{E(s_.M[b])} favored</span>'
                 f'{"<span><i class=swd></i>Projection</span>" if fut else ""}</div>{lows}</div>'
-                f'<div class="gfv" data-g="gf" hidden>{fh}<svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Points by game time slot">{h2}</svg>'
-                f'<p class="note" style="margin:4px 0 0">Points so far after each kickoff window. Tap a dot for the score and win chance at that point.</p></div></div></section>')
+                f'<div class="gfv" data-g="gf" hidden>{fh}<svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Points by game time slot">{h2}<line class="wpg" x1="0" x2="0" y1="{T_}" y2="{Hd - B_}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0" pointer-events="none"/></svg>'
+                f'<p class="note" style="margin:4px 0 0">Points so far, play by play. Drag across it or tap a dot.</p></div></div></section>')
 
     # ------------------------------------------------------------------ game pages
     def game_nav(s_, w, a, b, pre):
@@ -4168,25 +4177,23 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   document.addEventListener('focusin',function(e){ var hz=e.target.closest&&e.target.closest('.hz'); if(hz) showCard(hz); });
   document.addEventListener('mouseout',function(e){ var hz=e.target.closest&&e.target.closest('.hz'); if(hz&&!(e.relatedTarget&&e.relatedTarget.closest&&(e.relatedTarget.closest('.hz')||e.relatedTarget.closest('.lcard')))) hideCard(hz.closest('.lchart')); });
   document.addEventListener('click',function(e){ var hz=e.target.closest&&e.target.closest('.hz'); if(e.target.closest&&e.target.closest('.lcard')&&!e.target.closest('.cx')) return; if(hz){showCard(hz);} else {[].forEach.call(document.querySelectorAll('.lcard:not([hidden])'),function(c){hideCard(c.closest('.lchart'));});} });
+  // the scoreboard over the charts: always shows a moment (the latest by default); tapping or dragging picks another
+  function sbReset(box){ var c=box.querySelector('.wpcard'); if(c) c.innerHTML=c.getAttribute('data-def');
+    [].forEach.call(box.querySelectorAll('.wpd.on'),function(x){x.classList.remove('on');}); [].forEach.call(box.querySelectorAll('.wpg'),function(l){l.setAttribute('opacity','0');}); }
   document.addEventListener('click',function(e){
-    if(e.target.closest&&e.target.closest('.wpcard')&&!e.target.closest('.cx')) return;
     if(window._wpSkip) return;
-    var d=e.target.closest&&e.target.closest('.wpd'); var open=document.querySelectorAll('.wpd.on');
-    if(!d){ [].forEach.call(open,function(x){x.classList.remove('on'); x.closest('.wpc').querySelector('.wpcard').hidden=true;}); [].forEach.call(document.querySelectorAll('.wpg'),function(l){l.setAttribute('opacity','0');}); return; }
-    var box=d.closest('.wpc'), c=box.querySelector('.wpcard'), was=d.classList.contains('on');
-    [].forEach.call(open,function(x){x.classList.remove('on'); x.closest('.wpc').querySelector('.wpcard').hidden=true;});
-    if(was) return;
+    var d=e.target.closest&&e.target.closest('.wpc .wpd');
+    if(!d){ if(!(e.target.closest&&e.target.closest('.wpc'))) [].forEach.call(document.querySelectorAll('.wpc'),sbReset); return; }
+    if(d.classList.contains('on')){ sbReset(d.closest('.wpc')); return; }
     showWp(d);
   });
   function showWp(d){
     var box=d.closest('.wpc'), c=box.querySelector('.wpcard');
     [].forEach.call(box.querySelectorAll('.wpd.on'),function(x){x.classList.remove('on');});
-    d.classList.add('on'); c.innerHTML=d.getAttribute('data-card')+'<button type="button" class="cx" aria-label="Close">&times;</button>'; c.hidden=false;
-    var svg=d.ownerSVGElement||box.querySelector('svg'), r=svg.getBoundingClientRect(), br=box.getBoundingClientRect();
-    var x=r.left-br.left+r.width*parseFloat(d.getAttribute('data-x'))/100, y=r.top-br.top+r.height*parseFloat(d.getAttribute('data-y'))/100;
-    c.style.left=Math.min(Math.max(x,120),br.width-120)+'px'; c.style.top=y+'px';
-    if(y<c.offsetHeight+16||c.getBoundingClientRect().top<0){ c.style.transform='translate(-50%,16px)'; } else c.style.transform='';
-    var gl=svg.querySelector('.wpg'); if(gl){ var vb=svg.viewBox.baseVal, gx=vb.width*parseFloat(d.getAttribute('data-x'))/100; gl.setAttribute('x1',gx); gl.setAttribute('x2',gx); gl.setAttribute('opacity','1'); }
+    d.classList.add('on'); c.innerHTML=d.getAttribute('data-card');
+    var svg=d.ownerSVGElement, gl=svg&&svg.querySelector('.wpg');
+    [].forEach.call(box.querySelectorAll('.wpg'),function(l){ if(l!==gl) l.setAttribute('opacity','0'); });
+    if(gl){ var vb=svg.viewBox.baseVal, gx=vb.width*parseFloat(d.getAttribute('data-x'))/100; gl.setAttribute('x1',gx); gl.setAttribute('x2',gx); gl.setAttribute('opacity','1'); }
   }
   // press and drag across the win probability chart: the card follows every play
   var scr=null, scrMoved=false;
@@ -4196,7 +4203,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     if(best&&!best.classList.contains('on')) showWp(best);
   }
   document.addEventListener('pointerdown',function(e){
-    var svg=e.target.closest&&e.target.closest('.gfv[data-g="wp"] svg'); if(!svg||e.button>0) return;
+    var svg=e.target.closest&&e.target.closest('.wpc .gfv svg'); if(!svg||e.button>0) return;
     scr=svg; scrMoved=false; scr._x0=e.clientX;
   });
   document.addEventListener('pointermove',function(e){
