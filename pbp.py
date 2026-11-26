@@ -114,6 +114,12 @@ def parse_game(g, cands):
             m = re.search(r"([A-Z][A-Za-z'\-\. ]{1,25}) extra point is (GOOD|No Good|BLOCKED)", txt)
             kk = next((h[1] for h in hits if m and h[0] >= m.start() - 1 and h[0] <= m.end()), None)
             if kk: run[kk] += 0.5 if m.group(2) == "GOOD" else -1
+        m2 = re.search(r"TWO-POINT CONVERSION ATTEMPT\.(.*?)ATTEMPT SUCCEEDS", txt)
+        if m2 and "NULLIFIED" not in m2.group(1):           # a good two-point try: 2 to the passer and the catcher, or the runner
+            h2 = [h[1] for h in hits if m2.start(1) <= h[0] < m2.end(1)]
+            if " pass to " in m2.group(1): h2 = h2[:2]
+            else: h2 = h2[:1]
+            for x in dict.fromkeys(h2): run[x] += 2
         if tov and "FUMBLES" in txt and names:
             run[names[0]] += -2
             if dfn: run[dfn] += 2 + (6 if td else 0)
