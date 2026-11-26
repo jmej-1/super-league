@@ -127,7 +127,7 @@
 })();
 </script>
 <script>
-document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('.gft button'); if(!b) return; var pn=b.closest('.wpc'), g=b.getAttribute('data-g');
+document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('.gft button[data-g]'); if(!b) return; var pn=b.closest('.wpc'), g=b.getAttribute('data-g');
   [].forEach.call(b.parentNode.querySelectorAll('button'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});
   [].forEach.call(pn.querySelectorAll('.gfv'),function(v){v.hidden=v.getAttribute('data-g')!==g;}); [].forEach.call(pn.querySelectorAll('.wpd.on'),function(x){x.classList.remove('on');}); [].forEach.call(pn.querySelectorAll('.wpg'),function(l){l.setAttribute('opacity','0');}); var c=pn.querySelector('.wpcard'); if(c) c.innerHTML=c.getAttribute('data-def'); });
 </script>

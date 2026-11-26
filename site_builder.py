@@ -141,6 +141,7 @@ tr.tstart td{border-top:2px solid var(--rule)}
 .wpcard .sbw .im{width:18px;height:18px}.wpcard .sbw .nfl{width:15px;height:15px;margin:0}.wpcard .sbwn{font-weight:600}.wpcard .sbw b.up{color:#8FD6A4}.wpcard .sbw b.dn{color:#F08F8F}
 .wpcard .sbh{display:block;font-size:12px;font-weight:600;color:#AFC0DA;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wpcard .sbd{font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;text-align:left;color:transparent}.wpcard .sbd.up{color:#8FD6A4}.wpcard .sbd.dn{color:#F08F8F}
+.wpcard .sbtt{margin-right:14px;white-space:nowrap}.wpcard .sbtt b{color:#EEF2F8}.wpcard .sbtt.s0{box-shadow:inset 2px 0 0 #DCE3F0;padding-left:6px}.wpcard .sbtt.s1{box-shadow:inset 2px 0 0 #C9A21A;padding-left:6px}
 .wpcard .sbx{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:5px;font-size:11.5px;color:#8FA0BC}.wpcard .sbx b{font-weight:700;color:#DCE3F0}.wpcard .sbx b.up{color:#8FD6A4}
 .wpcard .sbv{display:flex;align-items:baseline;justify-content:flex-end;gap:6px}.wpcard .sbv .sbd{min-width:38px}
 .wpcard .sbr{display:grid;grid-template-columns:4px 24px 1fr auto 96px;align-items:center;gap:8px;padding:3px 0}.wpcard .sbc{width:4px;height:22px;border-radius:2px}
@@ -640,7 +641,7 @@ CSS += """
 .tasel2{margin:6px 0 0;font-size:13px;color:var(--mute)}
 .omd{margin-top:10px}.omd summary{cursor:pointer;font:700 14px var(--body);color:var(--turf)}
 .glog tr.dead td{background:#FBF0EE}.glog tr.dead td:first-child{box-shadow:inset 3px 0 0 var(--loss)}.dnpl{display:block;font:700 10px var(--body);letter-spacing:.04em;color:var(--loss);margin-top:1px}
-.gft{margin:0 0 10px}.gfh{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin:2px 0 8px}.gft1{display:flex;align-items:center;gap:10px}.gft1.r{justify-content:flex-end}.gfh b{display:block;font:800 28px/1 var(--disp)}.gfh small{color:var(--mute);font-size:12px;display:inline-flex;align-items:center;gap:5px}.gfh .r{text-align:right}.gfh .r small{justify-content:flex-end}
+.gft{margin:0 0 10px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}.wpstep{margin-left:auto;display:inline-flex;gap:6px}.wpstep .wps{font:600 13px var(--body);padding:6px 12px;border-radius:999px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);cursor:pointer}.wpstep .wps:hover{border-color:var(--ink)}.gfh{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin:2px 0 8px}.gft1{display:flex;align-items:center;gap:10px}.gft1.r{justify-content:flex-end}.gfh b{display:block;font:800 28px/1 var(--disp)}.gfh small{color:var(--mute);font-size:12px;display:inline-flex;align-items:center;gap:5px}.gfh .r{text-align:right}.gfh .r small{justify-content:flex-end}
 .gfm{text-align:center}.gfm b{font-size:22px}.gfl{display:inline-block;width:16px;border-top:3px solid var(--turf)}.gfl.d{border-top:3px dashed #C9A21A}
 .xcap{display:flex;align-items:center;gap:8px;margin:10px 0 26px;padding:0 2px;font-size:12px;color:var(--mute)}.xcap b{font:800 15px var(--disp);color:var(--ink)}.xcap small{margin-left:-6px}
 .xcap .xbr{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:12px;color:var(--mute)}.xcap .xbr i{font-style:normal}.xcap .xbr small{margin-left:3px;font-size:11px}.xcap .xbr b{color:var(--ink)}.exm{width:72px;height:5px;border-radius:3px;background:var(--rule);overflow:hidden}.exm i{display:block;height:100%;background:var(--flag)}.xcap{display:block;margin:12px 0 26px;padding:12px 14px;border:1px solid var(--rule);border-radius:10px;background:var(--paper)}.xcap .xhd{display:flex;align-items:center;gap:12px}.xcap .xl{font-weight:700;font-size:14px;color:var(--ink)}.xcap .xhd b{font:800 26px var(--disp);color:var(--ink);line-height:1}.xcap .exm{flex:1;width:auto;height:10px;border-radius:5px}.xcap .xft{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:13px}.xcap .xrk{color:var(--ink)}.xcap .xgo{margin-left:auto;color:var(--mute);text-decoration:underline}.xcap .xgo:hover{color:var(--turf)}.xcap .xdt{margin-top:8px}.xcap .xdt summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--mute)}.xcap .xdt[open] summary{color:var(--ink)}.xcap .xbr{margin-top:8px}.tat2x{display:inline-flex;align-items:center;gap:8px}
@@ -3271,6 +3272,37 @@ class Site:
         if A[1] + B[1] < 1e-6: return 1.0 if A[0] > B[0] else 0.0 if B[0] > A[0] else 0.5
         return s_.win_p(A, B)
 
+    def proj_moves(s_, w, a, b, t0, t1):
+        """Why the odds moved between t0 and t1 with no play in between: each lineup player whose projection changed, by how much,
+        and each team's projected total then and now. Per-player history starts Week 12; before that, the logged team totals."""
+        s = s_.s; PH = (getattr(s, "phist", None) or {}).get(w); U = datetime.timezone.utc
+        z = lambda t: t.astimezone(U).strftime("%Y-%m-%dT%H:%MZ") if t is not None else ""
+        z0, z1 = z(t0), z(t1)
+        if PH and s_.proj:
+            SPn = s.SP.get(w, {}); who = []; tot = {}
+            for sd, r in enumerate((a, b)):
+                T0 = T1 = 0.0
+                for i in s_.lineup_now(w, r):
+                    now = s_.proj(i, w)[0]; h = PH.get(i)
+                    at = lambda zz: (next((v for t_, v in reversed(h) if t_ <= zz), h[0][1]) if h else SPn.get(i, now))
+                    m0, m1 = (max(0.0, now + at(zz) - SPn.get(i, at(zz))) for zz in (z0 or "0", z1))
+                    T0 += m0; T1 += m1
+                    if abs(m1 - m0) * s_.f >= 0.1: who.append((i, sd, m0 * s_.f, m1 * s_.f))
+                tot[r] = (T0 * s_.f, T1 * s_.f)
+            return who, tot
+        L = [x for x in (getattr(s, "mlog", []) or []) if int(x[1]) == w and {int(x[2]), int(x[3])} == {a, b}]
+        def row(zz):
+            r_ = None
+            for x in L:
+                if x[0] <= zz: r_ = x
+            if not r_: return None
+            pa_, pb_ = float(r_[5]), float(r_[6])
+            return (pa_, pb_) if int(r_[2]) == a else (pb_, pa_)
+        r0, r1 = row(z0) if z0 else None, row(z1)
+        if not r1: return [], {}
+        r0 = r0 or r1
+        return [], {a: (r0[0], r1[0]), b: (r0[1], r1[1])}
+
     def wp_clean(s_, w, a, b, pts, dec):
         """Catcher for bad rows (late or stale feeds, snapshots that trail the play-by-play): drop any single point that jumps
         and then snaps right back while the score around it doesn't move, or whose score runs backward and then forward again.
@@ -3439,7 +3471,7 @@ class Site:
         return FR, FF, ticks
 
     def wp_chart(s_, w, a, b, pre):
-        def sb(when, xa, xb, p, proj=False, ev=None, nev=None, prv=None, p_row=None):
+        def sb(when, xa, xb, p, proj=False, ev=None, nev=None, prv=None, mix=None, pm=None):
             """The scoreboard over the charts: when, both teams' points so far and win chances, what each gained on this play, and the play."""
             def dl(v, f, pctg=False):
                 if prv is None or abs(v) < (0.0005 if pctg else 0.005): return '<small class="sbd"></small>'
@@ -3453,13 +3485,13 @@ class Site:
                 ga = sum(x[2] for e in ev for x in e["who"] if x[1] == 0); gb = sum(x[2] for e in ev for x in e["who"] if x[1] == 1)
                 xa0, xb0 = xa - ga, xb - gb
             split = ""
-            if ev and prv and p_row is not None and abs(p_row - p0) >= 0.003:   # the move since the last play shown = the clock running + this play
+            if ev and prv and mix is not None and abs(mix[0]) + abs(mix[1]) >= 0.003:   # the move since the last stop = projections + the clock + this play
                 def part(lbl, d):
-                    if abs(d) < 0.0005: return f'<span>{lbl} <b>even</b></span>'
-                    return f'<span>{lbl} <b class="{"up"}">{E(s_.M[a] if d > 0 else s_.M[b])} {abs(d) * 100:+.1f}%</b></span>'
-                split = f'<span class="sbx">{part("Clock since last play", p_row - p0)}{part("This play", p - p_row)}</span>'
+                    if abs(d) < 0.0005: return ""
+                    return f'<span>{lbl} <b class="up">{E(s_.M[a] if d > 0 else s_.M[b])} {abs(d) * 100:+.1f}%</b></span>'
+                split = f'<span class="sbx">{part("Projections", mix[1])}{part("Clock since last play", mix[0])}{part("This play", mix[2])}</span>'
             left = f'<span class="sbL"><span class="sbh">{E(when)}</span>{row(a, xa, p, "#DCE3F0", xa0, p0)}{row(b, xb, 1 - p, "#C9A21A", xb0, 1 - p0)}{split}</span>'
-            return left + (play(ev, nev) if PBP_ else "")
+            return left + ((pjblk(pm) if pm else play(ev, nev)) if PBP_ else "")
         def nfl_(t): return f'<i class="nfl N{t}" role="img" aria-label="{t}"></i>' if t in NFL_NICK else ""
         import pbp as _pb
         def ptxt(t, who):
@@ -3483,6 +3515,15 @@ class Site:
             if m2 and m2.group(2) == "SUCCEEDS" and (has(m2.group(1)) or not parts): parts.append(f"Two-point try: {m2.group(1).rstrip('.')}, good.")
             t = " ".join(p_ for p_ in parts if p_) or main
             return t if len(t) <= 160 else t[:157].rsplit(" ", 1)[0] + "..."
+        def pjblk(pm):
+            who, tot = pm
+            tl = "".join(f'<span class="sbtt s{sd}">{E(s_.M[r])} <b>{t0:.1f}</b> to <b>{t1:.1f}</b></span>'
+                         for sd, r in enumerate((a, b)) if r in tot for t0, t1 in [tot[r]] if abs(t1 - t0) >= 0.05)
+            chips = "".join(f'<span class="sbw s{sd}">{s_.logo(a if sd == 0 else b, pre, "lgs", w)}{nfl_(s_.team_at(w, i))}'
+                            f'<span class="sbwn">{E(s_.s.nm(i))}</span><b class="{"up" if m1 > m0 else "dn"}">{m0:.1f} to {m1:.1f}</b></span>'
+                            for i, sd, m0, m1 in sorted(who, key=lambda z: -abs(z[3] - z[2]))[:6])
+            return (f'<span class="sbpl"><span class="sbg"><b>Projection change</b></span>'
+                    f'<span class="sbt">{tl or "No projection change"}</span><span class="sbws">{chips}</span></span>')
         def play(ev, nev=None):
             """The play behind this point: the NFL game's score and clock, what happened, and every matchup player it scored for."""
             if not ev: return f'<span class="sbpl none"><span class="sbt">{E(nev or "")}</span></span>'
@@ -3498,11 +3539,25 @@ class Site:
                           for (pid, sd, nt), d in sorted(tot.items(), key=lambda z: -abs(z[1])) if abs(d) >= 0.05)
             return f'<span class="sbpl">{gl}<span class="sbt">{E(ptxt(g0["txt"], [x[0] for x in g0["who"]]))}</span><span class="sbws">{who}</span></span>'
         pts = s_.wp_series(w, a, b)
-        PBP_ = (w, a, b) in getattr(s_, "_wpos", {})
+        PBP_ = (w, a, b) in getattr(s_, "_wpos", {}); PM_ = {}
         if pts:
-            shw = [not (x[0] == "·" and PBP_ and not (len(x) > 5 and x[5]) and k != len(pts) - 1) for k, x in enumerate(pts)]   # points the drag stops on
+            isrow = lambda x: x[0] == "·" and len(x) > 5                     # a play-by-play row (a play, or just the clock running)
+            shw = [not (PBP_ and isrow(x) and not x[5] and k != len(pts) - 1) for k, x in enumerate(pts)]   # points the drag stops on
+            PM_ = [k for k, x in enumerate(pts) if PBP_ and x[0] == "·" and len(x) == 5 and x[2] is not None]   # odds moves with no play: projections
             sh_, last_ = [], None
             for k in range(len(pts)): sh_.append(last_); last_ = k if shw[k] else last_
+            MX_ = []                                                         # for each stop: (clock, projections, the play itself) since the last stop
+            for k in range(len(pts)):
+                j0 = sh_[k]
+                if j0 is None or k == 0: MX_.append(None); continue
+                ck = pj = 0.0
+                for j in range(j0 + 1, k):
+                    d = pts[j][1] - pts[j - 1][1]
+                    if isrow(pts[j - 1]): ck += d
+                    else: pj += d                                            # first play-by-play row after a logged update: today's projections take over
+                MX_.append((ck, pj, pts[k][1] - pts[k - 1][1]))
+            PM_ = {k: s_.proj_moves(w, a, b, next((pts[j][2] for j in range(k - 1, -1, -1) if pts[j][2] is not None and not isrow(pts[j])), None), pts[k][2])
+                   for k in PM_}
         if not pts or len(pts) < 2: return ""
         fut = getattr(s_, "_fut", {}).get((w, a, b), [])
         Wd, Hd, L, R, T_, B_ = 680, 268, 118, 44, 18, 58
@@ -3581,9 +3636,9 @@ class Site:
                   ''
                   )
         for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
-            card = sb(when, xa, xb, p, prv=((pts[sh_[k]][3][0], pts[sh_[k]][3][1], pts[sh_[k]][1]) if sh_[k] is not None else None), p_row=(pts[k - 1][1] if k else None), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Final" if "final" in str(when) else "Time slot check-in"))
+            card = sb(when, xa, xb, p, prv=((pts[sh_[k]][3][0], pts[sh_[k]][3][1], pts[sh_[k]][1]) if sh_[k] is not None else None), mix=MX_[k], pm=PM_.get(k), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Final" if "final" in str(when) else "Time slot check-in"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})          # a play-by-play point: no dot, a small tap target
-            if pl_ and not (ev_ and ev_[0]) and k != len(pts) - 1: continue      # nobody in the matchup scored on it: the line keeps it, dragging skips it
+            if pl_ and not shw[k]: continue      # nobody in the matchup scored on it: the line keeps it, dragging skips it
             g += (f'<circle class="wpd" cx="{X[k]:.1f}" cy="{Y[k]:.1f}" r="{6 if pl_ else 22}" fill="transparent" '
                   f'data-x="{X[k] / Wd * 100:.2f}" data-y="{Y[k] / Hd * 100:.2f}" data-card="{E(card)}"{"" if pl_ else ' tabindex="0" role="button"'}/>'
                   + ("" if pl_ else f'<circle class="wpdv" cx="{X[k]:.1f}" cy="{Y[k]:.1f}" r="4" fill="{"var(--turf)" if p >= 0.5 else "#C9A21A"}" stroke="var(--paper)" stroke-width="1.5"/>'))
@@ -3618,9 +3673,9 @@ class Site:
         h2 += (f'<polyline points="{ln(sb_, XF)}" fill="none" stroke="#C9A21A" stroke-width="3" stroke-dasharray="7 4" stroke-linejoin="round"/>'
                f'<polyline points="{ln(sa_, XF)}" fill="none" stroke="var(--turf)" stroke-width="3.2" stroke-linejoin="round"/>')
         for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
-            card = sb(when, xa, xb, p, prv=((pts[sh_[k]][3][0], pts[sh_[k]][3][1], pts[sh_[k]][1]) if sh_[k] is not None else None), p_row=(pts[k - 1][1] if k else None), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Final" if "final" in str(when) else "Time slot check-in"))
+            card = sb(when, xa, xb, p, prv=((pts[sh_[k]][3][0], pts[sh_[k]][3][1], pts[sh_[k]][1]) if sh_[k] is not None else None), mix=MX_[k], pm=PM_.get(k), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Final" if "final" in str(when) else "Time slot check-in"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})
-            if pl_ and not (ev_ and ev_[0]) and k != len(pts) - 1: continue
+            if pl_ and not shw[k]: continue
             if pl_:                                  # play-by-play points: no dot, but dragging across the chart stops on each one
                 h2 += f'<circle class="wpd wpq" cx="{XF[k]:.1f}" cy="{fy_(max(xa, xb)):.1f}" r="0" data-x="{XF[k] / Wd * 100:.2f}" data-card="{E(card)}"/>'
                 continue
@@ -3655,7 +3710,8 @@ class Site:
         _lp = pts[-1]; _lev = next((x[5] for x in reversed(pts) if len(x) > 5 and x[5]), None)
         sbdef = sb(("Now, " if (w not in s_.s.G and s_.wk_live(w)) else "") + str(_lp[4]), _lp[3][0], _lp[3][1], _lp[1], ev=_lev, nev="Latest", prv=(_lp[3][0], _lp[3][1], _lp[1]) if _lev else None)   # the latest score and odds, with the most recent play
         return (f'<section><h2>Win probability and game flow</h2><div class="panel wpc"><div class="rtog chips gft" role="group" aria-label="Chart">'
-                f'<button type="button" data-g="wp" aria-pressed="true">Win probability</button><button type="button" data-g="gf" aria-pressed="false">Game flow</button></div>'
+                f'<button type="button" data-g="wp" aria-pressed="true">Win probability</button><button type="button" data-g="gf" aria-pressed="false">Game flow</button>'
+                f'<span class="wpstep"><button type="button" class="wps" data-d="-1" aria-label="Previous play or update">&#8249; Prev</button><button type="button" class="wps" data-d="1" aria-label="Next play or update">Next &#8250;</button></span></div>'
                 f'<div class="wpcard" data-def="{E(sbdef)}">{sbdef}</div><div class="gfv" data-g="wp"><svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Win probability by game time slot">{g}<line class="wpg" x1="0" x2="0" y1="{T_}" y2="{Hd - B_}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0" pointer-events="none"/></svg><p class="note wphint">Press and drag across either chart to see every play.</p>'
                 f'<div class="wplg"><span><i class="sw" style="background:var(--turf)"></i>{E(s_.M[a])} favored</span><span><i class="sw" style="background:#C9A21A"></i>{E(s_.M[b])} favored</span>'
                 f'{"<span><i class=swd></i>Projection</span>" if fut else ""}</div>{lows}</div>'
@@ -4357,6 +4413,16 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   }
   // press and drag across the win probability chart: the card follows every play
   var scr=null, scrMoved=false;
+  // step one stop at a time (plays, projection changes, check-ins): the only way to land on updates packed close together
+  document.addEventListener('click',function(e){
+    var bt=e.target.closest&&e.target.closest('.wps'); if(!bt) return;
+    var box=bt.closest('.wpc'), svg=[].filter.call(box.querySelectorAll('.gfv svg'),function(v){return v.getBoundingClientRect().width>0;})[0]; if(!svg) return;
+    var ds=[].slice.call(svg.querySelectorAll('.wpd')), seen={}, L=[];
+    ds.forEach(function(d){ var c=d.getAttribute('data-card'); if(!seen[c]){seen[c]=1; L.push(d);} });
+    if(!L.length) return;
+    var cur=svg.querySelector('.wpd.on'), i=cur?L.findIndex(function(d){return d.getAttribute('data-card')===cur.getAttribute('data-card');}):L.length-1;
+    i=Math.max(0,Math.min(L.length-1,i+parseInt(bt.getAttribute('data-d'),10))); window._wpSkip=1; setTimeout(function(){window._wpSkip=0;},0); showWp(L[i]);
+  });
   function scrubAt(svg,cx){
     var r=svg.getBoundingClientRect(), fx=(cx-r.left)/r.width*100, best=null, bd=1e9;
     [].forEach.call(svg.querySelectorAll('.wpd'),function(d){ var dx=Math.abs(parseFloat(d.getAttribute('data-x'))-fx); if(dx<bd){bd=dx;best=d;} });
