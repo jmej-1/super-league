@@ -156,7 +156,7 @@
 1553|John Jenkins|DT|BAL||13|
 1686|Tony Jefferson|DB|LAC||13|
 1721|Andrew DePaola|LS|MIN||14|
-1737|Case Keenum|QB|CHI||14|
+1737|Case Keenum|QB|CHI|Out|14|
 1785|James Winchester|LS|KC||13|
 1844|Tyler Ott|LS|WAS||12|
 1932|DaQuan Jones|DT|NE||12|
@@ -309,7 +309,7 @@
 4207|Davon Godchaux|DT|JAX||9|
 4217|George Kittle|TE|SF||9|
 4219|Jeremy McNichols|RB|WAS|IR|9|
-4224|Chuck Clark|DB|DET|Questionable|9|
+4224|Chuck Clark|DB|DET|Out|9|
 4227|Harrison Butker|K|KC||9|
 4233|Zane Gonzalez|K|||9|
 4238|Xavier Woods|DB|||9|
@@ -387,7 +387,7 @@
 5044|Isaiah Oliver|CB|TEN||8|
 5045|Courtland Sutton|WR|DEN||8|
 5047|Brian O'Neill|T|MIN||8|OL,OT
-5048|Isaac Yiadom|CB|CHI||8|
+5048|Isaac Yiadom|CB|CHI|Out|8|
 5049|Harrison Phillips|DT|NYJ|Questionable|8|
 5051|Donte Jackson|CB|LAC||8|
 5054|Carlton Davis III|CB|NE|Questionable|8|
@@ -650,7 +650,7 @@
 6864|Khalid Kareem|DE|SF||6|
 6865|Colby Parkinson|TE|LAR||6|
 6867|Malik Harrison|LB|NYG||6|
-6868|DJ Wonnum|DE|DET|Questionable|6|DL,LB
+6868|DJ Wonnum|DE|DET|Out|6|DL,LB
 6869|Adam Trautman|TE|DEN||6|
 6872|Kyle Dugger|DB|CIN||6|
 6875|John Simpson|G|BAL|Questionable|6|
@@ -1069,7 +1069,7 @@
 8363|Jack Sanborn|LB|CHI||4|
 8364|Trent McDuffie|DB|LAR||4|
 8365|Kyler Gordon|DB|CHI|Out|4|
-8367|D'Marco Jackson|LB|CHI|Questionable|4|
+8367|D'Marco Jackson|LB|CHI||4|
 8368|Sam Williams|DL|CLE||4|
 8369|Chance Campbell|LB|PHI||4|
 8370|Jordan Jackson|DL|DEN||4|
@@ -1308,7 +1308,7 @@
 10894|DJ Turner II|DB|CIN||3|
 10895|O'Cyrus Torrence|OL|BUF|Questionable|3|
 10896|John Michael Schmitz Jr.|OL|NYG||3|
-10897|Tyrique Stevenson Sr.|CB|CHI|Questionable|3|
+10897|Tyrique Stevenson Sr.|CB|CHI||3|
 10898|Tuli Tuipulotu|DL|LAC|Questionable|3|DL,LB
 10899|Gervon Dexter Sr.|DL|ATL||3|
 10901|Keeanu Benton|NT|PIT||3|
@@ -1377,7 +1377,7 @@
 10974|Antonio Johnson|DB|JAX||3|
 10975|Daniel Scott|DB|IND||3|
 10976|Kyu Blu Kelly|CB|LAC||3|
-10977|Jordan McFadden|OL|CHI||3|
+10977|Jordan McFadden|OL|CHI|Out|3|
 10978|Darrell Luter Jr.|CB|LV||3|
 10979|Olu Oluwatimi|C|SEA||3|
 10980|SirVocea Dennis|LB|TB||3|
@@ -1523,7 +1523,7 @@
 11506|Jalen Cropper|WR|NO||3|
 11508|Princeton Fant|TE|DAL|IR|3|
 11510|Hunter Luepke|RB|DAL||3|
-11512|Tyrus Wheat|DE|DET||3|
+11512|Tyrus Wheat|DE|DET|Out|3|
 11514|Isaiah Land|LB|DAL||3|
 11516|T.J. Bass|OL|DAL||3|
 11520|Lucky Jackson|WR|DET||3|
@@ -2283,7 +2283,7 @@
 13174|Cooper McDonald|LB|KC||1|
 13176|Ale Kaho|LB|WAS||1|
 13179|Ja'seem Reed|WR|CAR||1|
-13181|Payton Page|DT|||1|
+13181|Payton Page|DT|NYJ||1|
 13195|Jahfari Harvey|DE|||1|
 13196|Elijah Williams|DL|MIN||1|
 13199|Montorie Foster Jr.|WR|SEA||1|
@@ -2403,7 +2403,7 @@
 13394|Josh Cameron|WR|JAX||0|
 13395|Keldric Faulk|DL|TEN||0|
 13396|Julian Neal|DB|SEA|IR|0|
-13397|Keith Abney II|DB|DET||0|
+13397|Keith Abney II|DB|DET|Out|0|
 13398|Treydan Stukes|DB|LV||0|
 13399|Genesis Smith|DB|LAC||0|
 13400|Justin Joly|TE|MIA||0|
