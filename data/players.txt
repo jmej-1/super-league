@@ -395,7 +395,7 @@
 5060|Braden Smith|OL|HOU||8|OG,OL
 5061|Uchenna Nwosu|LB|SEA||8|DL,LB
 5067|Arden Key|DE|IND||8|DL,LB
-5071|DeShon Elliott|DB|PIT|Questionable|8|
+5071|DeShon Elliott|DB|PIT||8|
 5073|Sebastian Joseph-Day|DT|PIT|IR|8|
 5075|Ogbo Okoronkwo|LB|SF||8|DL,LB
 5086|Marquez Valdes-Scantling|WR|PIT||8|
@@ -629,7 +629,7 @@
 6816|Cesar Ruiz|OL|NO||6|
 6817|Noah Igbinoghene|CB|CLE||6|
 6818|Nnamdi Madubuike|DT|BAL|Questionable|6|
-6819|Michael Pittman Jr.|WR|PIT|IR|6|
+6819|Michael Pittman Jr.|WR|PIT||6|
 6821|Austin Jackson|T|MIA|Questionable|6|OL,OT
 6825|Neville Gallimore|DT|CHI||6|
 6826|Cole Kmet|TE|CHI|IR|6|
@@ -715,7 +715,7 @@
 7083|Tyler Huntley|QB|BAL|IR|6|
 7087|Jonathan Ward|RB|||6|
 7090|Darnell Mooney|WR|NYG||6|
-7113|Alex Highsmith|LB|PIT|Doubtful|6|DL,LB
+7113|Alex Highsmith|LB|PIT|Out|6|DL,LB
 7115|Charlie Heck|T|||6|OL,OT
 7116|Kevin Dotson|OL|LAR||6|
 7117|L'Jarius Sneed|CB|KC|IR|6|
@@ -870,7 +870,7 @@
 7746|Austin Trammell|WR|JAX||5|
 7750|Grant Stuard|LB|LAR||5|
 7756|Khyiris Tonga|DT|KC||5|
-7757|Ben Skowronek|WR|PIT|Questionable|5|
+7757|Ben Skowronek|WR|PIT|IR|5|
 7758|Will Fries|G|MIN||5|OG,OL
 7765|Jonathon Cooper|DL|DEN||5|DL,LB
 7770|Patrick Johnson|LB|LV|IR|5|
@@ -1140,7 +1140,7 @@
 8485|Luke Tenuta|OL|IND||4|
 8486|Matt Araiza|P|KC||4|
 8487|Christian Benford|DB|BUF|Questionable|4|
-8489|Drew Ogletree|TE|IND|Questionable|4|
+8489|Drew Ogletree|TE|IND||4|
 8491|Austin Deculus|T|ARI||4|
 8494|James Houston|LB|DAL||4|DL,LB
 8495|Matt Henningsen|DE|DEN|IR|4|
@@ -1346,7 +1346,7 @@
 10937|Jake Moody|K|ATL||3|
 10938|D.J. Johnson|LB|||3|
 10939|Jay Ward|DB|MIN||3|
-10940|Nick Herbig|LB|PIT|Questionable|3|DL,LB
+10940|Nick Herbig|LB|PIT||3|DL,LB
 10941|Tyler Lacy|DE|DET||3|
 10942|Viliami Fehoko Jr.|DL|SF||3|
 10943|Isaiah McGuire|DL|CLE|Questionable|3|
@@ -1894,7 +1894,7 @@
 12493|Oronde Gadsden|TE|LAC||1|
 12494|Kyle McCord|QB|MIA||1|
 12495|Ollie Gordon II|RB|MIA||1|
-12496|Tai Felton|WR|MIN|Questionable|1|
+12496|Tai Felton|WR|MIN||1|
 12497|Tory Horton|WR|SEA||1|
 12498|Mason Taylor|TE|NYJ||1|
 12499|Elic Ayomanor|WR|TEN||1|
@@ -2167,7 +2167,7 @@
 12853|Justin Barron|LB|DAL||1|
 12855|Alijah Clark|DB|DAL||1|
 12856|Zion Childress|DB|LAC||1|
-12860|Theo Wease Jr.|WR|||1|
+12860|Theo Wease Jr.|WR|LAC||1|
 12862|Josh Priebe|OL|MIN||1|
 12863|Andrew Armstrong|WR|KC||1|
 12865|AJ Henning|WR|MIA||1|
