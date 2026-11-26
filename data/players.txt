@@ -190,7 +190,7 @@
 2359|Ameer Abdullah|RB|JAX||11|
 2393|Danielle Hunter|DE|HOU|Questionable|11|DL,LB
 2427|Za'Darius Smith|LB|ATL|Questionable|11|DL,LB
-2449|Stefon Diggs|WR|WAS|Questionable|11|
+2449|Stefon Diggs|WR|WAS||11|
 2468|Bradley Pinion|P|MIA|Questionable|11|
 2469|Joe Cardona|LS|LAR||11|
 2471|Michael Burton|RB|CLE|IR|11|
@@ -223,7 +223,7 @@
 3220|Jarran Reed|DT|SEA|Questionable|10|
 3233|Kevin Byard III|DB|NE||10|
 3236|Maliek Collins|DT|CLE||10|
-3241|Jonathan Bullard|DE|DAL||10|
+3241|Jonathan Bullard|DE|DAL|Out|10|
 3247|Joe Thuney|OL|CHI||10|OG,OL
 3248|Isaac Seumalo|G|ARI||10|
 3256|Javon Hargrave|DT|GB|IR|10|
@@ -478,7 +478,7 @@
 5870|Daniel Jones|QB|||7|
 5871|Zach Allen|DE|DEN||7|
 5872|Deebo Samuel Sr.|WR|SF||7|
-5875|Erik McCoy|OL|NO|Questionable|7|
+5875|Erik McCoy|OL|NO||7|
 5876|Julian Love|DB|SEA||7|
 5877|Elgton Jenkins|G|CLE|Questionable|7|OG,OL
 5882|Taylor Rapp|DB|DEN|Out|7|
@@ -593,7 +593,7 @@
 6650|Chase McLaughlin|K|TB||7|
 6659|Craig Reynolds|RB|||7|
 6699|Gunner Olszewski|WR|NYG|IR|7|
-6711|Jalen Thompson|DB|DAL|Questionable|7|
+6711|Jalen Thompson|DB|DAL||7|
 6740|Brett Toth|OL||Questionable|7|OL,OT
 6768|Tua Tagovailoa|QB|ATL||6|
 6770|Joe Burrow|QB|CIN||6|
@@ -615,7 +615,7 @@
 6799|Grant Delpit|DB|CLE||6|
 6800|K'Lavon Chaisson|LB|WAS||6|DL,LB
 6801|Tee Higgins|WR|CIN||6|
-6802|A.J. Epenesa|DE|PHI||6|
+6802|A.J. Epenesa|DE|PHI|Out|6|
 6803|Brandon Aiyuk|WR|WAS||6|
 6804|Jordan Love|QB|GB||6|
 6806|J.K. Dobbins|RB|DEN|Sus|6|
@@ -763,7 +763,7 @@
 7527|Mac Jones|QB|SF||5|
 7528|Najee Harris|RB|||5|
 7531|Feleipe Franks|TE|CAR||5|
-7535|Hunter Long|TE|ARI||5|
+7535|Hunter Long|TE|ARI|Questionable|5|
 7536|Quintin Morris|TE|JAX||5|
 7537|Jaret Patterson|RB|DEN||5|
 7543|Travis Etienne Jr.|RB|NO||5|
@@ -983,7 +983,7 @@
 8170|James Mitchell|TE|DAL||4|
 8172|Greg Dulcich|TE|MIA||4|
 8176|Danny Gray|WR||Questionable|4|
-8177|Grant Calcaterra|TE|PHI||4|
+8177|Grant Calcaterra|TE|PHI|Out|4|
 8180|Jalen Nailor|WR|LV||4|
 8181|Connor Heyward|RB|LV||4|
 8183|Brock Purdy|QB|SF|Questionable|4|
@@ -1050,7 +1050,7 @@
 8330|Quentin Lake|DB|LAR||4|
 8331|Otito Ogbonnia|DL|DAL||4|
 8333|Alontae Taylor|DB|TEN||4|
-8334|Malcolm Rodriguez|LB|DET||4|
+8334|Malcolm Rodriguez|LB|DET|Questionable|4|
 8336|Tyreke Smith|DL|KC||4|
 8339|Kyle Hamilton|DB|BAL||4|
 8341|Cam Taylor-Britt|DB|IND|IR|4|
@@ -1229,7 +1229,7 @@
 9482|Michael Mayer|TE|LV||3|
 9484|Tucker Kraft|TE|GB||3|
 9486|Dontayvion Wicks|WR|PHI|IR|3|
-9487|Parker Washington|WR|JAX||3|
+9487|Parker Washington|WR|JAX|Questionable|3|
 9488|Jaxon Smith-Njigba|WR|SEA|Questionable|3|
 9489|Justin Shorter|WR|||3|
 9490|Tyler Scott|WR|LAR||3|
@@ -1564,7 +1564,7 @@
 11600|Ja'Tavion Sanders|TE|CAR||2|
 11603|AJ Barner|TE|SEA||2|
 11604|Brock Bowers|TE|LV|Questionable|2|
-11608|Isaiah Williams|WR|NYJ|Questionable|2|
+11608|Isaiah Williams|WR|NYJ||2|
 11610|Malik Washington|WR|MIA||2|
 11616|Jacob Cowing|WR|SF||2|
 11617|Malachi Corley|WR|CLE||2|
@@ -2080,7 +2080,7 @@
 12694|RJ Mickens|DB|LAC||1|
 12695|Robert Longerbeam|DB|ATL||1|
 12696|Aeneas Peebles|DT|BAL|Questionable|1|
-12698|Ajani Cornelius|OL|PHI||1|
+12698|Ajani Cornelius|OL|PHI|Out|1|
 12699|LaJohntay Wester|WR|||1|
 12700|Gavin Bartholomew|TE|MIN||1|
 12702|Rayuan Lane III|DB|JAX||1|
@@ -2183,7 +2183,7 @@
 12889|Beaux Collins|WR|ATL||1|
 12897|Nate Carter|RB|KC||1|
 12899|Doneiko Slaughter|DB|PIT||1|
-12900|Danny Striggow|DL|JAX|Questionable|1|
+12900|Danny Striggow|DL|JAX||1|
 12901|Patrick Herbert|TE|LAC||1|
 12902|Ethan Downs|DE|KC|IR|1|
 12907|Quentin Skinner|WR|PHI||1|
@@ -2348,7 +2348,7 @@
 13329|Malik Benson|WR|LV||0|
 13330|Kenyon Sadiq|TE|NYJ||0|
 13333|Deion Burks|WR|IND||0|
-13335|Cole Payton|QB|PHI||0|
+13335|Cole Payton|QB|PHI|Out|0|
 13336|Dane Key|WR|DEN||0|
 13337|Emmett Johnson|RB|KC||0|
 13338|Kevin Coleman Jr.|WR|MIA||0|
@@ -2388,7 +2388,7 @@
 13377|Arvell Reese|LB|NYG|Questionable|0|DL,LB
 13379|Josiah Trotter|LB|TB||0|
 13380|Brenen Thompson|WR|LAC|Questionable|0|
-13381|Jaishawn Barham|LB|DAL||0|DL,LB
+13381|Jaishawn Barham|LB|DAL|Out|0|DL,LB
 13382|Keionte Scott|DB|TB||0|
 13384|A.J. Haulcy|DB|IND||0|
 13385|Mansoor Delane|DB|KC||0|
@@ -2545,7 +2545,7 @@
 13547|Skyler Gill-Howard|DT|DET|IR|0|
 13548|Gabriel Rubio|DL|PIT||0|
 13550|Pat Coogan|C|TEN||0|
-13551|Karson Sharar|LB|ARI||0|
+13551|Karson Sharar|LB|ARI|Questionable|0|
 13552|Anterio Thompson|DT|ATL|PUP|0|
 13553|Ryan Eckley|P|BAL||0|
 13554|CJ Williams|WR|JAX||0|
