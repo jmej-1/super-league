@@ -6,7 +6,7 @@ Output (all relative links, so it works on Netlify, a Claude artifact, or a loca
   game/w{week}-{rid}-{rid}.html    one page per matchup (box score if played, preview if not)
   logos/{Manager}.png              copied by superleague.py
 """
-import html, datetime, os, math, re
+import html, datetime, os, math, re, sys
 from collections import defaultdict, Counter
 import numpy as np
 from scipy.stats import norm
@@ -2723,6 +2723,7 @@ class Site:
             if len(pts) > 1: pts[-1] = (pts[-1][0], s_.win_p(s_.upcoming(w, a), s_.upcoming(w, b))) + pts[-1][2:]   # latest point = the live number shown everywhere
             if pb_ and len(pts) > 2:
                 pts = s_.wp_anchor(w, a, b, pts, kick, o0, oN, done)
+        pts, dec = s_.wp_clean(w, a, b, pts, dec)
         if os.environ.get("WPDBG") == f"{w}-{a}-{b}" and not getattr(s_, "_dbgd", 0):
             s_._dbgd = 1; P_ = getattr(s_, "_wpos", {}).get((w, a, b))
             for k, x in enumerate(pts): print("WPDBG", k, P_[k] if P_ else k, x[0], round(x[1], 3), x[2], [round(v, 1) for v in x[3]])
@@ -3188,6 +3189,33 @@ class Site:
         H3 = datetime.timedelta(hours=3, minutes=15)
         return max(ends) if ends and len(ends) == n_ else max(ends + [g + H3])
 
+    def wp_clean(s_, w, a, b, pts, dec):
+        """Catcher for bad rows (late or stale feeds, snapshots that trail the play-by-play): drop any single point that jumps
+        and then snaps right back while the score around it doesn't move, or whose score runs backward and then forward again.
+        Each drop is printed to the build log as WPFIX so it can be traced."""
+        if len(pts) < 4: return pts, dec
+        P_ = getattr(s_, "_wpos", {}).get((w, a, b)); drop = set()
+        tot = lambda x: (x[3][0] or 0) + (x[3][1] or 0) if x[3] else 0.0
+        for k in range(1, len(pts) - 1):
+            if k == dec or pts[k][0] != "·": continue         # slot ticks and labelled points stay
+            km = next((j for j in range(k - 1, -1, -1) if pts[j][0] == "·"), None); kp = next((j for j in range(k + 1, len(pts)) if pts[j][0] == "·"), None)
+            if km is None or kp is None: continue
+            if tot(pts[km]) == 0 and tot(pts[kp]) == 0: continue   # before anyone scores, moves are news, not feed errors
+            pa, pk, pb = pts[km][1], pts[k][1], pts[kp][1]
+            jump, back = pk - pa, pb - pk
+            blip = abs(jump) > 0.05 and jump * back < 0 and abs(pb - pa) < 0.35 * abs(jump) and abs(tot(pts[kp]) - tot(pts[km])) < 0.5
+            stale = tot(pts[k]) + 1.0 < min(tot(pts[km]), tot(pts[kp])) and abs(tot(pts[kp]) - tot(pts[km])) < 0.1
+            if blip or stale:
+                drop.add(k); key = (w, a, b, str(pts[k][2]))
+                if key not in getattr(s_, "_wpfix", set()):
+                    s_.__dict__.setdefault("_wpfix", set()).add(key)
+                    print(f"WPFIX week {w} {s_.M[a]} vs {s_.M[b]}: dropped {pts[k][2]} p={pk:.3f} ({'blip' if blip else 'stale score'})", file=sys.stderr)
+        if not drop: return pts, dec
+        keep = [k for k in range(len(pts)) if k not in drop]
+        if P_ and len(P_) == len(pts): s_._wpos[(w, a, b)] = [P_[k] for k in keep]
+        if dec is not None: dec = keep.index(dec) if dec in keep else next((j for j, k in enumerate(keep) if k > dec), len(keep) - 1)
+        return [pts[k] for k in keep], dec
+
     def wp_anchor(s_, w, a, b, pts, kick, o0, oN, done):
         """Weave every logged update into the play-by-play line: the pre-kickoff odds from each update during the week
         (projection and injury news), and the live odds from each update during and between games. Each logged number goes on
@@ -3220,8 +3248,17 @@ class Site:
             for t_, x in timed:
                 if t_ is not None and t_ <= tm: v = x[1]
             return v
-        A = [(None, pts[0][1] - o0)] + [(tm, p - model_at(tm)) for tm, p, *_ in anc if not (k0 and tm < k0)]
-        pre_shift = pts[0][1] - o0
+        # Pre-kickoff updates were figured on the best projected lineup at the time. Once lineups are revealed (players locked at
+        # kickoff, or the week is final), shift them so the last one lands on the model's kickoff number with the real starters:
+        # the pregame story keeps its shape (news, waivers, projections) but ends where the actual lineups say it should.
+        lg = lambda v: math.log(max(1e-6, min(1 - 1e-6, v)) / (1 - max(1e-6, min(1 - 1e-6, v))))
+        ex = lambda v: 1 / (1 + math.exp(-v))
+        preA = [x for x in anc if k0 and x[0] < k0]
+        if preA:
+            dl = lg(o0) - lg(preA[-1][1])
+            anc = [((x[0], ex(lg(x[1]) + dl)) + tuple(x[2:])) if (k0 and x[0] < k0) else x for x in anc]
+        A = [(None, 0.0 if preA else pts[0][1] - o0)] + [(tm, p - model_at(tm)) for tm, p, *_ in anc if not (k0 and tm < k0)]
+        pre_shift = 0.0 if preA else pts[0][1] - o0
         end_t = max((t_ for t_, _ in timed if t_ is not None), default=None)
         A.append((end_t, (pts[-1][1] - oN) if not done else 0.0))
         def off(tm):
