@@ -194,7 +194,7 @@
 2468|Bradley Pinion|P|MIA|Questionable|11|
 2469|Joe Cardona|LS|LAR||11|
 2471|Michael Burton|RB|CLE|IR|11|
-2505|Darren Waller|TE|CAR||11|
+2505|Darren Waller|TE|CAR|Questionable|11|
 2525|Bobby Hart|T|SEA||11|OL,OT
 2543|Trent Brown|OL|HOU||11|OL,OT
 2592|Grady Jarrett|DT|CHI||11|
@@ -282,7 +282,7 @@
 4092|Dalvin Tomlinson|DT|LAC|Questionable|9|
 4102|Dion Dawkins|OT|BUF||9|OL,OT
 4104|Taylor Moton|T|CAR|IR|9|OL,OT
-4107|Chidobe Awuzie|CB|BAL||9|
+4107|Chidobe Awuzie|CB|BAL|Questionable|9|
 4113|Dawuane Smoot|DE|NYG||9|
 4114|Tanoh Kpassagnon|DE||Questionable|9|DL,LB
 4118|Alex Anzalone|LB|TB||9|
@@ -369,7 +369,7 @@
 4993|Mike Gesicki|TE|CIN||8|
 4995|Ian Thomas|TE|LV||8|
 4999|Josh Sweat|DE|ARI||8|
-5001|Dalton Schultz|TE|HOU||8|
+5001|Dalton Schultz|TE|HOU|Questionable|8|
 5008|Durham Smythe|TE|BAL|IR|8|
 5011|Michael Dickson|P|SEA||8|
 5012|Mark Andrews|TE|BAL||8|
@@ -653,7 +653,7 @@
 6868|DJ Wonnum|DE|DET|Out|6|DL,LB
 6869|Adam Trautman|TE|DEN||6|
 6872|Kyle Dugger|DB|CIN||6|
-6875|John Simpson|G|BAL|Questionable|6|
+6875|John Simpson|G|BAL||6|
 6881|Matt Hennessy|OL|DAL|IR|6|
 6882|Darnay Holmes|CB|ATL||6|
 6887|Larrell Murchison|DT|LAR|Out|6|
@@ -762,7 +762,7 @@
 7526|Jaylen Waddle|WR|DEN||5|
 7527|Mac Jones|QB|SF||5|
 7528|Najee Harris|RB|||5|
-7531|Feleipe Franks|TE|CAR||5|
+7531|Feleipe Franks|TE|CAR|Questionable|5|
 7535|Hunter Long|TE|ARI|Questionable|5|
 7536|Quintin Morris|TE|JAX||5|
 7537|Jaret Patterson|RB|DEN||5|
@@ -776,7 +776,7 @@
 7567|Kenny Gainwell|RB|TB||5|
 7568|Brevin Jordan|TE|HOU|Questionable|5|
 7569|Nico Collins|WR|HOU||5|
-7571|Rashod Bateman|WR|BAL|Questionable|5|
+7571|Rashod Bateman|WR|BAL||5|
 7585|Davis Mills|QB|HOU||5|
 7587|Dyami Brown|WR|WAS|IR|5|
 7588|Javonte Williams|RB|DAL||5|
@@ -801,7 +801,7 @@
 7630|Greg Newsome II|CB|NYG|IR|5|
 7631|Christian Darrisaw|T|MIN|Questionable|5|OL,OT
 7633|Kwity Paye|DE|LV||5|
-7635|Jaelan Phillips|LB|CAR||5|DL,LB
+7635|Jaelan Phillips|LB|CAR|Questionable|5|DL,LB
 7637|Zaven Collins|LB|ARI||5|DL,LB
 7638|Alijah Vera-Tucker|OL|NE|IR|5|OG,OL
 7639|Rashawn Slater|T|LAC|IR|5|OL,OT
@@ -833,7 +833,7 @@
 7671|Benjamin St-Juste|DB|GB||5|
 7672|Ernest Jones IV|LB|SEA|Questionable|5|
 7673|Chazz Surratt|LB|SEA||5|
-7674|Patrick Jones II|DE|CAR||5|
+7674|Patrick Jones II|DE|CAR|Questionable|5|
 7676|Malcolm Koonce|DE|LV||5|
 7677|Divine Deablo|LB|ATL||5|
 7678|Joseph Ossai|DE|NYJ|Questionable|5|DL,LB
@@ -847,7 +847,7 @@
 7691|Spencer Brown|OT|BUF||5|OL,OT
 7692|Kendrick Green|C|NYG||5|OG,OL
 7693|Chauncey Golston|DE|NYG|IR|5|
-7694|Tommy Tremble|TE|CAR||5|
+7694|Tommy Tremble|TE|CAR|Questionable|5|
 7695|Osa Odighizuwa|DT|SF||5|
 7696|Milton Williams|DT|NE||5|
 7697|Brady Christensen|T|CAR|IR|5|OL,OT
@@ -1063,7 +1063,7 @@
 8351|Drake Jackson|DL|||4|
 8355|Kayvon Thibodeaux|DL|NYG||4|DL,LB
 8359|Marcus Jones|DB|NE||4|
-8360|Logan Hall|DL|HOU|Doubtful|4|
+8360|Logan Hall|DL|HOU||4|
 8361|Damarion Williams|DB|LAR||4|
 8362|Leo Chenal|LB|WAS|IR|4|
 8363|Jack Sanborn|LB|CHI||4|
@@ -1182,7 +1182,7 @@
 8713|Josh Sills|OL|NYG||4|
 8714|Josh Blackwell|CB|CHI||4|
 8726|Brenden Schooler|DB|NE||4|
-8733|Jake Hummel|LB|HOU|Questionable|4|
+8733|Jake Hummel|LB|HOU||4|
 8736|Elijah Garcia|DT|DAL||4|
 8739|Keir Thomas|DE|LAR|Questionable|4|
 8746|Benton Whitley|DE|NE||4|
@@ -1252,7 +1252,7 @@
 9756|Jordan Addison|WR|MIN|Doubtful|3|
 9757|Kendre Miller|RB|DAL||3|
 9758|C.J. Stroud|QB|HOU||3|
-9997|Zay Flowers|WR|BAL|Questionable|3|
+9997|Zay Flowers|WR|BAL||3|
 9998|Hendon Hooker|QB|TEN||3|
 9999|Will Levis|QB|NYJ||3|
 10210|Cameron Latu|TE|NE||3|
@@ -1533,7 +1533,7 @@
 11557|Joe Milton|QB|PHI||2|
 11558|Sam Hartman|QB|WAS||2|
 11559|Michael Penix Jr.|QB|ATL||2|
-11560|Caleb Williams|QB|CHI||2|
+11560|Caleb Williams|QB|CHI|Questionable|2|
 11562|Spencer Rattler|QB|NO||2|
 11563|Bo Nix|QB|DEN||2|
 11564|Drake Maye|QB|NE|Out|2|
@@ -1575,7 +1575,7 @@
 11625|Adonai Mitchell|WR|NYJ||2|
 11626|Xavier Legette|WR|CAR||2|
 11627|Troy Franklin|WR|DEN||2|
-11628|Marvin Harrison Jr.|WR|HOU|Questionable|2|
+11628|Marvin Harrison Jr.|WR|HOU||2|
 11629|Devontez Walker|WR|BAL||2|
 11630|Roman Wilson|WR|PIT||2|
 11631|Brian Thomas Jr.|WR|JAX||2|
@@ -1617,7 +1617,7 @@
 11675|Kool-Aid McKinstry|DB|NO||2|
 11676|Mike Sainristil|DB|WAS||2|
 11677|Braden Fiske|DL|LAR||2|
-11678|Cooper DeJean|DB|PHI||2|
+11678|Cooper DeJean|DB|PHI|Questionable|2|
 11679|Chris Braswell|LB|HOU|Out|2|
 11680|Patrick Paul|OL|MIA||2|
 11681|Kingsley Suamataia|OL|KC||2|
@@ -1875,7 +1875,7 @@
 12469|Dylan Sampson|RB|CLE||1|
 12471|DJ Giddens|RB|IND||1|
 12472|Raheim Sanders|RB|CLE|IR|1|
-12473|Mitchell Evans|TE|CAR||1|
+12473|Mitchell Evans|TE|CAR|Questionable|1|
 12474|Woody Marks|RB|HOU|Questionable|1|
 12475|Ricky White III|WR|SEA||1|
 12476|Devin Neal|RB|WAS||1|
@@ -1959,7 +1959,7 @@
 12568|Jalon Walker|DL|ATL|IR|1|DL,LB
 12569|Kelvin Banks Jr.|OL|NO||1|
 12570|Will Campbell|OT|NE||1|
-12571|Mike Green|DL|BAL|Questionable|1|DL,LB
+12571|Mike Green|DL|BAL||1|DL,LB
 12572|Armand Membou|OL|NYJ||1|
 12573|Mason Graham|DL|CLE||1|
 12574|Abdul Carter|DL|NYG|Questionable|1|DL,LB
@@ -2079,7 +2079,7 @@
 12693|Jeremy Crawshaw|P|DEN||1|
 12694|RJ Mickens|DB|LAC||1|
 12695|Robert Longerbeam|DB|ATL||1|
-12696|Aeneas Peebles|DT|BAL|Questionable|1|
+12696|Aeneas Peebles|DT|BAL||1|
 12698|Ajani Cornelius|OL|PHI|Out|1|
 12699|LaJohntay Wester|WR|||1|
 12700|Gavin Bartholomew|TE|MIN||1|
@@ -2444,7 +2444,7 @@
 13444|Monroe Freeling|OT|CAR||0|
 13445|Caleb Banks|DT|MIN||0|
 13446|Blake Miller|OT|DET||0|
-13447|Vega Ioane|OG|BAL||0|
+13447|Vega Ioane|OG|BAL|Questionable|0|
 13448|Kadyn Proctor|OT|MIA||0|
 13449|Francis Mauigoa|OT|NYG||0|
 13450|Spencer Fano|OT|CLE||0|
@@ -2578,7 +2578,7 @@
 13583|Ethan Onianwa|G|ATL||0|
 13584|Rayshaun Benny|DT|BAL||0|
 13585|Evan Beerntsen|OL|PHI||0|
-13586|Jackson Kuwatch|LB|CAR||0|
+13586|Jackson Kuwatch|LB|CAR|Questionable|0|
 13587|Parker Hughes|LB|JAX|IR|0|
 13588|Zach Durfee|DE|JAX|IR|0|
 13589|Nadame Tucker|DE|CLE||0|
