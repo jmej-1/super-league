@@ -9,6 +9,7 @@ bash fetch.sh "$RAW" "$P/data" > /tmp/update_fetch.log 2>&1
 ls -dt "$P"/../data_bak_* 2>/dev/null | tail -n +8 | xargs -r rm -rf          # keep the last 7 backups
 ls -dt /tmp/raw_* | tail -n +4 | xargs -r rm -rf                          # and the last 3 raw pulls
 python3 ingest.py "$RAW" data > /tmp/update_ingest.log 2>&1
+python3 proj_log.py data >> /tmp/update_ingest.log 2>&1 || true
 rm -rf out/site
 python3 superleague.py data out > /tmp/update_build.log 2>&1
 python3 -c "import re;h=open('out/site/index.html').read();open('/tmp/a.js','w').write('\n;\n'.join(re.findall(r'<script>(.*?)</script>',h,re.S)))"

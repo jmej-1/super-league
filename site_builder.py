@@ -2485,6 +2485,9 @@ class Site:
         from zoneinfo import ZoneInfo
         s = s_.s; ET = ZoneInfo("America/New_York"); OH = [list(x) for x in (getattr(s, "ohist", None) or [])]
         if not OH: return OH
+        for x in OH:                                       # the log is written in UTC (the update runs on a UTC clock): show it in Eastern
+            if re.match(r"\d{4}-\d\d-\d\d \d\d:\d\d$", str(x[1])):
+                x[1] = datetime.datetime.strptime(x[1], "%Y-%m-%d %H:%M").replace(tzinfo=datetime.timezone.utc).astimezone(ET).strftime("%Y-%m-%d %H:%M")
         pts_ = lambda ts: datetime.datetime.strptime(ts, "%Y-%m-%d %H:%M").replace(tzinfo=ET) if re.match(r"\d{4}-\d\d-\d\d \d\d:\d\d$", ts) else None
         for k, cond in sorted((getattr(s, "ocond", None) or {}).items()):
             if not cond or not cond["O"]: continue
@@ -2523,6 +2526,24 @@ class Site:
             # projection and injury changes), and just after it ended (or now). Between two anchors the gap is phased out over time,
             # so the line goes through every number the site actually posted.
             idx_ = [(j, pts_(x[1])) for j, x in enumerate(OH)]
+            # pregame updates of this week, redone with the starters who actually played: the same conditional odds, fed the game
+            # chances those lineups had at that moment instead of the ones logged (which assumed the best projected lineups)
+            wend = max([tt for j, tt in idx_ if tt is not None and OH[j][0] == f"W{k - 1}"] or [None], key=lambda x: x or datetime.datetime.min.replace(tzinfo=ET))
+            ml_ = [(datetime.datetime.strptime(r_[0], "%Y-%m-%dT%H:%MZ").replace(tzinfo=datetime.timezone.utc).astimezone(ET), int(r_[2]), int(r_[3]), float(r_[4]))
+                   for r_ in (getattr(s, "mlog", []) or []) if int(r_[1]) == k]
+            def logged_p(a_, b_, tt):
+                v = None
+                for tm_, x_, y_, p_ in ml_:
+                    if tm_ <= tt and {x_, y_} == {a_, b_}: v = p_ if x_ == a_ else 1 - p_
+                return v
+            for j, tt in idx_:
+                if tt is None or tt >= t0 or (wend and tt <= wend): continue
+                cr = {gi: s_.pregame_p(k, a_, b_, tt) for gi, (a_, b_) in enumerate(gl)}
+                cl = {gi: logged_p(a_, b_, tt) for gi, (a_, b_) in enumerate(gl)}
+                if any(v is None for v in list(cr.values()) + list(cl.values())): continue
+                keep_ = dict(cur); cur.update(cr); mr = mix(); cur.update(cl); ml = mix(); cur.clear(); cur.update(keep_)
+                if not mr or not ml: continue
+                OH[j] = [OH[j][0], OH[j][1], {r: tuple([min(1.0, max(0.0, OH[j][2][r][q] + mr[r][q] - ml[r][q])) for q in range(3)] + list(OH[j][2][r][3:])) if r in mr else OH[j][2][r] for r in OH[j][2]}]
             before = [j for j, tt in idx_ if tt is not None and tt <= t0] or [j for j, x in enumerate(OH) if x[0] in (f"W{k - 1}", f"Pre-W{k}")]
             endw = [j for j, x in enumerate(OH) if x[0] == f"W{k}"]
             if not before: continue
@@ -3193,6 +3214,29 @@ class Site:
         H3 = datetime.timedelta(hours=3, minutes=15)
         return max(ends) if ends and len(ends) == n_ else max(ends + [g + H3])
 
+    def lineup_now(s_, w, r):
+        """Who counts as team r's starters for week w: the real lineup once the week is final; while it's on, everyone locked
+        in plus the best projected players for the slots still open."""
+        if w in s_.s.G: return [i for i, _ in s_.s.W[w][r]["S"] if i != "0"]
+        t = s_.TEAM.get((w, r)) or {}
+        return list(t.get("lineup") or [])
+    def pregame_p(s_, w, a, b, tm):
+        """Win chance for a at moment tm (before kickoff), with today's known lineups, each player at the projection he had then."""
+        s = s_.s; PH = (getattr(s, "phist", None) or {}).get(w)
+        if not PH or not s_.proj: return None
+        tz = tm.astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+        if tz < min(v[0][0] for v in PH.values() if v): return None          # before the log starts
+        cv = s_.T["cv"]; SPn = s.SP.get(w, {})
+        def team(r):
+            mu = var = 0.0
+            for i in s_.lineup_now(w, r):
+                now = s_.proj(i, w)[0]; h = PH.get(i)
+                then = next((v for t_, v in reversed(h) if t_ <= tz), h[0][1]) if h else SPn.get(i, now)
+                m = max(0.0, now + then - SPn.get(i, then)); mu += m; var += (cv.get(s.pos(i), 0.6) * m) ** 2
+            return mu * s_.f, math.sqrt(var) * s_.T["corr"] * s_.f
+        A, B = team(a), team(b)
+        return s_.win_p(A, B) if A[0] > 0 and B[0] > 0 else None
+
     def wp_clean(s_, w, a, b, pts, dec):
         """Catcher for bad rows (late or stale feeds, snapshots that trail the play-by-play): drop any single point that jumps
         and then snaps right back while the score around it doesn't move, or whose score runs backward and then forward again.
@@ -3258,11 +3302,19 @@ class Site:
         lg = lambda v: math.log(max(1e-6, min(1 - 1e-6, v)) / (1 - max(1e-6, min(1 - 1e-6, v))))
         ex = lambda v: 1 / (1 + math.exp(-v))
         preA = [x for x in anc if k0 and x[0] < k0]
-        if preA:
+        if preA and s_.pregame_p(w, a, b, preA[-1][0]) is not None:
+            # projection history is on file: redo every pregame update with the starters who actually played (or are locked in),
+            # each at the projection he had at that moment, and the best lineup around them for slots still open
+            anc = [((x[0], s_.pregame_p(w, a, b, x[0]) or x[1]) + tuple(x[2:])) if (k0 and x[0] < k0) else x for x in anc]
+            preA = [x for x in anc if k0 and x[0] < k0]
+            pre_shift = preA[-1][1] - o0
+        elif preA:                                         # no projection history: keep the updates' shape, end them on the real lineups
             dl = lg(o0) - lg(preA[-1][1])
             anc = [((x[0], ex(lg(x[1]) + dl)) + tuple(x[2:])) if (k0 and x[0] < k0) else x for x in anc]
-        A = [(None, 0.0 if preA else pts[0][1] - o0)] + [(tm, p - model_at(tm)) for tm, p, *_ in anc if not (k0 and tm < k0)]
-        pre_shift = 0.0 if preA else pts[0][1] - o0
+            preA = [x for x in anc if k0 and x[0] < k0]
+            pre_shift = 0.0
+        else: pre_shift = pts[0][1] - o0
+        A = [(None, pre_shift)] + [(tm, p - model_at(tm)) for tm, p, *_ in anc if not (k0 and tm < k0)]
         end_t = max((t_ for t_, _ in timed if t_ is not None), default=None)
         A.append((end_t, (pts[-1][1] - oN) if not done else 0.0))
         def off(tm):

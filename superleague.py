@@ -113,6 +113,9 @@ def load(D):
     for fn in os.listdir(D):
         m = re.fullmatch(r"sleeper_proj_(\d+)\.txt", fn)
         if m: SP[int(m.group(1))] = {i: float(p) for i, p in rows(f"{D}/{fn}")}
+    phist = defaultdict(lambda: defaultdict(list))       # week -> player -> [(utc, projection)] in time order
+    if os.path.exists(f"{D}/proj_hist.txt"):
+        for ts, w, i, v in rows(f"{D}/proj_hist.txt"): phist[int(w)][i].append((ts, float(v)))
     projlog = {}
     for fn in os.listdir(D):
         m = re.fullmatch(r"teamproj_(\d+)\.txt", fn)
@@ -149,7 +152,7 @@ def load(D):
     if os.path.exists(f"{D}/reserve_live.txt"):
         for w, r, i in rows(f"{D}/reserve_live.txt"): reserve_live[int(w)][int(r)].add(i)
     LIVE["reserve_live"] = reserve_live
-    return dict(TW=TW, sched=sched, NEWS=NEWS, LIVE=LIVE, NS=NS, L=L, M=M, PL=PL, W=W, G=G, weeks=weeks, fut=fut, draft=draft, tx=tx, rost=rost, reserve=reserve, reserve_wk=reserve_wk, byes=byes, vegas=vegas, notes=notes, projlog=projlog, lineslog=lineslog, NP=NP, SP=SP)
+    return dict(TW=TW, sched=sched, NEWS=NEWS, LIVE=LIVE, NS=NS, L=L, M=M, PL=PL, W=W, G=G, weeks=weeks, fut=fut, draft=draft, tx=tx, rost=rost, reserve=reserve, reserve_wk=reserve_wk, byes=byes, vegas=vegas, notes=notes, projlog=projlog, lineslog=lineslog, NP=NP, SP=SP, phist=phist)
 
 # ----------------------------------------------------------------------------- helpers
 class Ctx:
