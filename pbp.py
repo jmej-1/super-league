@@ -121,7 +121,8 @@ def parse_game(g, cands):
             else: h2 = h2[:1]
             for x in dict.fromkeys(h2): run[x] += 2
         if tov and "FUMBLES" in txt and names:
-            run[names[0]] += -2
+            fb = fumbler(txt, hits)                          # whoever had the ball, not just the first name on the play
+            if fb: run[fb] += -2
             if dfn: run[dfn] += 2 + (6 if td else 0)
         # a defense's points-allowed bonus is settled at the final, so it isn't counted mid-game: it rides in with the anchor,
         # spread over the game clock, instead of showing up as +10 at kickoff
@@ -144,6 +145,26 @@ def parse_game(g, cands):
         times = [times[k] for k in keep]; fracs = [fracs[k] for k in keep]; cum = [cum[k] for k in keep]; pas = [pas[k] for k in keep]; info = [info[k] for k in keep]
     g["_info"] = info                              # (quarter, clock, play text, away score, home score) for each row kept
     return times, fracs, cum, pas
+
+NM_ = r"[A-Z][A-Za-z'\-]*\.[A-Z][A-Za-z'\-\.]*"
+def fumbler(txt, hits):
+    """The ball carrier on the fumble the other team recovered: 'X FUMBLES' names him; otherwise the catcher or the man lateraled to
+    in that stretch of the play, or else its runner."""
+    k = [m.start() for m in re.finditer(r"FUMBLES", txt)]
+    lost = next((x for x in k if "RECOVERED by" in txt[x:x + 120]), k[-1] if k else None)
+    if lost is None: return None
+    seg0 = max(txt.rfind(". ", 0, lost) + 2 if txt.rfind(". ", 0, lost) >= 0 else 0, 0)
+    seg = txt[:lost]
+    m = re.search("(" + NM_ + r")\s+$", seg)
+    if m: pos = m.start(1)
+    else:
+        c = [x for x in re.finditer(r"(?:pass [^.]*? to|[Ll]ateral to) (" + NM_ + ")", seg)]
+        if c: pos = c[-1].start(1)
+        else:
+            r_ = [h for h in hits if h[0] < lost]
+            s0 = [h for h in r_ if h[0] >= txt.rfind(". ", 0, lost)] or r_
+            return s0[0][1] if s0 else None
+    return next((h[1] for h in hits if abs(h[0] - pos) <= 1), None)
 
 def game_paths(G, w, actual, team_of, name_of, pos_of, extra=()):
     """For every NFL game in week w: {team: (times, fracs, {pid: [cum...]})} anchored to actual finals.

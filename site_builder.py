@@ -3454,12 +3454,28 @@ class Site:
             left = f'<span class="sbL"><span class="sbh">{E(when)}</span>{row(a, xa, p, "#DCE3F0", xa0, p0)}{row(b, xb, 1 - p, "#C9A21A", xb0, 1 - p0)}</span>'
             return left + (play(ev, nev) if PBP_ else "")
         def nfl_(t): return f'<i class="nfl N{t}" role="img" aria-label="{t}"></i>' if t in NFL_NICK else ""
-        def ptxt(t):
-            t = re.sub(r"^\s*\([^)]*\)\s*", "", t or "")                      # "(Shotgun)" and the like
-            t = re.split(r"\s\*\*\s|\.?\s*PENALTY on|\.?\s*Penalty on", t)[0]                   # drop the injury notes and penalty fine print
-            t = re.sub(r"\s*\([^)]*\)\.?\s*$", ".", t.strip())                       # and the tacklers
+        import pbp as _pb
+        def ptxt(t, who):
+            """The play as it reads on ESPN, cut to what matters to this matchup: no tacklers or long snappers, and the extra point or
+            two-point try only when someone in the matchup was in it. A kicker or two-point man alone sees just his part."""
+            t = re.split(r"\s\*\*\s|\.?\s*PENALTY on|\.?\s*Penalty on|\.?\s*The Replay Official", t or "")[0]
+            t = re.sub(r"\s*\((?:[^()]*)\)", "", t)                              # (Shotgun), (B.Branch, D.Moore), (Aborted)
+            t = re.sub(r"\s*\[[^\]]*\]", "", t)                                   # [D.Olajiga]
+            t = re.sub(r",?\s*(?:Center|Holder)-[^,.]*", "", t)
             t = re.sub(r"\s+", " ", t).strip()
-            return t if len(t) <= 150 else t[:147].rsplit(" ", 1)[0] + "..."
+            ks = {_pb.key_of(s_.s.PL.get(i, {}).get("name", "")) for i in who if i.isdigit()} - {None}
+            has = lambda x: any(re.search(r"(?<![A-Za-z])" + re.escape(k) + r"(?![a-z])", x) for k in ks)
+            dfn = any(not i.isdigit() for i in who)
+            parts = []
+            m2 = re.search(r"TWO-POINT CONVERSION ATTEMPT\.\s*(.*?)\s*ATTEMPT (SUCCEEDS|FAILS)\.?", t)
+            mx = re.search(r"(" + _pb.NM_ + r") extra point is (GOOD|No Good|BLOCKED)\.?", t)
+            cut = min([m.start() for m in (m2, mx) if m] + [len(t)])
+            main = t[:cut].strip()
+            if has(main) or dfn or not (m2 or mx): parts.append(main)
+            if mx and has(mx.group(0)): parts.append(f"{mx.group(1)} extra point is {mx.group(2)}.")
+            if m2 and m2.group(2) == "SUCCEEDS" and (has(m2.group(1)) or not parts): parts.append(f"Two-point try: {m2.group(1).rstrip('.')}, good.")
+            t = " ".join(p_ for p_ in parts if p_) or main
+            return t if len(t) <= 160 else t[:157].rsplit(" ", 1)[0] + "..."
         def play(ev, nev=None):
             """The play behind this point: the NFL game's score and clock, what happened, and every matchup player it scored for."""
             if not ev: return f'<span class="sbpl none"><span class="sbt">{E(nev or "")}</span></span>'
@@ -3473,7 +3489,7 @@ class Site:
             who = "".join(f'<span class="sbw s{sd}">{s_.logo(a if sd == 0 else b, pre, "lgs", w)}{nfl_(nt)}'
                           f'<span class="sbwn">{E(s_.s.nm(pid))}</span><b class="{"up" if d > 0 else "dn"}">{d:+.2f}</b></span>'
                           for (pid, sd, nt), d in sorted(tot.items(), key=lambda z: -abs(z[1])) if abs(d) >= 0.05)
-            return f'<span class="sbpl">{gl}<span class="sbt">{E(ptxt(g0["txt"]))}</span><span class="sbws">{who}</span></span>'
+            return f'<span class="sbpl">{gl}<span class="sbt">{E(ptxt(g0["txt"], [x[0] for x in g0["who"]]))}</span><span class="sbws">{who}</span></span>'
         pts = s_.wp_series(w, a, b)
         PBP_ = (w, a, b) in getattr(s_, "_wpos", {})
         if not pts or len(pts) < 2: return ""
