@@ -1768,7 +1768,7 @@ class Site:
         def gcard(w, a, b, done):
             if done:
                 sa, sb = s.G[w]["scores"][a], s.G[w]["scores"][b]
-                row = lambda r, sc, won: f'<div class="gr {"w" if won else "l"}">{s_.logo(r, pre, "lg")}<span class="t"><b>{E(s_.TN(r))}</b><small>{E(s_.M[r])}</small></span><span class="s">{fp(sc)}</span></div>'
+                row = lambda r, sc, won: f'<div class="gr {"w" if won else "l"}">{s_.logo(r, pre, "lg", w)}<span class="t"><b>{E(s_.TN(r, w))}</b><small>{E(s_.M[r])}</small></span><span class="s">{fp(sc)}</span></div>'
                 return f'<a class="gcard" href="{s_.gurl(w, a, b, pre)}">{row(a, sa, sa > sb)}{row(b, sb, sb > sa)}<div class="gf"><span class="tagf">Final</span><span>Box score</span></div>{s_.sline(w, a, b)}</a>'
             A, B = s_.upcoming(w, a), s_.upcoming(w, b); pa = s_.win_p(A, B); live = s_.wk_live(w)
             sc = lambda r, mu: f'{fp(s_.now_pts(w, r))}<small>Proj {mu:.1f}</small>' if live else f"{mu:.1f}"
