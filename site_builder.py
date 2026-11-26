@@ -2536,10 +2536,25 @@ class Site:
                 for tm_, x_, y_, p_ in ml_:
                     if tm_ <= tt and {x_, y_} == {a_, b_}: v = p_ if x_ == a_ else 1 - p_
                 return v
+            lw_ = [(datetime.datetime.strptime(r_[0], "%Y-%m-%dT%H:%MZ").replace(tzinfo=datetime.timezone.utc).astimezone(ET), int(r_[2]), int(r_[3]), float(r_[4]), float(r_[5]), float(r_[6]))
+                   for r_ in (getattr(s, "livewp", []) or []) if int(r_[1]) == k]
+            def live_row(a_, b_, tt):
+                v = None
+                for tm_, x_, y_, p_, sx, sy in lw_:
+                    if tm_ <= tt and {x_, y_} == {a_, b_}: v = (p_, sx, sy) if x_ == a_ else (1 - p_, sy, sx)
+                return v
             for j, tt in idx_:
-                if tt is None or tt >= t0 or (wend and tt <= wend): continue
-                cr = {gi: s_.pregame_p(k, a_, b_, tt) for gi, (a_, b_) in enumerate(gl)}
-                cl = {gi: logged_p(a_, b_, tt) for gi, (a_, b_) in enumerate(gl)}
+                if tt is None or (wend and tt <= wend) or tt >= t1 or OH[j][0] == f"W{k}": continue
+                if tt >= t0:                                 # between games: same redo, with the points already banked
+                    kk_ = {gi: getattr(s_, "_wkick", {}).get((k, a_, b_)) or getattr(s_, "_wkick", {}).get((k, b_, a_)) or {} for gi, (a_, b_) in enumerate(gl)}
+                    if any(any(v_ <= tt < v_ + datetime.timedelta(hours=3.5) for v_ in kk_[gi].values()) for gi in kk_): continue   # mid-game: leave it
+                    lr = {gi: live_row(a_, b_, tt) for gi, (a_, b_) in enumerate(gl)}
+                    if any(v is None for v in lr.values()): continue
+                    cr = {gi: s_.pregame_p(k, a_, b_, tt, lr[gi][1], lr[gi][2], kk_[gi]) for gi, (a_, b_) in enumerate(gl)}
+                    cl = {gi: lr[gi][0] for gi in lr}
+                else:
+                    cr = {gi: s_.pregame_p(k, a_, b_, tt) for gi, (a_, b_) in enumerate(gl)}
+                    cl = {gi: logged_p(a_, b_, tt) for gi, (a_, b_) in enumerate(gl)}
                 if any(v is None for v in list(cr.values()) + list(cl.values())): continue
                 keep_ = dict(cur); cur.update(cr); mr = mix(); cur.update(cl); ml = mix(); cur.clear(); cur.update(keep_)
                 if not mr or not ml: continue
@@ -3220,22 +3235,27 @@ class Site:
         if w in s_.s.G: return [i for i, _ in s_.s.W[w][r]["S"] if i != "0"]
         t = s_.TEAM.get((w, r)) or {}
         return list(t.get("lineup") or [])
-    def pregame_p(s_, w, a, b, tm):
-        """Win chance for a at moment tm (before kickoff), with today's known lineups, each player at the projection he had then."""
+    def pregame_p(s_, w, a, b, tm, la=0.0, lb=0.0, kick=None):
+        """Win chance for a at moment tm (before kickoff, or between games), redone with today's known lineups: points already
+        banked at tm (la, lb), plus every lineup player whose game hadn't started by tm at the projection he had then.
+        An empty slot (no one left who can fill it) counts as zero from the start."""
         s = s_.s; PH = (getattr(s, "phist", None) or {}).get(w)
         if not PH or not s_.proj: return None
         tz = tm.astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
-        if tz < min(v[0][0] for v in PH.values() if v): return None          # before the log starts
-        cv = s_.T["cv"]; SPn = s.SP.get(w, {})
-        def team(r):
+        cv = s_.T["cv"]; SPn = s.SP.get(w, {}); kick = kick or {}
+        def team(r, locked):
             mu = var = 0.0
             for i in s_.lineup_now(w, r):
+                ko = kick.get(s_.team_at(w, i))
+                if ko is not None and ko <= tm: continue                     # already played by tm: his points are in locked
                 now = s_.proj(i, w)[0]; h = PH.get(i)
                 then = next((v for t_, v in reversed(h) if t_ <= tz), h[0][1]) if h else SPn.get(i, now)
                 m = max(0.0, now + then - SPn.get(i, then)); mu += m; var += (cv.get(s.pos(i), 0.6) * m) ** 2
-            return mu * s_.f, math.sqrt(var) * s_.T["corr"] * s_.f
-        A, B = team(a), team(b)
-        return s_.win_p(A, B) if A[0] > 0 and B[0] > 0 else None
+            return locked + mu * s_.f, math.sqrt(var) * s_.T["corr"] * s_.f
+        A, B = team(a, la), team(b, lb)
+        if A[0] <= 0 and B[0] <= 0: return None
+        if A[1] + B[1] < 1e-6: return 1.0 if A[0] > B[0] else 0.0 if B[0] > A[0] else 0.5
+        return s_.win_p(A, B)
 
     def wp_clean(s_, w, a, b, pts, dec):
         """Catcher for bad rows (late or stale feeds, snapshots that trail the play-by-play): drop any single point that jumps
@@ -3302,12 +3322,13 @@ class Site:
         lg = lambda v: math.log(max(1e-6, min(1 - 1e-6, v)) / (1 - max(1e-6, min(1 - 1e-6, v))))
         ex = lambda v: 1 / (1 + math.exp(-v))
         preA = [x for x in anc if k0 and x[0] < k0]
-        if preA and s_.pregame_p(w, a, b, preA[-1][0]) is not None:
-            # projection history is on file: redo every pregame update with the starters who actually played (or are locked in),
-            # each at the projection he had at that moment, and the best lineup around them for slots still open
-            anc = [((x[0], s_.pregame_p(w, a, b, x[0]) or x[1]) + tuple(x[2:])) if (k0 and x[0] < k0) else x for x in anc]
+        if anc and s_.pregame_p(w, a, b, anc[-1][0], anc[-1][2], anc[-1][3], kick) is not None:
+            # projection history is on file: redo every logged update (before kickoff and between games) with the starters who
+            # actually played or are locked in, each at the projection he had at that moment, the best lineup around them for slots
+            # still open, and nothing for a slot nobody can fill. Lineup news then never shows up as a jump on game day.
+            anc = [((x[0], (lambda q: x[1] if q is None else q)(s_.pregame_p(w, a, b, x[0], x[2], x[3], kick))) + tuple(x[2:])) for x in anc]
             preA = [x for x in anc if k0 and x[0] < k0]
-            pre_shift = preA[-1][1] - o0
+            pre_shift = (preA[-1][1] - o0) if preA else pts[0][1] - o0
         elif preA:                                         # no projection history: keep the updates' shape, end them on the real lineups
             dl = lg(o0) - lg(preA[-1][1])
             anc = [((x[0], ex(lg(x[1]) + dl)) + tuple(x[2:])) if (k0 and x[0] < k0) else x for x in anc]
@@ -3331,6 +3352,7 @@ class Site:
         out = [pts[0]]
         for x in pts[1:-1]:
             tm = T_(x)
+            if tm is None and x[2] is not None: tm = KEY(x)          # time-slot ticks shift with the line too, so they sit on it
             out.append((x[0], min(1.0, max(0.0, x[1] + off(tm))) if tm is not None else x[1]) + x[2:])
         out.append(pts[-1])
         # logged updates as their own points, in time order among the plays
