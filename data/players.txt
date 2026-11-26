@@ -231,7 +231,7 @@
 3258|Nick Vannett|TE|BAL||10|
 3268|Eric Murray|DB|JAX|IR|10|
 3269|Chris Moore|WR|BAL||10|
-3271|Tyler Higbee|TE|LAR||10|
+3271|Tyler Higbee|TE|LAR|Out|10|
 3272|Miles Killebrew|DB|TB||10|DB,LB
 3281|David Onyemata|DT|NYJ|IR|10|
 3286|Demarcus Robinson|WR|SF||10|
@@ -978,7 +978,7 @@
 8160|Kenny Pickett|QB|CAR||4|
 8161|Malik Willis|QB|MIA|IR|4|
 8162|Sam Howell|QB|DAL||4|
-8167|Christian Watson|WR|GB|Questionable|4|
+8167|Christian Watson|WR|GB|Out|4|
 8168|Skyy Moore|WR|GB||4|
 8170|James Mitchell|TE|DAL||4|
 8172|Greg Dulcich|TE|MIA||4|
@@ -2030,7 +2030,7 @@
 12641|Jaylin Lane|WR|WAS|IR|1|
 12642|Jalen Travis|OT|IND|Questionable|1|
 12643|Kyle Kennard|DE|WAS||1|
-12644|Barryn Sorrell|DE|GB||1|
+12644|Barryn Sorrell|DE|GB|Questionable|1|
 12645|David Walker|LB|TB||1|DL,LB
 12646|Barrett Carter|LB|CIN||1|
 12647|Billy Bowman Jr.|DB|ATL|Questionable|1|
