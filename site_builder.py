@@ -4029,8 +4029,12 @@ def bundle(files, s, logo_dir, font_dir, site=None):
 (function(){
   // Clean URLs: superleague.website/records. Old #/ links still work and get rewritten on arrival.
   if(/^#\//.test(location.hash)) history.replaceState(null,'',location.hash.slice(1)||'/');
-  function RH(){ var p=location.pathname.replace(/\/+$/,''); return '#'+(p||'/'); }
-  function nav(u,rep){ var path=String(u).replace(/^#/,''); if(path.charAt(0)!=='/') path='/'+path;
+  if(/^\/team\//.test(location.pathname)) history.replaceState(null,'',location.pathname.replace(/^\/team\//,'/'));
+  // team pages live at the top level: superleague.website/Jesse
+  var TMN={}; Object.keys(TM).forEach(function(r){ TMN[TM[r][1].toLowerCase()]=TM[r][1]; });
+  function short(path){ return path.replace(/^\/team\/([^\/]+)/,'/$1'); }
+  function RH(){ var p=location.pathname.replace(/\/+$/,''); var m=/^\/team\/(.+)$/.exec(p); if(m) p='/'+m[1]; var q=p.split('/'); if(q[1]&&TMN[q[1].toLowerCase()]) p='/team/'+TMN[q[1].toLowerCase()]+(q.length>2?'/'+q.slice(2).join('/'):''); return '#'+(p||'/'); }
+  function nav(u,rep){ var path=short(String(u).replace(/^#/,'')); if(path.charAt(0)!=='/') path='/'+path;
     if(path!==location.pathname){ history[rep?'replaceState':'pushState'](null,'',path); }
     window.dispatchEvent(new Event('hashchange')); }
   window.addEventListener('popstate',function(){ window.dispatchEvent(new Event('hashchange')); });
@@ -4039,11 +4043,12 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     var a=e.target.closest&&e.target.closest('a[href]'); if(!a||a.target==='_blank') return;
     var h=a.getAttribute('href'); if(!/^#\/|^\/(?!\/)/.test(h)) return;
     e.preventDefault(); nav(h); });
-  function fixLinks(root){ [].forEach.call((root||document).querySelectorAll('a[href^="#/"]'),function(a){ a.setAttribute('href',a.getAttribute('href').slice(1)); }); }
+  function fixLinks(root){ [].forEach.call((root||document).querySelectorAll('a[href^="#/"]'),function(a){ a.setAttribute('href',short(a.getAttribute('href').slice(1))); }); }
   fixLinks();
   var pgs=[].slice.call(document.querySelectorAll('.pg'));
   function go(){
     var h=decodeURIComponent(RH().replace(/^#\\/?/,'')), p=h.split('/'), id, sub;
+    var tmn=TMN[(p[0]||'').toLowerCase()]; if(tmn){ p=['team',tmn].concat(p.slice(1)); }
     if(p[0]==='news'&&p[1]&&window.NG&&NG[p[1]]){ nav('#/'+NG[p[1]],true); return; }
     if(p[0]==='player'&&window.PD){ renderPlayer(p[1],p[2]); id='player'; }
     else if(p[0]==='nfl'&&window.PD){ var nsame=(window._lastNFL===p[1]); window._lastNFL=p[1]; renderNFL(p[1],p[2]); id='nfl'; if(nsame) window._keepY=1; }
