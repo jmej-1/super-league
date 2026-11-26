@@ -189,7 +189,7 @@
 2353|Denzel Perryman|LB|LAC||11|
 2359|Ameer Abdullah|RB|JAX||11|
 2393|Danielle Hunter|DE|HOU|Questionable|11|DL,LB
-2427|Za'Darius Smith|LB|ATL||11|DL,LB
+2427|Za'Darius Smith|LB|ATL|Questionable|11|DL,LB
 2449|Stefon Diggs|WR|WAS|Questionable|11|
 2468|Bradley Pinion|P|MIA|Questionable|11|
 2469|Joe Cardona|LS|LAR||11|
@@ -1083,7 +1083,7 @@
 8380|Thomas Booker IV|DL|LV||4|
 8381|Cobie Durant|DB|DAL||4|
 8382|Kingsley Enagbare|DL|NYJ||4|
-8383|Cameron Thomas|DL|ATL||4|
+8383|Cameron Thomas|DL|ATL|Questionable|4|
 8384|Zyon McCollum|DB|TB||4|
 8385|George Karlaftis|DL|KC||4|
 8386|Damarri Mathis|DB|CLE|IR|4|
@@ -1153,7 +1153,7 @@
 8510|Russ Yeast|DB|CIN||4|
 8511|Rasheed Walker|OL|CAR||4|
 8517|Rodney Thomas II|LB|SEA||4|DB,LB
-8519|Deane Leonard|DB|LAC|Questionable|4|
+8519|Deane Leonard|DB|LAC|IR|4|
 8520|Daniel Hardy|LB|CHI||4|
 8522|Chris Paul|OL|WAS||4|
 8523|Nick Muse|TE|ATL||4|
@@ -1912,7 +1912,7 @@
 12512|Quinshon Judkins|RB|CLE||1|
 12514|Emeka Egbuka|WR|TB||1|
 12516|Kalel Mullings|RB|TEN||1|
-12517|Colston Loveland|TE|CHI||1|
+12517|Colston Loveland|TE|CHI|Out|1|
 12518|Tyler Warren|TE|IND||1|
 12519|Luther Burden III|WR|CHI||1|
 12520|Xavier Restrepo|WR|TEN||1|
@@ -1973,7 +1973,7 @@
 12582|Marcus Mbow|OL|NYG||1|
 12583|Oluwafemi Oladejo|DL|TEN||1|
 12584|Darien Porter|DB|LV||1|
-12585|James Pearce Jr.|DL|ATL|Questionable|1|
+12585|James Pearce Jr.|DL|ATL||1|
 12586|Cameron Williams|OL|ATL||1|
 12587|Joshua Farmer|DL|NE||1|
 12588|Kevin Winston Jr.|DB|TEN||1|
@@ -2000,7 +2000,7 @@
 12610|Princely Umanmielen|DL|CAR||1|
 12611|Lathan Ransom|DB|CAR||1|
 12612|T.J. Sanders|DL|BUF|Questionable|1|
-12613|Tate Ratledge|OL|DET||1|
+12613|Tate Ratledge|OL|DET|Questionable|1|
 12614|Shemar James|LB|DAL||1|
 12615|Omarr Norman-Lott|DT|KC|Out|1|
 12616|Shemar Turner|DE|CHI||1|
@@ -2479,7 +2479,7 @@
 13479|Kyle Louis|LB|MIA||0|
 13480|LT Overton|DE|DAL||0|
 13481|Bryce Boettcher|LB|IND||0|
-13482|Kendal Daniels|LB|ATL||0|
+13482|Kendal Daniels|LB|ATL|Questionable|0|
 13483|Jeremiah Wright|G|NO||0|
 13484|Trey Moore|LB|MIA|IR|0|
 13485|Will Lee III|CB|CAR||0|
