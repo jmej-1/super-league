@@ -3542,8 +3542,9 @@ class Site:
                   ''
                   )
         for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
-            card = sb(when, xa, xb, p, ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "No fantasy points on this update" if lab == "·" else "Time slot check-in"))
+            card = sb(when, xa, xb, p, ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Time slot check-in"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})          # a play-by-play point: no dot, a small tap target
+            if pl_ and not (ev_ and ev_[0]) and k != len(pts) - 1: continue      # nobody in the matchup scored on it: the line keeps it, dragging skips it
             g += (f'<circle class="wpd" cx="{X[k]:.1f}" cy="{Y[k]:.1f}" r="{6 if pl_ else 22}" fill="transparent" '
                   f'data-x="{X[k] / Wd * 100:.2f}" data-y="{Y[k] / Hd * 100:.2f}" data-card="{E(card)}"{"" if pl_ else ' tabindex="0" role="button"'}/>'
                   + ("" if pl_ else f'<circle class="wpdv" cx="{X[k]:.1f}" cy="{Y[k]:.1f}" r="4" fill="{"var(--turf)" if p >= 0.5 else "#C9A21A"}" stroke="var(--paper)" stroke-width="1.5"/>'))
@@ -3578,8 +3579,9 @@ class Site:
         h2 += (f'<polyline points="{ln(sb_, XF)}" fill="none" stroke="#C9A21A" stroke-width="3" stroke-dasharray="7 4" stroke-linejoin="round"/>'
                f'<polyline points="{ln(sa_, XF)}" fill="none" stroke="var(--turf)" stroke-width="3.2" stroke-linejoin="round"/>')
         for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
-            card = sb(when, xa, xb, p, ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "No fantasy points on this update" if lab == "·" else "Time slot check-in"))
+            card = sb(when, xa, xb, p, ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Time slot check-in"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})
+            if pl_ and not (ev_ and ev_[0]) and k != len(pts) - 1: continue
             if pl_:                                  # play-by-play points: no dot, but dragging across the chart stops on each one
                 h2 += f'<circle class="wpd wpq" cx="{XF[k]:.1f}" cy="{fy_(max(xa, xb)):.1f}" r="0" data-x="{XF[k] / Wd * 100:.2f}" data-card="{E(card)}"/>'
                 continue
