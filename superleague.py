@@ -1305,6 +1305,7 @@ def main():
         s.mval = move_values(s)       # every move graded: best lineup with it minus without it, each week since
         for fn, page in site_builder.build_site(s, T, TEAM, SIM, L, weeks_left, starts_pm, season_pm, f"{D}/logos", proj, f"{D}/fonts").items():
             open(f"{O}/site/{fn}", "w").write(page)
+        import og; og.make(site_builder.LAST_SITE, f"{O}/site", D)
         import shutil; shutil.copytree(f"{D}/logos", f"{O}/site/logos", dirs_exist_ok=True) if os.path.isdir(f"{D}/logos") else None
         shutil.copytree(f"{D}/fonts", f"{O}/site/fonts", dirs_exist_ok=True) if os.path.isdir(f"{D}/fonts") else None
     except ImportError:

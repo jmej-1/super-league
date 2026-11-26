@@ -4113,6 +4113,9 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         lg += f".brandlogo{{background-image:url(data:image/png;base64,{base64.b64encode(open(f'{bd}/shield.png', 'rb').read()).decode()})}}"
     if os.path.exists(f"{bd}/favicon.png"):
         head = head.replace("</title>", f'</title><link rel="icon" type="image/png" href="data:image/png;base64,{base64.b64encode(open(f"{bd}/favicon.png", "rb").read()).decode()}">', 1)
+    head = head.replace("</title>", '</title><meta property="og:site_name" content="Super League"><meta property="og:title" content="Super League 2026">'
+                        '<meta property="og:description" content="Standings, odds, records and the weekly Desk."><meta property="og:image" content="https://superleague.website/og/home.jpg">'
+                        '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">', 1)
     pages = []
     for path in order:
         h = files[path]; me = pid(path)
@@ -5013,7 +5016,8 @@ def bundle(files, s, logo_dir, font_dir, site=None):
 
 
 def build_site(s, T, TEAM, SIM, L, weeks_left, starts_pm, season_pm, logo_dir="data/logos", proj=None, font_dir="data/fonts", single=True):
-    S = Site(s, T, TEAM, SIM, weeks_left, starts_pm, season_pm, logo_dir, proj)
+    global LAST_SITE
+    S = Site(s, T, TEAM, SIM, weeks_left, starts_pm, season_pm, logo_dir, proj); LAST_SITE = S
     files = S.site_pages()
     for r in s.R: files[f"team/{s.M[r]}.html"] = S.team(r)
     files.update(S.news_pages())
