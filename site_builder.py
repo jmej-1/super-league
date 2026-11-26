@@ -4133,7 +4133,13 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   // team pages live at the top level: superleague.website/Jesse
   var TMN={}; Object.keys(TM).forEach(function(r){ TMN[TM[r][1].toLowerCase()]=TM[r][1]; });
   function short(path){ return path.replace(/^\/team\/([^\/]+)/,'/$1'); }
-  function RH(){ var p=location.pathname.replace(/\/+$/,''); var m=/^\/team\/(.+)$/.exec(p); if(m) p='/'+m[1]; var q=p.split('/'); if(q[1]&&TMN[q[1].toLowerCase()]) p='/team/'+TMN[q[1].toLowerCase()]+(q.length>2?'/'+q.slice(2).join('/'):''); return '#'+(p||'/'); }
+  var TMR={}; Object.keys(TM).forEach(function(r){ TMR[TM[r][1].toLowerCase()]=r; });
+  function RH(){ var p=location.pathname.replace(/\/+$/,'');
+    var wk=/^\/week(\d+)(?:\/([^\/]+))?$/i.exec(p);           // /week12 = that week's schedule, /week12/jesse = Jesse's game that week
+    if(wk){ var r=wk[2]&&TMR[decodeURIComponent(wk[2]).toLowerCase()], o=r&&window.GOF&&GOF[wk[1]]&&GOF[wk[1]][r];
+      if(o){ var x=Math.min(+r,+o), y=Math.max(+r,+o); return '#/game/w'+wk[1]+'-'+x+'-'+y; }
+      return '#/schedule/wk'+wk[1]; }
+    var m=/^\/team\/(.+)$/.exec(p); if(m) p='/'+m[1]; var q=p.split('/'); if(q[1]&&TMN[q[1].toLowerCase()]) p='/team/'+TMN[q[1].toLowerCase()]+(q.length>2?'/'+q.slice(2).join('/'):''); return '#'+(p||'/'); }
   function nav(u,rep){ var path=short(String(u).replace(/^#/,'')); if(path.charAt(0)!=='/') path='/'+path;
     if(path!==location.pathname){ history[rep?'replaceState':'pushState'](null,'',path); }
     window.dispatchEvent(new Event('hashchange')); }
@@ -4212,11 +4218,12 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     [].forEach.call(pg.querySelectorAll('.wkp'),function(x){x.hidden=x.getAttribute('data-w')!==String(w);});
     var i=sel.selectedIndex; pg.querySelector('.wstep[data-d="-1"]').disabled=i<=0; pg.querySelector('.wstep[data-d="1"]').disabled=i>=sel.options.length-1;
   }
-  document.addEventListener('change',function(e){ if(e.target.classList&&e.target.classList.contains('wsel')) setWeek(e.target.closest('.pg'),e.target.value); });
+  function wkUrl(pg,w){ if(pg&&/^schedule/.test(pg.getAttribute('data-p')||'')) history.replaceState(null,'','/week'+w); }
+  document.addEventListener('change',function(e){ if(e.target.classList&&e.target.classList.contains('wsel')){ var pg=e.target.closest('.pg'); setWeek(pg,e.target.value); wkUrl(pg,e.target.value); } });
   document.addEventListener('click',function(e){
     var b=e.target.closest&&e.target.closest('.wstep'); if(!b) return;
     var pg=b.closest('.pg'), sel=pg.querySelector('.wsel'), i=sel.selectedIndex+parseInt(b.getAttribute('data-d'),10);
-    if(i>=0&&i<sel.options.length) setWeek(pg, sel.options[i].value);
+    if(i>=0&&i<sel.options.length){ setWeek(pg, sel.options[i].value); wkUrl(pg, sel.options[i].value); }
   });
   function showCard(hz){
     var box=hz.closest('.lchart'), c=box.querySelector('.lcard'), svg=hz.ownerSVGElement, g=svg.querySelector('.guide');
@@ -4950,7 +4957,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         import json as _json
         teams = {r: [site.TN(r), s.M[r]] for r in s.R}
         pdata = ("<script>var TA=" + _json.dumps(site.ta_data(), separators=(",", ":")) + ";</script>" + open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "ta.js")).read() + "<script>var WKD=" + _json.dumps(site.week_data(), separators=(",", ":")) + ";var PD=" + _json.dumps(site.players_data(), separators=(",", ":")) + ";var TM=" + _json.dumps(teams, separators=(",", ":")) + ";var TMW=" + _json.dumps(site.names_js(), separators=(",", ":")) +
-                 ";var NG=" + _json.dumps({n["slug"]: "game/w%s-%s-%s" % ((lambda w, a, b: (w, min(a, b), max(a, b)))(*(int(x) for x in n["game"].split("-")))) for n in site.news_list() if n.get("kind") not in ("feature", "cover") and n.get("game")}, separators=(",", ":")) + ";var NFLN=" + _json.dumps({k: f"{NFL_CITY[k]} {NFL_NICK[k]}" for k in NFL_NICK if k in NFL_CITY}, separators=(",", ":")) + ";var NFLK=" + _json.dumps(NFL_NICK, separators=(",", ":")) + ";var OH=" + _json.dumps([[lab, ts, {str(r): [round(v[0], 4), round(v[1], 4), round(v[2], 4)] + ([round(v[3], 3)] if len(v) > 3 and v[3] is not None else []) for r, v in d.items()}] for lab, ts, d in site.oh_ext()], separators=(",", ":")) + ";var NWS=" + _json.dumps([[n["title"], n["slug"], n.get("week")] for n in site.news_list()], separators=(",", ":")) + ";var YR=" + _json.dumps(str(site.yr)) + ";var BY=" + _json.dumps({t: 0 for t in NFL_NICK} | {t: w for w, ts in s.byes.items() for t in ts}) + ";</script>")
+                 ";var NG=" + _json.dumps({n["slug"]: "game/w%s-%s-%s" % ((lambda w, a, b: (w, min(a, b), max(a, b)))(*(int(x) for x in n["game"].split("-")))) for n in site.news_list() if n.get("kind") not in ("feature", "cover") and n.get("game")}, separators=(",", ":")) + ";var NFLN=" + _json.dumps({k: f"{NFL_CITY[k]} {NFL_NICK[k]}" for k in NFL_NICK if k in NFL_CITY}, separators=(",", ":")) + ";var NFLK=" + _json.dumps(NFL_NICK, separators=(",", ":")) + ";var OH=" + _json.dumps([[lab, ts, {str(r): [round(v[0], 4), round(v[1], 4), round(v[2], 4)] + ([round(v[3], 3)] if len(v) > 3 and v[3] is not None else []) for r, v in d.items()}] for lab, ts, d in site.oh_ext()], separators=(",", ":")) + ";var NWS=" + _json.dumps([[n["title"], n["slug"], n.get("week")] for n in site.news_list()], separators=(",", ":")) + ";var GOF=" + _json.dumps({str(w): {str(r): (g[1] if g[0] == r else g[0]) for (w_, r), g in site.game_of.items() if w_ == w} for w in sorted({k[0] for k in site.game_of})}, separators=(",", ":")) + ";var YR=" + _json.dumps(str(site.yr)) + ";var BY=" + _json.dumps({t: 0 for t in NFL_NICK} | {t: w for w, ts in s.byes.items() for t in ts}) + ";</script>")
         chrome = first[first.index("<body>") + 6:first.index("</div></div></div>", first.index('class="top"')) + 18]
         chrome = re.sub(r' aria-current=page', '', chrome)
         chrome = re.sub(r'href="(index|news|standings|playoffs|schedule|teams|players|h2h|draft|races|awards|trades|transactions|excitement|analyzer|records)\.html"', lambda m: f'href="#/{"" if m.group(1) == "index" else m.group(1)}"', chrome)
