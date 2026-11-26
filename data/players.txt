@@ -1028,7 +1028,7 @@
 8286|Dax Hill|DB|CIN||4|
 8287|David Ojabo|DL|NO||4|DL,LB
 8289|Aidan Hutchinson|DL|DET|IR|4|
-8290|Sauce Gardner|DB|IND|Questionable|4|
+8290|Sauce Gardner|DB|IND||4|
 8293|Coby Bryant|DB|CHI|IR|4|
 8294|Bryan Cook|DB|CIN||4|
 8295|Zach Carter|DL|ARI|IR|4|
