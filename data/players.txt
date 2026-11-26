@@ -340,7 +340,7 @@
 4718|Dare Ogunbowale|RB|||9|
 4771|Greg Van Roten|OG|NE||14|OG,OL
 4848|Christian Kuntz|LS|PIT||9|LB,LS
-4866|Saquon Barkley|RB|PHI||8|
+4866|Saquon Barkley|RB|PHI|Questionable|8|
 4881|Lamar Jackson|QB|BAL|IR|8|
 4892|Baker Mayfield|QB|TB||8|
 4943|Sam Darnold|QB|SEA||8|
@@ -375,7 +375,7 @@
 5012|Mark Andrews|TE|BAL||8|
 5017|Jessie Bates III|DB|JAX||8|
 5020|B.J. Hill|DT|CIN||8|
-5022|Dallas Goedert|TE|PHI||8|
+5022|Dallas Goedert|TE|PHI|Out|8|
 5023|Chukwuma Okorafor|OL|NYJ||8|OL,OT
 5025|Ronnie Harrison Jr.|DB|MIA|IR|8|
 5027|Geron Christian Sr.|OL|JAX||8|OL,OT
@@ -393,7 +393,7 @@
 5054|Carlton Davis III|CB|NE|Questionable|8|
 5055|M.J. Stewart|DB|HOU||8|
 5060|Braden Smith|OL|HOU||8|OG,OL
-5061|Uchenna Nwosu|LB|SEA||8|DL,LB
+5061|Uchenna Nwosu|LB|SEA|Questionable|8|DL,LB
 5067|Arden Key|DE|IND||8|DL,LB
 5071|DeShon Elliott|DB|PIT||8|
 5073|Sebastian Joseph-Day|DT|PIT|IR|8|
@@ -1106,7 +1106,7 @@
 8443|Evan Neal|OL|PHI||4|
 8444|Trevor Penning|T|LAC|IR|4|
 8445|Zion Johnson|G|CLE||4|
-8446|Charles Cross|OL|SEA|Questionable|4|
+8446|Charles Cross|OL|SEA||4|
 8448|Cole Strange|OL|LAC||4|
 8449|Tyler Smith|OL|DAL||4|
 8450|Tyler Linderbaum|OL|LV||4|
@@ -1455,8 +1455,8 @@
 11193|Brenton Cox Jr.|LB|GB||3|
 11194|Keshawn Banks|LB|MIN||3|
 11199|Emari Demercado|RB|HOU||3|
-11201|Blake Whiteheart|TE|CLE|Questionable|3|
-11230|Patrick O'Connell|LB|SEA||3|
+11201|Blake Whiteheart|TE|CLE||3|
+11230|Patrick O'Connell|LB|SEA|Questionable|3|
 11233|Ty Okada|DB|SEA||3|
 11237|Jacob Saylors|RB|DET||3|
 11240|C.J. Okoye|DL|NYG||3|
@@ -1904,7 +1904,7 @@
 12503|Isaiah Bond|WR|CLE||1|
 12504|Kaleb Johnson|RB|GB||1|
 12505|Jalen Royals|WR|KC||1|
-12506|Harold Fannin Jr.|TE|CLE|Questionable|1|
+12506|Harold Fannin Jr.|TE|CLE||1|
 12507|Omarion Hampton|RB|LAC||1|
 12508|Jaxson Dart|QB|NYG|IR|1|
 12509|Tre' Harris|WR|LAC||1|
@@ -2273,7 +2273,7 @@
 13146|Jared Bartlett|LB|JAX|IR|1|
 13147|Gus Hartwig|C|ATL||1|
 13150|Darius Cooper|WR|PHI||1|
-13151|Nick Kallerup|TE|SEA|Questionable|1|
+13151|Nick Kallerup|TE|SEA||1|
 13155|Chandler Martin|LB|NYG||1|
 13156|Keondre Jackson|DB|BAL||1|
 13163|Jahvaree Ritzie|DT|MIN||1|
@@ -2386,7 +2386,7 @@
 13375|Sonny Styles|LB|WAS||0|
 13376|Caleb Downs|DB|DAL||0|
 13377|Arvell Reese|LB|NYG|Questionable|0|DL,LB
-13379|Josiah Trotter|LB|TB||0|
+13379|Josiah Trotter|LB|TB|Questionable|0|
 13380|Brenen Thompson|WR|LAC|Questionable|0|
 13381|Jaishawn Barham|LB|DAL|Out|0|DL,LB
 13382|Keionte Scott|DB|TB||0|
