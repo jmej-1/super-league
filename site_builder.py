@@ -134,6 +134,11 @@ tr.tstart td{border-top:2px solid var(--rule)}
 .kt{white-space:nowrap} .ksep{display:inline-block;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.55;margin:0 7px;vertical-align:middle} .lu .pl .who small .stg{margin-left:8px} .nflr{margin:0 0 0 5px}
 @media (max-width:760px){.lu .kt{display:block;margin:2px 0 0;white-space:normal} .lu .ksep{display:none} .lu .pl .who small .stg{margin-left:0}}
 .wpc{position:relative} .wpc .gfv svg{touch-action:pan-y;cursor:crosshair;user-select:none;-webkit-user-select:none} .wphint{margin:2px 0 0;font-size:12px} .wpd{cursor:pointer;outline:none} .wpdv{pointer-events:none} .wpd:hover+.wpdv,.wpd.on+.wpdv{r:7} .wpcard{display:block;background:var(--field,#0b1a3a);color:#EEF2F8;border-radius:12px;padding:10px 14px 8px;margin:10px 0 6px;max-width:420px;margin-left:auto;font-size:14px}
+.wpcard .sbpl{display:block;border-top:1px solid rgba(238,242,248,.14);margin-top:7px;padding-top:7px;height:98px;overflow:hidden}.wpcard .sbpl.none{display:flex;align-items:center;justify-content:center}.wpcard .sbpl.none .sbt{color:#8FA0BC;font-style:italic}
+.wpcard .sbg{display:flex;align-items:center;gap:5px;font-size:12px;color:#C7D2E4;white-space:nowrap}.wpcard .sbg .nfl{width:16px;height:16px;margin:0}.wpcard .sbg b{font-weight:700;color:#EEF2F8;margin-right:2px}.wpcard .sbgx{opacity:.6;margin:0 2px}.wpcard .sbq{margin-left:auto;font-weight:700;color:#C9A21A}
+.wpcard .sbt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;line-height:1.35;color:#DCE3F0;margin:4px 0 5px}
+.wpcard .sbws{display:flex;gap:6px;overflow:hidden;white-space:nowrap}.wpcard .sbw{display:inline-flex;align-items:center;gap:4px;background:rgba(238,242,248,.08);border-radius:999px;padding:2px 8px 2px 2px;font-size:12px;flex:none}.wpcard .sbw.s0{box-shadow:inset 2px 0 0 #DCE3F0}.wpcard .sbw.s1{box-shadow:inset 2px 0 0 #C9A21A}
+.wpcard .sbw .im{width:18px;height:18px}.wpcard .sbw .nfl{width:15px;height:15px;margin:0}.wpcard .sbwn{font-weight:600}.wpcard .sbw b.up{color:#8FD6A4}.wpcard .sbw b.dn{color:#F08F8F}
 .wpcard .sbh{display:block;font-size:12px;font-weight:600;color:#AFC0DA;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wpcard .sbr{display:grid;grid-template-columns:4px 24px 1fr auto 52px;align-items:center;gap:8px;padding:3px 0}.wpcard .sbc{width:4px;height:22px;border-radius:2px}
 .wpcard .sbr .im{width:24px;height:24px}.wpcard .sbn{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}.wpcard .sbr.lead .sbn{opacity:1}
@@ -2715,7 +2720,7 @@ class Site:
                     span = (E_[k] - E_[k - 1]).total_seconds() or 1
                     for r_ in rows:
                         if E_[k - 1] < r_[0] < E_[k]:
-                            newp.append(("·", r_[1], r_[0], (r_[2], r_[3]), f"{r_[0].strftime('%a %-I:%M %p')}")); pos.append(k - 1 + (r_[0] - E_[k - 1]).total_seconds() / span)
+                            newp.append(("·", r_[1], r_[0], (r_[2], r_[3]), f"{r_[0].strftime('%a %-I:%M %p')}", r_[6] if len(r_) > 6 else None)); pos.append(k - 1 + (r_[0] - E_[k - 1]).total_seconds() / span)
                 if k > 0 and E_[k] is not None and (done or all(fin[t] for t, kk in kick.items() if kk == x[2])):
                     r_ = at(E_[k])
                     if r_: x = (x[0], r_[1], x[2], (r_[2], r_[3]), x[4])
@@ -2727,8 +2732,10 @@ class Site:
                 if tail:
                     nxt_k = next((k for k in range(k0 + 1, len(pts))), None)
                     for j, r_ in enumerate(tail):
-                        newp.insert(len([q for q in pos if q <= k0]) + j, ("·", r_[1], r_[0], (r_[2], r_[3]), f"Live, {r_[0].strftime('%a %-I:%M %p')}"))
+                        newp.insert(len([q for q in pos if q <= k0]) + j, ("·", r_[1], r_[0], (r_[2], r_[3]), f"Live, {r_[0].strftime('%a %-I:%M %p')}", r_[6] if len(r_) > 6 else None))
                         pos.insert(len([q for q in pos if q <= k0]) + j, k0 + 0.9 * (j + 1) / (len(tail) + 1))
+            for j in range(1, len(pos)):                     # plays in different games at the same second: one after the other, not on top of each other
+                if pos[j] <= pos[j - 1] and newp[j][0] == "·": pos[j] = pos[j - 1] + 0.004
             decobj = pts[dec] if dec is not None else None
             pts = newp
             if decobj is not None and decobj in pts: dec = pts.index(decobj)
@@ -2758,7 +2765,7 @@ class Site:
         if done:
             dec = dec if dec is not None else len(pts) - 1
             fin_p = 1.0 if s.G[w]["scores"][a] > s.G[w]["scores"][b] else 0.0
-            pts = pts[:dec] + [(lab, fin_p, g_, xs, when + (", final" if k == 0 else ", already decided")) for k, (lab, _, g_, xs, when) in enumerate(pts[dec:])]
+            pts = pts[:dec] + [(x[0], fin_p, x[2], x[3], x[4] + (", final" if k == 0 else ", already decided")) + tuple(x[5:]) for k, x in enumerate(pts[dec:])]
         else:
             o0, oN = pts[0][1], pts[-1][1]
             PL_ = getattr(s, "projlog", {}).get(w)          # the projection logged before the week started
@@ -3217,9 +3224,9 @@ class Site:
                 pts = s_.wp_series(w, a, b)
                 if not pts: continue
                 wi = a if s.G[w]["scores"][a] > s.G[w]["scores"][b] else b; lo = b if wi == a else a
-                xs = [(p if wi == a else 1 - p, lab if lab != "·" else "@" + when_) for lab, p, _g, _x, when_ in pts[:-1]]
+                xs = [(p if wi == a else 1 - p, lab if lab != "·" else "@" + when_) for lab, p, _g, _x, when_, *_e in pts[:-1]]
                 low, lab = min(xs)
-                df = max(((xb_ - xa_) if wi == a else (xa_ - xb_)) for _, _, _, (xa_, xb_), _ in pts)     # most points the winner trailed by at any point
+                df = max(((xb_ - xa_) if wi == a else (xa_ - xb_)) for _, _, _, (xa_, xb_), *_e in pts)     # most points the winner trailed by at any point
                 out.append(dict(w=w, wi=wi, lo=lo, low=low, at=lab, down=max(df, 0.0)))
         s_._impr = out; return out
     def slot_end(s_, w, a, b, g):
@@ -3429,12 +3436,34 @@ class Site:
         return FR, FF, ticks
 
     def wp_chart(s_, w, a, b, pre):
-        def sb(when, xa, xb, p, proj=False):
+        def sb(when, xa, xb, p, proj=False, ev=None, nev=None):
             """The scoreboard over the charts: when, both teams' points so far and win chances."""
             row = lambda r, x, q, col: (f'<span class="sbr{" lead" if q > 0.5 else ""}"><i class="sbc" style="background:{col}"></i>{s_.logo(r, pre, "lgs", w)}'
                                         f'<span class="sbn">{E(s_.TN(r, w))}</span><b class="sbs">{(f"{x:.1f}" if proj else fp(x))}</b><span class="sbp">{pct(q)}</span></span>')
-            return f'<span class="sbh">{E(when)}</span>{row(a, xa, p, "#DCE3F0")}{row(b, xb, 1 - p, "#C9A21A")}'
+            return f'<span class="sbh">{E(when)}</span>{row(a, xa, p, "#DCE3F0")}{row(b, xb, 1 - p, "#C9A21A")}{play(ev, nev) if PBP_ else ""}'
+        def nfl_(t): return f'<i class="nfl N{t}" role="img" aria-label="{t}"></i>' if t in NFL_NICK else ""
+        def ptxt(t):
+            t = re.sub(r"^\s*\([^)]*\)\s*", "", t or "")                      # "(Shotgun)" and the like
+            t = re.split(r"\s\*\*\s|\.?\s*PENALTY on|\.?\s*Penalty on", t)[0]                   # drop the injury notes and penalty fine print
+            t = re.sub(r"\s*\([^)]*\)\.?\s*$", ".", t.strip())                       # and the tacklers
+            t = re.sub(r"\s+", " ", t).strip()
+            return t if len(t) <= 150 else t[:147].rsplit(" ", 1)[0] + "..."
+        def play(ev, nev=None):
+            """The play behind this point: the NFL game's score and clock, what happened, and every matchup player it scored for."""
+            if not ev: return f'<span class="sbpl none"><span class="sbt">{E(nev or "")}</span></span>'
+            g0 = max(ev, key=lambda e: max(abs(x[2]) for x in e["who"]))       # the main play if two land at once
+            tot = {}
+            for e in ev:
+                for pid, sd, d, *tt in e["who"]: tot[(pid, sd, tt[0] if tt else s_.team_at(w, pid))] = tot.get((pid, sd, tt[0] if tt else s_.team_at(w, pid)), 0.0) + d
+            q = g0["q"]; qn = f"Q{q}" if q <= 4 else ("OT" if q == 5 else f"{q - 4}OT")
+            gl = (f'<span class="sbg">{nfl_(g0["aw"])}<b>{E(g0["aw"])} {g0["asc"]}</b><span class="sbgx">at</span>{nfl_(g0["hm"])}<b>{E(g0["hm"])} {g0["hsc"]}</b>'
+                  f'<span class="sbq">{qn} {int(g0["c"]) // 60}:{int(g0["c"]) % 60:02d}</span></span>')
+            who = "".join(f'<span class="sbw s{sd}">{s_.logo(a if sd == 0 else b, pre, "lgs", w)}{nfl_(nt)}'
+                          f'<span class="sbwn">{E(s_.s.nm(pid))}</span><b class="{"up" if d > 0 else "dn"}">{d:+.1f}</b></span>'
+                          for (pid, sd, nt), d in sorted(tot.items(), key=lambda z: -abs(z[1])) if abs(d) >= 0.05)
+            return f'<span class="sbpl">{gl}<span class="sbt">{E(ptxt(g0["txt"]))}</span><span class="sbws">{who}</span></span>'
         pts = s_.wp_series(w, a, b)
+        PBP_ = (w, a, b) in getattr(s_, "_wpos", {})
         if not pts or len(pts) < 2: return ""
         fut = getattr(s_, "_fut", {}).get((w, a, b), [])
         Wd, Hd, L, R, T_, B_ = 680, 268, 118, 44, 18, 58
@@ -3512,8 +3541,8 @@ class Site:
             g += (f'<circle cx="{X[dk]:.1f}" cy="{yy:.1f}" r="11" fill="none" stroke="{col}" stroke-width="2.5"/>'
                   ''
                   )
-        for k, (lab, p, _, (xa, xb), when) in enumerate(pts):
-            card = sb(when, xa, xb, p)
+        for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
+            card = sb(when, xa, xb, p, ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "No fantasy points on this update" if lab == "·" else "Time slot check-in"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})          # a play-by-play point: no dot, a small tap target
             g += (f'<circle class="wpd" cx="{X[k]:.1f}" cy="{Y[k]:.1f}" r="{6 if pl_ else 22}" fill="transparent" '
                   f'data-x="{X[k] / Wd * 100:.2f}" data-y="{Y[k] / Hd * 100:.2f}" data-card="{E(card)}"{"" if pl_ else ' tabindex="0" role="button"'}/>'
@@ -3548,8 +3577,8 @@ class Site:
                    f'<polyline points="{ln([sb_[-1]] + fb_, fx)}" fill="none" stroke="#C9A21A" stroke-width="2" stroke-dasharray="3 5" opacity=".7"/>')
         h2 += (f'<polyline points="{ln(sb_, XF)}" fill="none" stroke="#C9A21A" stroke-width="3" stroke-dasharray="7 4" stroke-linejoin="round"/>'
                f'<polyline points="{ln(sa_, XF)}" fill="none" stroke="var(--turf)" stroke-width="3.2" stroke-linejoin="round"/>')
-        for k, (lab, p, _, (xa, xb), when) in enumerate(pts):
-            card = sb(when, xa, xb, p)
+        for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
+            card = sb(when, xa, xb, p, ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "No fantasy points on this update" if lab == "·" else "Time slot check-in"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})
             if pl_:                                  # play-by-play points: no dot, but dragging across the chart stops on each one
                 h2 += f'<circle class="wpd wpq" cx="{XF[k]:.1f}" cy="{fy_(max(xa, xb)):.1f}" r="0" data-x="{XF[k] / Wd * 100:.2f}" data-card="{E(card)}"/>'
@@ -3582,7 +3611,7 @@ class Site:
                 wi_ = a if s_.s.G[w]["scores"][a] > s_.s.G[w]["scores"][b] else b
                 lows = f'<div class="wlos one">{low_(wi_)}</div>'
             else: lows = f'<div class="wlos">{low_(a)}{low_(b)}</div>'
-        _lp = pts[-1]; sbdef = sb(("Now, " if (w not in s_.s.G and s_.wk_live(w)) else "") + str(_lp[4]), _lp[3][0], _lp[3][1], _lp[1])
+        _lp = pts[-1]; sbdef = sb(("Now, " if (w not in s_.s.G and s_.wk_live(w)) else "") + str(_lp[4]), _lp[3][0], _lp[3][1], _lp[1], ev=_lp[5] if len(_lp) > 5 else None, nev="Latest")
         return (f'<section><h2>Win probability and game flow</h2><div class="panel wpc"><div class="rtog chips gft" role="group" aria-label="Chart">'
                 f'<button type="button" data-g="wp" aria-pressed="true">Win probability</button><button type="button" data-g="gf" aria-pressed="false">Game flow</button></div>'
                 f'<div class="wpcard" data-def="{E(sbdef)}">{sbdef}</div><div class="gfv" data-g="wp"><svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Win probability by game time slot">{g}<line class="wpg" x1="0" x2="0" y1="{T_}" y2="{Hd - B_}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0" pointer-events="none"/></svg><p class="note wphint">Press and drag across either chart to see every play.</p>'

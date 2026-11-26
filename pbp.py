@@ -72,9 +72,10 @@ def parse_game(g, cands):
         if prev is not None and tt - prev > _dt.timedelta(minutes=50):
             shift += tt - prev - _dt.timedelta(minutes=1); tt = prev + _dt.timedelta(minutes=1)
         p[0] = tt.strftime(fmt_); prev = tt
-    run = defaultdict(float); times, fracs, cum, pas = [], [], [], []
+    run = defaultdict(float); times, fracs, cum, pas, info = [], [], [], [], []
     pa = {away: 0, home: 0}                      # points each defense has allowed
     for p in plays:
+        r0 = dict(run)
         wc, per, clk, typ, txt, asc, hsc, ofid = p[:8]; tov = p[8] if len(p) > 8 else 0
         off = g["tid"].get(str(ofid)); dfn = home if off == away else away if off == home else None
         if "No Play" in txt or typ in ("Penalty", "Timeout", "Official Timeout", "End Period", "End of Half", "End of Game", "Two-minute warning"):
@@ -119,7 +120,7 @@ def parse_game(g, cands):
         # a defense's points-allowed bonus is settled at the final, so it isn't counted mid-game: it rides in with the anchor,
         # spread over the game clock, instead of showing up as +10 at kickoff
         pa[home] = asc; pa[away] = hsc                     # points each defense has allowed so far
-        times.append(wc); fracs.append(frac_of(per, clk)); cum.append(dict(run)); pas.append(dict(pa))
+        times.append(wc); fracs.append(frac_of(per, clk)); cum.append(dict(run)); pas.append(dict(pa)); info.append((per, clk, txt, asc, hsc, {k: round(v - r0.get(k, 0.0), 2) for k, v in run.items() if abs(v - r0.get(k, 0.0)) > 1e-9}))
     # ESPN sometimes leads a game with stray rows stamped at kickoff but carrying a later game clock (halftime, end of game).
     # Drop any row whose clock is ahead of a later row's: the clock only moves forward.
     # Keep the longest run of rows where the clock never goes backward (stray rows at the start or end fall out).
@@ -134,7 +135,8 @@ def parse_game(g, cands):
     while k >= 0: keep.append(k); k = par[k]
     keep.reverse()
     if len(keep) < len(fracs):
-        times = [times[k] for k in keep]; fracs = [fracs[k] for k in keep]; cum = [cum[k] for k in keep]; pas = [pas[k] for k in keep]
+        times = [times[k] for k in keep]; fracs = [fracs[k] for k in keep]; cum = [cum[k] for k in keep]; pas = [pas[k] for k in keep]; info = [info[k] for k in keep]
+    g["_info"] = info                              # (quarter, clock, play text, away score, home score) for each row kept
     return times, fracs, cum, pas
 
 def game_paths(G, w, actual, team_of, name_of, pos_of, extra=()):
@@ -161,6 +163,7 @@ def game_paths(G, w, actual, team_of, name_of, pos_of, extra=()):
             paths[pid] = seq
         for t_ in (g["away"], g["home"]): paths[("pa", t_)] = [x.get(t_, 0) for x in pas]
         paths[("opp", g["away"])] = g["home"]; paths[("opp", g["home"])] = g["away"]
+        paths[("info",)] = g.get("_info") or []; paths[("game",)] = (g["away"], g["home"])
         rec = (times, fracs, paths, g.get("final"))
         out[g["away"]] = rec; out[g["home"]] = rec
     return out
@@ -231,14 +234,39 @@ def wp_timeline(sides, paths, kick, cv, corr, pos_of):
                 m = script_mult(pos_of(pid), mg, f)
                 mu += cur + pj * left * m; var += (cv.get(pos_of(pid), 0.6) * pj * m) ** 2 * left; lk += cur
         return mu, math.sqrt(var) * corr * (WP_SD_SCALE if st else 1.0), lk     # wider spread only once the week's games are under way
-    out = []; prev = None
+    def val(pid, t, k):                           # a player's fantasy points after play k of his game (a defense counts its points-allowed tier)
+        pp = paths[t][2]
+        if k is None: return float(tier(0)) if not pid.isdigit() and ("pa", pid) in pp else 0.0
+        v = pp.get(pid, [0.0] * (k + 1))[k]
+        if not pid.isdigit() and ("pa", pid) in pp: v += tier(pp[("pa", pid)][k])
+        return v
+    gid = lambda t: id(paths[t]) if t in paths else t
+    out = []; prev = None; ev = []; seen_k = {}
     for j, (tm, t, k) in enumerate(tl):
-        st[t] = k
-        if j + 1 < len(tl) and tl[j + 1][0] == tm: continue      # several plays at the same instant: one point, after all of them
+        before = st.get(t); st[t] = k
+        # what this play did for anyone in the matchup
+        pp = paths[t][2]; inf = (pp.get(("info",)) or [None] * (k + 1))
+        if gid(t) not in seen_k or seen_k[gid(t)] != k:
+            seen_k[gid(t)] = k
+            who = []
+            if k < len(inf) and inf[k]:
+                q, clk, txt, asc, hsc = inf[k][:5]; dl = inf[k][5] if len(inf[k]) > 5 else {}
+                for sd, X in enumerate(sides):
+                    for pid, tt, pj, act in X:
+                        if tt not in paths or gid(tt) != gid(t): continue
+                        d = dl.get(pid, 0.0)                                   # what this play itself was worth to him
+                        if not pid.isdigit() and ("pa", pid) in pp and before is not None:
+                            d += tier(pp[("pa", pid)][k]) - tier(pp[("pa", pid)][before])
+                        if abs(d) > 1e-6: who.append((pid, sd, round(d, 2), tt))
+            if who:
+                aw, hm = pp.get(("game",), ("", ""))
+                ev.append(dict(t=t, q=q, c=clk, txt=txt, aw=aw, hm=hm, asc=asc, hsc=hsc, who=who))
+        if j + 1 < len(tl) and tl[j + 1][0] == tm and gid(tl[j + 1][1]) == gid(t): continue   # the same play (same game, same second): one point
         (ma, sa, la), (mb, sb, lb) = side_state(sides[0]), side_state(sides[1])
         p = (1.0 if ma > mb else 0.0 if mb > ma else 0.5) if sa + sb == 0 else float(norm.cdf((ma - mb) / math.hypot(sa, sb)))
-        row = (tm, p, la, lb, ma, mb)              # time, A's win chance, points so far, projected finals
-        if prev is None or abs(p - prev[1]) > 1e-4 or abs(la - prev[2]) > 1e-6 or abs(lb - prev[3]) > 1e-6: out.append(row); prev = row
+        row = (tm, p, la, lb, ma, mb, ev)         # time, A's win chance, points so far, projected finals, what happened
+        if prev is None or abs(p - prev[1]) > 1e-4 or abs(la - prev[2]) > 1e-6 or abs(lb - prev[3]) > 1e-6 or ev: out.append(row); prev = row
+        ev = []
     return out
 
 def thin(rows, n=160):
@@ -250,4 +278,5 @@ def thin(rows, n=160):
     # keep big jumps too
     for k in range(1, len(rows)):
         if abs(rows[k][1] - rows[k - 1][1]) > 0.04: keep |= {k - 1, k}
+        if len(rows[k]) > 6 and rows[k][6]: keep.add(k)          # every play that scored for someone in the matchup stays
     return [rows[k] for k in sorted(keep)]
