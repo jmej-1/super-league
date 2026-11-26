@@ -3641,7 +3641,8 @@ class Site:
                 wi_ = a if s_.s.G[w]["scores"][a] > s_.s.G[w]["scores"][b] else b
                 lows = f'<div class="wlos one">{low_(wi_)}</div>'
             else: lows = f'<div class="wlos">{low_(a)}{low_(b)}</div>'
-        _lp = pts[-1]; sbdef = sb(("Now, " if (w not in s_.s.G and s_.wk_live(w)) else "") + str(_lp[4]), _lp[3][0], _lp[3][1], _lp[1], ev=_lp[5] if len(_lp) > 5 else None, nev="Latest", prv=((pts[-2][3][0], pts[-2][3][1], pts[-2][1]) if len(pts) > 1 and len(_lp) > 5 and _lp[5] else None))
+        _lp = pts[-1]; _lev = next((x[5] for x in reversed(pts) if len(x) > 5 and x[5]), None)
+        sbdef = sb(("Now, " if (w not in s_.s.G and s_.wk_live(w)) else "") + str(_lp[4]), _lp[3][0], _lp[3][1], _lp[1], ev=_lev, nev="Latest", prv=(_lp[3][0], _lp[3][1], _lp[1]) if _lev else None)   # the latest score and odds, with the most recent play
         return (f'<section><h2>Win probability and game flow</h2><div class="panel wpc"><div class="rtog chips gft" role="group" aria-label="Chart">'
                 f'<button type="button" data-g="wp" aria-pressed="true">Win probability</button><button type="button" data-g="gf" aria-pressed="false">Game flow</button></div>'
                 f'<div class="wpcard" data-def="{E(sbdef)}">{sbdef}</div><div class="gfv" data-g="wp"><svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Win probability by game time slot">{g}<line class="wpg" x1="0" x2="0" y1="{T_}" y2="{Hd - B_}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0" pointer-events="none"/></svg><p class="note wphint">Press and drag across either chart to see every play.</p>'
