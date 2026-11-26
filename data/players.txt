@@ -85,7 +85,7 @@
 93|D'Qwell Jackson|LB|||14|
 94|Kyle Williams|DT|||16|
 95|Dominique Rodgers-Cromartie|CB|||14|
-96|Aaron Rodgers|QB|PIT||21|
+96|Aaron Rodgers|QB|||21|
 97|Paul Soliai|DT|||13|
 98|Fred Davis|TE|||6|
 99|Allen Barbre|G|||13|
@@ -284,7 +284,7 @@
 4104|Taylor Moton|T|CAR|IR|9|OL,OT
 4107|Chidobe Awuzie|CB|BAL||9|
 4113|Dawuane Smoot|DE|NYG||9|
-4114|Tanoh Kpassagnon|DE|TEN|Questionable|9|DL,LB
+4114|Tanoh Kpassagnon|DE||Questionable|9|DL,LB
 4118|Alex Anzalone|LB|TB||9|
 4122|Dan Feeney|OL|TB||9|
 4123|Ethan Pocic|OL|BAL|IR|9|OG,OL
@@ -337,7 +337,7 @@
 4654|Cameron Johnston|P|PIT||9|
 4663|Austin Ekeler|RB|WAS||9|
 4693|Andrew Wylie|G|WAS||9|OG,OL
-4718|Dare Ogunbowale|RB|HOU||9|
+4718|Dare Ogunbowale|RB|||9|
 4771|Greg Van Roten|OG|NE||14|OG,OL
 4848|Christian Kuntz|LS|PIT||9|LB,LS
 4866|Saquon Barkley|RB|PHI||8|
@@ -2248,7 +2248,7 @@
 13051|K.C. Ossai|LB|HOU|IR|1|
 13052|Eli Cox|C|JAX||1|
 13054|Junior Tafuna|DT|HOU||1|
-13058|Cam Horsley|DT|CAR||1|
+13058|Cam Horsley|DT|||1|
 13073|Sebastian Valdez|DL|SF||1|
 13074|Isaiah Neyor|WR|GB||1|
 13075|Myles Price|WR|MIN|Questionable|1|
