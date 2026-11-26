@@ -133,17 +133,19 @@ tr.tstart td{border-top:2px solid var(--rule)}
 .h2hg{table-layout:fixed;min-width:860px} .h2hg col.h2n{width:120px} .h2hg col.h2t{width:72px} .h2hg th,.h2hg td{overflow:hidden;text-overflow:ellipsis} .h2hg{border-collapse:collapse} .h2hg tbody td{border:1px solid var(--ink)} .h2hg thead th:not(:first-child){border-bottom:1px solid var(--ink)} .dboard td.dc{border:1px solid var(--ink)} .dboard thead th:not(:first-child){border-bottom:1px solid var(--ink)}
 .kt{white-space:nowrap} .ksep{display:inline-block;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.55;margin:0 7px;vertical-align:middle} .lu .pl .who small .stg{margin-left:8px} .nflr{margin:0 0 0 5px}
 @media (max-width:760px){.lu .kt{display:block;margin:2px 0 0;white-space:normal} .lu .ksep{display:none} .lu .pl .who small .stg{margin-left:0}}
-.wpc{position:relative} .wpc .gfv svg{touch-action:pan-y;cursor:crosshair;user-select:none;-webkit-user-select:none} .wphint{margin:2px 0 0;font-size:12px} .wpd{cursor:pointer;outline:none} .wpdv{pointer-events:none} .wpd:hover+.wpdv,.wpd.on+.wpdv{r:7} .wpcard{display:block;background:var(--field,#0b1a3a);color:#EEF2F8;border-radius:12px;padding:10px 14px 8px;margin:10px 0 6px;max-width:420px;margin-left:auto;font-size:14px}
-.wpcard .sbpl{display:block;border-top:1px solid rgba(238,242,248,.14);margin-top:7px;padding-top:7px;height:98px;overflow:hidden}.wpcard .sbpl.none{display:flex;align-items:center;justify-content:center}.wpcard .sbpl.none .sbt{color:#8FA0BC;font-style:italic}
+.wpc{position:relative} .wpc .gfv svg{touch-action:pan-y;cursor:crosshair;user-select:none;-webkit-user-select:none} .wphint{margin:2px 0 0;font-size:12px} .wpd{cursor:pointer;outline:none} .wpdv{pointer-events:none} .wpd:hover+.wpdv,.wpd.on+.wpdv{r:7} .wpcard{display:block;background:var(--field,#0b1a3a);color:#EEF2F8;border-radius:12px;padding:10px 14px 8px;margin:10px 0 6px;font-size:14px;display:grid;grid-template-columns:minmax(300px,1fr) minmax(0,1.25fr);gap:0 22px;align-items:stretch}
+.wpcard .sbL{display:block;min-width:0}.wpcard .sbpl{display:block;border-left:1px solid rgba(238,242,248,.14);padding-left:20px;height:96px;overflow:hidden;min-width:0}.wpcard .sbpl.none{display:flex;align-items:center;justify-content:center}.wpcard .sbpl.none .sbt{color:#8FA0BC;font-style:italic}
 .wpcard .sbg{display:flex;align-items:center;gap:5px;font-size:12px;color:#C7D2E4;white-space:nowrap}.wpcard .sbg .nfl{width:16px;height:16px;margin:0}.wpcard .sbg b{font-weight:700;color:#EEF2F8;margin-right:2px}.wpcard .sbgx{opacity:.6;margin:0 2px}.wpcard .sbq{margin-left:auto;font-weight:700;color:#C9A21A}
 .wpcard .sbt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;line-height:1.35;color:#DCE3F0;margin:4px 0 5px}
 .wpcard .sbws{display:flex;gap:6px;overflow:hidden;white-space:nowrap}.wpcard .sbw{display:inline-flex;align-items:center;gap:4px;background:rgba(238,242,248,.08);border-radius:999px;padding:2px 8px 2px 2px;font-size:12px;flex:none}.wpcard .sbw.s0{box-shadow:inset 2px 0 0 #DCE3F0}.wpcard .sbw.s1{box-shadow:inset 2px 0 0 #C9A21A}
 .wpcard .sbw .im{width:18px;height:18px}.wpcard .sbw .nfl{width:15px;height:15px;margin:0}.wpcard .sbwn{font-weight:600}.wpcard .sbw b.up{color:#8FD6A4}.wpcard .sbw b.dn{color:#F08F8F}
 .wpcard .sbh{display:block;font-size:12px;font-weight:600;color:#AFC0DA;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wpcard .sbr{display:grid;grid-template-columns:4px 24px 1fr auto 52px;align-items:center;gap:8px;padding:3px 0}.wpcard .sbc{width:4px;height:22px;border-radius:2px}
+.wpcard .sbd{font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;text-align:left;color:transparent}.wpcard .sbd.up{color:#8FD6A4}.wpcard .sbd.dn{color:#F08F8F}
+.wpcard .sbv{display:flex;align-items:baseline;justify-content:flex-end;gap:6px}.wpcard .sbv .sbd{min-width:38px}
+.wpcard .sbr{display:grid;grid-template-columns:4px 24px 1fr auto 96px;align-items:center;gap:8px;padding:3px 0}.wpcard .sbc{width:4px;height:22px;border-radius:2px}
 .wpcard .sbr .im{width:24px;height:24px}.wpcard .sbn{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}.wpcard .sbr.lead .sbn{opacity:1}
 .wpcard .sbs{font:800 20px/1 var(--disp,inherit);font-variant-numeric:tabular-nums;text-align:right}.wpcard .sbp{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:#AFC0DA}.wpcard .sbr.lead .sbp{color:var(--flag,#e0b43a)}
-@media (max-width:760px){.wpcard{max-width:none;margin-left:0}}
+@media (max-width:760px){.wpcard{display:block}.wpcard .sbpl{border-left:0;padding-left:0;border-top:1px solid rgba(238,242,248,.14);margin-top:7px;padding-top:7px;height:98px}.wpcard .sbr{gap:8px;grid-template-columns:4px 24px 1fr auto 56px}.wpcard .sbv{flex-direction:column;align-items:flex-end;gap:1px}.wpcard .sbv .sbd{min-width:0;text-align:right;line-height:1}.wpcard .sbd:empty{display:none}}
 .wcr{display:grid;grid-template-columns:1fr auto 64px;gap:10px;align-items:baseline} .wcr i{font-style:normal;color:#C9D1E1} .wcr em{font-style:normal;font:800 17px var(--disp)} .wcr strong{text-align:right;color:var(--flag)}
 .wprow{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:13px;color:var(--mute)} .wprow span{display:flex;gap:6px;align-items:baseline} .wprow b{color:var(--ink);font-weight:700} .wprow small{font-size:12px}
 .nfl{display:inline-block;width:18px;height:18px;background:center/contain no-repeat;vertical-align:-4px;margin-right:5px;flex:none}
@@ -3436,11 +3438,21 @@ class Site:
         return FR, FF, ticks
 
     def wp_chart(s_, w, a, b, pre):
-        def sb(when, xa, xb, p, proj=False, ev=None, nev=None):
-            """The scoreboard over the charts: when, both teams' points so far and win chances."""
-            row = lambda r, x, q, col: (f'<span class="sbr{" lead" if q > 0.5 else ""}"><i class="sbc" style="background:{col}"></i>{s_.logo(r, pre, "lgs", w)}'
-                                        f'<span class="sbn">{E(s_.TN(r, w))}</span><b class="sbs">{(f"{x:.1f}" if proj else fp(x))}</b><span class="sbp">{pct(q)}</span></span>')
-            return f'<span class="sbh">{E(when)}</span>{row(a, xa, p, "#DCE3F0")}{row(b, xb, 1 - p, "#C9A21A")}{play(ev, nev) if PBP_ else ""}'
+        def sb(when, xa, xb, p, proj=False, ev=None, nev=None, prv=None):
+            """The scoreboard over the charts: when, both teams' points so far and win chances, what each gained on this play, and the play."""
+            def dl(v, f, pctg=False):
+                if prv is None or abs(v) < (0.0005 if pctg else 0.005): return '<small class="sbd"></small>'
+                return f'<small class="sbd {"up" if v > 0 else "dn"}">{v * 100:+.1f}</small>' if pctg else f'<small class="sbd {"up" if v > 0 else "dn"}">{v:+.{f}f}</small>'
+            def row(r, x, q, col, x0, q0):
+                return (f'<span class="sbr{" lead" if q > 0.5 else ""}"><i class="sbc" style="background:{col}"></i>{s_.logo(r, pre, "lgs", w)}'
+                        f'<span class="sbn">{E(s_.TN(r, w))}</span><span class="sbv"><b class="sbs">{(f"{x:.1f}" if proj else fp(x))}</b>{dl(x - x0, 2) if prv else dl(0, 2)}</span>'
+                        f'<span class="sbv"><span class="sbp">{pct(q)}</span>{dl(q - q0, 1, True) if prv and q > q0 else dl(0, 1, True)}</span></span>')
+            xa0, xb0, p0 = prv if prv else (xa, xb, p)
+            if ev:                                     # the points this play was worth to each side, same as the chips
+                ga = sum(x[2] for e in ev for x in e["who"] if x[1] == 0); gb = sum(x[2] for e in ev for x in e["who"] if x[1] == 1)
+                xa0, xb0 = xa - ga, xb - gb
+            left = f'<span class="sbL"><span class="sbh">{E(when)}</span>{row(a, xa, p, "#DCE3F0", xa0, p0)}{row(b, xb, 1 - p, "#C9A21A", xb0, 1 - p0)}</span>'
+            return left + (play(ev, nev) if PBP_ else "")
         def nfl_(t): return f'<i class="nfl N{t}" role="img" aria-label="{t}"></i>' if t in NFL_NICK else ""
         def ptxt(t):
             t = re.sub(r"^\s*\([^)]*\)\s*", "", t or "")                      # "(Shotgun)" and the like
@@ -3459,7 +3471,7 @@ class Site:
             gl = (f'<span class="sbg">{nfl_(g0["aw"])}<b>{E(g0["aw"])} {g0["asc"]}</b><span class="sbgx">at</span>{nfl_(g0["hm"])}<b>{E(g0["hm"])} {g0["hsc"]}</b>'
                   f'<span class="sbq">{qn} {int(g0["c"]) // 60}:{int(g0["c"]) % 60:02d}</span></span>')
             who = "".join(f'<span class="sbw s{sd}">{s_.logo(a if sd == 0 else b, pre, "lgs", w)}{nfl_(nt)}'
-                          f'<span class="sbwn">{E(s_.s.nm(pid))}</span><b class="{"up" if d > 0 else "dn"}">{d:+.1f}</b></span>'
+                          f'<span class="sbwn">{E(s_.s.nm(pid))}</span><b class="{"up" if d > 0 else "dn"}">{d:+.2f}</b></span>'
                           for (pid, sd, nt), d in sorted(tot.items(), key=lambda z: -abs(z[1])) if abs(d) >= 0.05)
             return f'<span class="sbpl">{gl}<span class="sbt">{E(ptxt(g0["txt"]))}</span><span class="sbws">{who}</span></span>'
         pts = s_.wp_series(w, a, b)
@@ -3542,7 +3554,7 @@ class Site:
                   ''
                   )
         for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
-            card = sb(when, xa, xb, p, ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Time slot check-in"))
+            card = sb(when, xa, xb, p, prv=((pts[k - 1][3][0], pts[k - 1][3][1], pts[k - 1][1]) if k else None), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Time slot check-in"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})          # a play-by-play point: no dot, a small tap target
             if pl_ and not (ev_ and ev_[0]) and k != len(pts) - 1: continue      # nobody in the matchup scored on it: the line keeps it, dragging skips it
             g += (f'<circle class="wpd" cx="{X[k]:.1f}" cy="{Y[k]:.1f}" r="{6 if pl_ else 22}" fill="transparent" '
@@ -3579,7 +3591,7 @@ class Site:
         h2 += (f'<polyline points="{ln(sb_, XF)}" fill="none" stroke="#C9A21A" stroke-width="3" stroke-dasharray="7 4" stroke-linejoin="round"/>'
                f'<polyline points="{ln(sa_, XF)}" fill="none" stroke="var(--turf)" stroke-width="3.2" stroke-linejoin="round"/>')
         for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
-            card = sb(when, xa, xb, p, ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Time slot check-in"))
+            card = sb(when, xa, xb, p, prv=((pts[k - 1][3][0], pts[k - 1][3][1], pts[k - 1][1]) if k else None), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Time slot check-in"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})
             if pl_ and not (ev_ and ev_[0]) and k != len(pts) - 1: continue
             if pl_:                                  # play-by-play points: no dot, but dragging across the chart stops on each one
@@ -3613,7 +3625,7 @@ class Site:
                 wi_ = a if s_.s.G[w]["scores"][a] > s_.s.G[w]["scores"][b] else b
                 lows = f'<div class="wlos one">{low_(wi_)}</div>'
             else: lows = f'<div class="wlos">{low_(a)}{low_(b)}</div>'
-        _lp = pts[-1]; sbdef = sb(("Now, " if (w not in s_.s.G and s_.wk_live(w)) else "") + str(_lp[4]), _lp[3][0], _lp[3][1], _lp[1], ev=_lp[5] if len(_lp) > 5 else None, nev="Latest")
+        _lp = pts[-1]; sbdef = sb(("Now, " if (w not in s_.s.G and s_.wk_live(w)) else "") + str(_lp[4]), _lp[3][0], _lp[3][1], _lp[1], ev=_lp[5] if len(_lp) > 5 else None, nev="Latest", prv=((pts[-2][3][0], pts[-2][3][1], pts[-2][1]) if len(pts) > 1 and len(_lp) > 5 and _lp[5] else None))
         return (f'<section><h2>Win probability and game flow</h2><div class="panel wpc"><div class="rtog chips gft" role="group" aria-label="Chart">'
                 f'<button type="button" data-g="wp" aria-pressed="true">Win probability</button><button type="button" data-g="gf" aria-pressed="false">Game flow</button></div>'
                 f'<div class="wpcard" data-def="{E(sbdef)}">{sbdef}</div><div class="gfv" data-g="wp"><svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Win probability by game time slot">{g}<line class="wpg" x1="0" x2="0" y1="{T_}" y2="{Hd - B_}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0" pointer-events="none"/></svg><p class="note wphint">Press and drag across either chart to see every play.</p>'
