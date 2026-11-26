@@ -3208,7 +3208,7 @@ class Site:
         for r_ in getattr(s, "livewp", []) or []:
             if int(r_[1]) != w or {int(r_[2]), int(r_[3])} != {a, b}: continue
             tm = pe(r_[0]); p = float(r_[4]); fl = int(r_[2]) == a
-            if done and any(kk <= tm < kk + datetime.timedelta(hours=3.5) for kk in kick.values()): continue   # finished week: mid-game snapshots were the live model of the day; the play-by-play redo is better
+            if any(kk <= tm < kk + datetime.timedelta(hours=3.5) for kk in kick.values()): continue   # mid-game snapshots lag the play-by-play (Sleeper's points trail by a few plays); the play-by-play line already has it
             sa_, sb_ = (float(r_[5]), float(r_[6])) if fl else (float(r_[6]), float(r_[5]))
             anc.append((tm, p if fl else 1 - p, sa_, sb_, f"Update, {tm.strftime('%a %-I:%M %p')}"))
         anc.sort()
@@ -3251,6 +3251,8 @@ class Site:
                 j = len(out) - 1 if not done else len(out)
             if (k0 and tm < k0) or j == 0: j = 1 + npre; npre += 1      # before kickoff: in time order right after the pregame point
             out.insert(j, pt)
+        pre = [p for tm, p, *_ in anc if k0 and tm < k0]
+        if pre: out[0] = (out[0][0], pre[0]) + tuple(out[0][2:])     # the line starts where the week's odds started, then follows each update to kickoff
         if not hasattr(s_, "_wpos"): s_._wpos = {}
         s_._wpos[(w, a, b)] = list(range(len(out)))
         return out
