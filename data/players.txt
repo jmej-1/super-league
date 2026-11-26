@@ -403,7 +403,7 @@
 5090|Folorunso Fatukasi|DT|LV||8|
 5095|Daniel Carlson|K|MIA||8|
 5097|Wyatt Teller|G|HOU|Questionable|8|OG,OL
-5098|Siran Neal|CB|SF||8|
+5098|Siran Neal|CB|SF|Questionable|8|
 5119|Jason Sanders|K|NYJ||8|
 5121|Braxton Berrios|WR|NYG|IR|8|
 5127|Kyle Allen|QB|BUF||8|
@@ -647,7 +647,7 @@
 6858|James Lynch|DT|CHI||6|
 6860|Akeem Davis-Gaither|LB|IND|IR|6|
 6862|Saahdiq Charles|T|CAR||6|OL,OT
-6864|Khalid Kareem|DE|SF|Questionable|6|
+6864|Khalid Kareem|DE|SF||6|
 6865|Colby Parkinson|TE|LAR||6|
 6867|Malik Harrison|LB|NYG||6|
 6868|DJ Wonnum|DE|DET|Questionable|6|DL,LB
@@ -1258,7 +1258,7 @@
 10210|Cameron Latu|TE|NE||3|
 10212|Josh Whyle|TE|GB|IR|3|
 10213|Tre Tucker|WR|LV||3|
-10214|Davis Allen|TE|LAR||3|
+10214|Davis Allen|TE|LAR|Questionable|3|
 10215|Jake Haener|QB|NYG||3|
 10218|Xavier Hutchinson|WR|HOU||3|
 10219|Chris Rodriguez Jr.|RB|JAX||3|
@@ -2018,10 +2018,10 @@
 12628|Sai'vion Jones|DE|DEN|Out|1|
 12629|Emery Jones Jr.|OL|BAL||1|
 12630|Nick Martin|LB|SF|IR|1|
-12631|Upton Stout|CB|SF||1|
+12631|Upton Stout|CB|SF|Questionable|1|
 12632|Caleb Ransaw|DB|JAX|IR|1|
 12633|Wyatt Milum|OL|JAX||1|
-12634|Jordan Watkins|WR|SF||1|
+12634|Jordan Watkins|WR|SF|Questionable|1|
 12635|Tonka Hemingway|DT|LV|Questionable|1|
 12636|Que Robinson|LB|DEN||1|DL,LB
 12638|Quincy Riley|CB|NO||1|
@@ -2484,7 +2484,7 @@
 13484|Trey Moore|LB|MIA|IR|0|
 13485|Will Lee III|CB|CAR||0|
 13486|Connor Lew|C|CIN||0|
-13487|Carver Willis|OL|SF||0|
+13487|Carver Willis|OL|SF|Questionable|0|
 13488|Kaleb Elarms-Orr|LB|BUF||0|
 13489|Malik Muhammad II|CB|CHI||0|
 13490|Wade Woodaz|LB|HOU||0|
