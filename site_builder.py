@@ -1580,7 +1580,11 @@ class Site:
                 if not lv: continue
                 a, b = s_.game_of.get((LW, r), (r, r)); o = b if r == a else a; u = G_(LW, a, b)
                 for i in lv["starters"]:
-                    if not i or i == "0" or i not in lv["played"] or i in lv.get("inprog", ()): continue
+                    if not i or i == "0" or i not in lv["played"]: continue
+                    if i in lv.get("inprog", ()):            # game on now: the start and his points so far count toward totals; single-game marks wait
+                        for X in (agg_t[(i, r)], agg_p[i]):
+                            X["pts"] += lv["played"][i]; X["g"] += 1; X["gl"] = X.get("gl", 0) + 1; X["by"][r] += 1
+                        continue
                     p = lv["played"][i]; ps = s.pos(i); wv = (p - R.at(LW, ps)) * wpp; pm = p - PMv.get(ps, 0)
                     for P in ("ALL", ps):
                         add(f"p_start_{P}", p, fp(p), r, [r], p=i, o=o, w=LW, u=u)
@@ -3849,7 +3853,8 @@ class Site:
                            round((pts - s.repl["val"].at(LW, s.pos(i))) * s.wpp, 3) if started and fin and pts is not None and s.pos(i) in s.repl["val"] else None,
                            round(pts - PM_[s.pos(i)], 2) if started and fin and pts is not None and s.pos(i) in PM_ else None, s_.wk_rank(LW, i) if fin and pts is not None else None, None, 1, "", t_, None,
                            round(s_.wi(pts - PM_[s.pos(i)]), 3) if started and fin and pts is not None and s.pos(i) in PM_ else None])
-            st_ = [x for x in wk if x[2] and x[3] is not None and x[8] != 1]; var = sum((x[3] or 0) - R.at(x[0], s.pos(i)) for x in st_)
+            st_ = [x for x in wk if x[2] and x[3] is not None]                      # starts and points count the moment his game is on
+            var = sum((x[3] or 0) - R.at(x[0], s.pos(i)) for x in st_ if x[8] != 1)       # value above replacement waits for the final
             dx = dmap.get(i)
             P_ = s.PL.get(i, {})
             ab = (P_.get("team") or "") if i.isdigit() else i
@@ -3884,7 +3889,7 @@ class Site:
         """[total, bench, free agent, left on bench, times he should have started] from a player's weekly entries.
         Total = every NFL point this season; bench leaves out IR weeks; free agent = weeks on no Super League roster."""
         irw = {w for w in getattr(s_.s, "reserve_wk", {}) if any(i in v for v in s_.s.reserve_wk[w].values())}
-        done = [x for x in wk if x[3] is not None and x[8] != 1]
+        done = [x for x in wk if x[3] is not None]
         tot_ = sum(x[3] for x in done)
         ben = sum(x[3] for x in done if x[1] and not x[2] and x[0] not in irw)
         fa = sum(x[3] for x in done if not x[1])
@@ -4344,7 +4349,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
       // two stints with the same manager are one row, as if the weeks were back to back
       var mg={}; runs=runs.filter(function(u){ var m=mg[u.r]; if(!m){ mg[u.r]=u; return true; } m.ws=m.ws.concat(u.ws); m.b=u.b; u.nts.forEach(function(n){ if(m.nts.indexOf(n)<0) m.nts.push(n); }); return false; });
       if(!runs.length) return; any=true;
-      var agg=function(ws){ var st=ws.filter(function(x){return x[2]&&x[8]!==1;}), o={wk:ws.length,gs:st.length,pts:0,war:0,edge:0,wi:0,w:0,l:0};
+      var agg=function(ws){ var st=ws.filter(function(x){return x[2]&&x[3]!=null;}), o={wk:ws.length,gs:st.length,pts:0,war:0,edge:0,wi:0,w:0,l:0};
         st.forEach(function(x){ o.pts+=x[3]||0; o.war+=x[9]||0; o.edge+=x[10]||0; o.wi+=x[17]||0; if(x[6]===1) o.w++; else if(x[6]===0) o.l++; }); return o; };
       var X=pstats(d,y), M_=function(v,txt,k){ return mark(v,txt,k,y,d.p,FL); };
       var cells=function(o,top){ var c=function(v,txt,k){ return top?M_(v,txt,k):txt; };
@@ -4555,7 +4560,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     yrs.forEach(function(y){ var S=d.sea[y], st=S.s; if(yr&&y!==yr) return;
       T[0]+=st[0]; T[1]+=st[1]; T[2]+=st[2]; T[3]+=st[3]; T[4]+=st[4]; nmv+=st[6];
       S.w.forEach(function(x){ if(x[2]&&x[6]!==null&&x[6]!==undefined){ if(x[6]) WW++; else LL++; } });
-      S.w.forEach(function(x){ if(!x[1]||x[8]===1) return; var k=x[1]; if(!per[k]){per[k]={wk:0,st:0,pts:0,yrs:{}}; teams.push(k);} per[k].wk++; per[k].yrs[y]=1; if(x[2]){per[k].st++; per[k].pts+=x[3]||0;} }); });
+      S.w.forEach(function(x){ if(!x[1]) return; var k=x[1]; if(!per[k]){per[k]={wk:0,st:0,pts:0,yrs:{}}; teams.push(k);} per[k].wk++; per[k].yrs[y]=1; if(x[2]){per[k].st++; per[k].pts+=x[3]||0;} }); });
     var rl='#/players/'+d.p+'/war/'+id;
     var ord=function(n){ var s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); };
     var yrl=function(ex){ return ex===0?'Rookie':ord(ex+1)+' year'; };
