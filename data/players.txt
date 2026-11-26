@@ -978,7 +978,7 @@
 8160|Kenny Pickett|QB|CAR||4|
 8161|Malik Willis|QB|MIA|IR|4|
 8162|Sam Howell|QB|DAL||4|
-8167|Christian Watson|WR|GB||4|
+8167|Christian Watson|WR|GB|Questionable|4|
 8168|Skyy Moore|WR|GB||4|
 8170|James Mitchell|TE|DAL||4|
 8172|Greg Dulcich|TE|MIA||4|

@@ -1867,6 +1867,12 @@
 11|SF|sack=1;int=1;fum_rec=1;def_td=1;pts_allow=10;yds_allow=324
 11|TB|sack=1;pts_allow=31;yds_allow=386
 11|WAS|sack=3;pts_allow=20;yds_allow=312
-12|6804|pass_att=3;pass_cmp=1;pass_yd=6
-12|8167|rec_tgt=1;rec=1;rec_yd=6
-12|LAR|yds_allow=6
+12|11586|rush_att=5;rush_yd=14
+12|13545|fgm=1;fga=1;fgm_lng=54
+12|421|pass_att=8;pass_cmp=7;pass_yd=40;rush_att=1;rush_yd=-6
+12|6804|pass_att=10;pass_cmp=6;pass_yd=70
+12|8150|rec_tgt=4;rec=3;rec_yd=10
+12|8167|rec_tgt=2;rec=2;rec_yd=38
+12|9484|rec_tgt=2;rec=1;rec_yd=10;fum_lost=1
+12|GB|pts_allow=6;yds_allow=53
+12|LAR|fum_rec=1;pts_allow=3;yds_allow=62
