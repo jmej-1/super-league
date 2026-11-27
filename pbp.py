@@ -20,6 +20,13 @@ def key_of(full):
     first, rest = full.split(" ", 1)
     return f"{first[0]}.{rest}"
 
+def keys_of(full):
+    """Every way ESPN writes a name: 'B.Robinson', and 'Bi.Robinson' / 'Bri.Thomas' when two players share the short form."""
+    k = key_of(full)
+    if not k: return []
+    first, rest = SUF.sub("", full.strip()).split(" ", 1)
+    return [k] + [f"{first[:n]}.{rest}" for n in (2, 3) if len(first) > n]
+
 def tier(pa):
     return 10 if pa == 0 else 7 if pa <= 6 else 4 if pa <= 13 else 1 if pa <= 20 else 0 if pa <= 27 else -1 if pa <= 34 else -4
 
@@ -52,7 +59,8 @@ def parse_game(g, cands):
     keys = {}                                    # key -> [(pid, team)]
     for t in (away, home):
         for pid, k in cands.get(t, []):
-            if k: keys.setdefault(k, []).append((pid, t))
+            for k_ in (k if isinstance(k, (list, tuple)) else [k]):
+                if k_: keys.setdefault(k_, []).append((pid, t))
     pat = re.compile(r"(?<![A-Za-z])(" + "|".join(sorted((re.escape(k) for k in keys), key=len, reverse=True)) + r")(?![a-z])") if keys else None
     plays = g["plays"]
     # fill missing wall clocks from the neighbours
@@ -181,7 +189,7 @@ def game_paths(G, w, actual, team_of, name_of, pos_of, extra=()):
     for pid in set(actual) | set(extra):          # extra: everyone on an NFL roster, for games still in progress (no finals yet)
         t = team_of(pid)
         if not t: continue
-        cands[t].append((pid, key_of(name_of(pid)) if pid.isdigit() else None))
+        cands[t].append((pid, keys_of(name_of(pid)) if pid.isdigit() else None))
     out = {}
     for g in G.values():
         if g["w"] != w: continue

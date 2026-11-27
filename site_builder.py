@@ -645,6 +645,7 @@ CSS += """
 .gfm{text-align:center}.gfm b{font-size:22px}.gfl{display:inline-block;width:16px;border-top:3px solid var(--turf)}.gfl.d{border-top:3px dashed #C9A21A}
 .xcap{display:flex;align-items:center;gap:8px;margin:10px 0 26px;padding:0 2px;font-size:12px;color:var(--mute)}.xcap b{font:800 15px var(--disp);color:var(--ink)}.xcap small{margin-left:-6px}
 .xcap .xbr{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:12px;color:var(--mute)}.xcap .xbr i{font-style:normal}.xcap .xbr small{margin-left:3px;font-size:11px}.xcap .xbr b{color:var(--ink)}.exm{width:72px;height:5px;border-radius:3px;background:var(--rule);overflow:hidden}.exm i{display:block;height:100%;background:var(--flag)}.xcap{display:block;margin:12px 0 26px;padding:12px 14px;border:1px solid var(--rule);border-radius:10px;background:var(--paper)}.xcap .xhd{display:flex;align-items:center;gap:12px}.xcap .xl{font-weight:700;font-size:14px;color:var(--ink)}.xcap .xhd b{font:800 26px var(--disp);color:var(--ink);line-height:1}.xcap .exm{flex:1;width:auto;height:10px;border-radius:5px}.xcap .xft{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:13px}.xcap .xrk{color:var(--ink)}.xcap .xgo{margin-left:auto;color:var(--mute);text-decoration:underline}.xcap .xgo:hover{color:var(--turf)}.xcap .xdt{margin-top:8px}.xcap .xdt summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--mute)}.xcap .xdt[open] summary{color:var(--ink)}.xcap .xbr{margin-top:8px}.tat2x{display:inline-flex;align-items:center;gap:8px}
+.potg .pgh{display:flex;align-items:center;gap:10px}.potg .pgt{flex:1;min-width:0}.potg .pgt b{display:block;font-size:15px;color:var(--ink)}.potg .pgw{font-size:12.5px;color:var(--mute)}.potg .pgv{font:800 28px var(--disp);color:var(--turf);text-align:right;line-height:1}.potg .pgv small{display:block;font:600 11px var(--body);color:var(--mute)}.potg .pgx{margin:10px 0 6px;font-size:14.5px;line-height:1.45;color:var(--ink)}.potg .pgn{font-size:13px;color:var(--mute)}.potg .pgn{display:flex;flex-wrap:wrap;gap:4px 14px}.potg .pgn b{color:var(--ink)}
 .rhold b{display:inline-block;max-width:calc(100% - 64px);vertical-align:middle}.rnfl{display:inline-flex;align-items:center;gap:4px;margin-left:8px;font:600 12px var(--body);color:#8E99AF;vertical-align:middle}.rnfl .nfl{width:16px;height:16px;margin:0}
 .vs .gut{white-space:nowrap}.vs .gut small{font:700 13px var(--body);margin-left:5px}
 .gsx{display:flex;justify-content:space-between;gap:12px;margin:0;padding:0 0 10px;font-size:12px;color:var(--mute);border-bottom:1px solid var(--rule)}.gsr:has(+ .gsx){border-bottom:0;padding-bottom:4px}.vs .vsh{display:flex;align-items:center;gap:6px;font:700 13px var(--body);color:var(--mute);justify-content:flex-end}.vs .b.vsh{justify-content:flex-start}
@@ -1564,7 +1565,7 @@ class Site:
         new = lambda: dict(pts=0.0, war=0.0, g=0, pm=0.0, wins=0, xw=0.0, ben=0.0, by=Counter(), nfl=Counter(), seq=[])
         agg_t = defaultdict(new); agg_p = defaultdict(new)
         if yr == s_.yr: s_.play_impacts()
-        PC_ = getattr(s_, "_pcred", None) or {}
+        PC_ = getattr(s_, "_pcred", None) or {}; CL_ = getattr(s_, "_clutch", None) or {}
         for w in s.weeks:
             scw = s.G[w]["scores"]
             for r, d in s.W[w].items():
@@ -1579,9 +1580,10 @@ class Site:
                         add(f"p_startlo_{P}", -p, fp(p), r, [r], p=i, o=o, w=w, u=G_(w, a, b))
                         add(f"p_pmlo_{P}", -pm, f"{pm:+.1f}", r, [r], p=i, o=o, w=w, u=G_(w, a, b), x=f"{fp(p)} pts")
                         add(f"p_war1lo_{P}", -wv, f"{wv:+.2f}", r, [r], p=i, o=o, w=w, u=G_(w, a, b), x=f"{fp(p)} pts")
-                    cr_ = PC_.get((w, r, i)) if yr == s_.yr else None
+                    cr_ = PC_.get((w, r, i)) if yr == s_.yr else None; cl_ = CL_.get((w, r, i)) if yr == s_.yr else None
                     for X in (agg_t[(i, r)], agg_p[i]):
-                        if cr_: X["wpa"] = X.get("wpa", 0.0) + cr_[0]; X["cpa"] = X.get("cpa", 0.0) + cr_[1]; X["hasp"] = 1
+                        if cr_: X["wpa"] = X.get("wpa", 0.0) + cr_[0]; X["cpa"] = X.get("cpa", 0.0) + cr_[1]
+                        if cl_: X["cw"] = X.get("cw", 0.0) + cl_[0]; X["ce"] = X.get("ce", 0.0) + cl_[1]; X["hasp"] = X.get("hasp", 0) + 1
                         X["pts"] += p; X["war"] += wv; X["g"] += 1; X["pm"] += pm; X["wins"] += won; X["xw"] += 0.5 + s_.wi(pm); X["by"][r] += 1; X["nfl"][s_.team_at(w, i)] += max(p, 0) + 1e-3; X["seq"].append(s_.team_at(w, i))
                 irs_ = set(getattr(s, "reserve_wk", {}).get(w, {}).get(r, []))
                 for i, p in d["B"]:
@@ -1647,8 +1649,10 @@ class Site:
                         wi_ = X["xw"] - 0.5 * gw_ if gw_ else 0.0
                         if gw_: A("wi", wi_ - gp, f"{wi_:+.2f}", f"{gw_} starts"); A("wilo", -wi_ - gp, f"{wi_:+.2f}", f"{gw_} starts")
                         if n1: A("top", n1 - g_ * 1e-4, str(n1), f"of {g_} starts")          # ties: fewer starts wins (a higher rate)
-                        if X.get("hasp") and pre_ == "py":             # clutch: the win chance (WPA) and title odds (CPA) his plays added
-                            A("wpa", X["wpa"] - gp, f"{X['wpa']:+.2f}", f"wins added, {g_} starts"); A("cpa", X["cpa"] - gp, f"{X['cpa'] * 100:+.2f}%", f"{g_} starts")
+                        if X.get("hasp", 0) >= 4 and pre_ == "py":    # clutch: the wins his plays added beyond what his points alone are worth
+                            cl = X["cw"] - X["ce"]; cx = f"{X['cw']:+.2f} WPA, {X['ce']:+.2f} expected from his points"
+                            A("clutch", cl - gp, f"{cl:+.2f}", cx); A("clutchlo", -cl - gp, f"{cl:+.2f}", cx)
+                            A("cpa", X.get("cpa", 0.0) - gp, f"{X.get('cpa', 0.0) * 100:+.2f}%", f"{g_} starts")
                     bn_ = X.get("bn", 0)
                     if X["ben"] > 0: A("ben", X["ben"] - bn_ * 1e-6, fp(X["ben"]), f"{bn_} week{'' if bn_ == 1 else 's'} on the bench", sq="bseq")
                     if bn_ >= 1: A("benppg", X["ben"] / bn_ + bn_ * 1e-8, fp(X["ben"] / bn_), f"{bn_} week{'' if bn_ == 1 else 's'} on the bench", sq="bseq")
@@ -3220,6 +3224,17 @@ class Site:
         t = re.split(r"\s\*\*\s|\.?\s*PENALTY on|\.?\s*Penalty on|\.?\s*The Replay Official", t or "")[0]
         t = re.sub(r"\s*\((?:[^()]*)\)", "", t); t = re.sub(r"\s*\[[^\]]*\]", "", t); t = re.sub(r",?\s*Hit (Left|Right) Upright\.?", "", t)
         t = re.sub(r",?\s*(?:Center|Holder)-(?:[A-Z][A-Za-z'\-]*\.)?[A-Za-z'\-]+", "", t)
+        NM = r"[A-Z][A-Za-z]*\.\s?[A-Z][A-Za-z'\-\.]*"
+        for rx in (r"(?:" + NM + r"(?:\s+and\s+" + NM + r")*)\s+reported in as eligible\.?",   # who reported eligible, who got hurt, replay reviews
+                   r"[A-Z]{2,3}-" + NM + r" was injured during the play\.?",
+                   r"[A-Z][A-Za-z .]+ challenged the [^.]*?ruling, and the play was (?:Upheld|REVERSED)\.?",
+                   r"The ruling on the field (?:stands|was confirmed)\.?",
+                   r"The (?:ball spot|penalty|first down|runner's forward progress)[^.]*? (?:was|were) assisted by replay\.?",
+                   r"\d+-second runoff avoided\.?",
+                   r"Direct snap to " + NM + r"\.",
+                   r",?\s*Hit (?:Left|Right) Upright\.?"):
+            t = re.sub(r"\s*" + rx, "", t)
+        t = re.sub(r"(yards?|gain|loss)\.(?=[A-Z][a-z])", r"\1. ", t); t = re.sub(r"(No Good|BLOCKED)(?![.,])", r"\1.", t)       # "yards.Minnesota" -> "yards. Minnesota"
         return re.sub(r"\s+", " ", t).strip()
 
     def play_impacts(s_):
@@ -3261,8 +3276,33 @@ class Site:
                         ptx = re.sub(r"\s*TWO-POINT CONVERSION ATTEMPT\..*$", "", re.sub(r"\s*[A-Z][\w'.\-]* extra point is (GOOD|No Good|BLOCKED)\.?", "", ptx)).strip()
                     out.append((w, r, o, f"game/w{w}-{min(a, b)}-{max(a, b)}.html", x[4], clk, ptx,
                                 sorted(who.items(), key=lambda z: -z[1]), g, g * lev))
+        # What a start's WPA "should" be from its points alone, by position (a straight-line fit over every finished start):
+        # the rest is clutch, when the points came and how close the game was. That part is the one that isn't skill.
+        st_ = []
+        for w in s.weeks:
+            if w > s.last or w > reg: continue
+            for r, d in s.W[w].items():
+                for i, p in d["S"]:
+                    if i != "0": st_.append((w, r, i, p, (cred.get((w, r, i)) or [0.0, 0.0])[0]))
+        fit = {}
+        for ps in {s.pos(x[2]) for x in st_}:
+            xs = [x[3] for x in st_ if s.pos(x[2]) == ps]; ys = [x[4] for x in st_ if s.pos(x[2]) == ps]
+            if len(xs) < 10: continue
+            mx, my = sum(xs) / len(xs), sum(ys) / len(ys); vx = sum((v - mx) ** 2 for v in xs) or 1.0
+            b_ = sum((u - mx) * (v - my) for u, v in zip(xs, ys)) / vx; fit[ps] = (my - b_ * mx, b_)
+        s_._clutch = {(w, r, i): (wp, fit[s.pos(i)][0] + fit[s.pos(i)][1] * p) for w, r, i, p, wp in st_ if s.pos(i) in fit}
         s_._pimp = out; s_._pcred = cred
         return out
+
+    def play_of_game(s_, w, a, b):
+        """The winner's biggest play: the one that moved the matchup most toward how it ended. (The biggest swing in a game came
+        from the team that lost about a third of the time, so it has to be the winner's.)"""
+        s = s_.s
+        if w > s.last: return None
+        sc = s.G[w]["scores"]; win = a if sc[a] > sc[b] else b if sc[b] > sc[a] else None
+        if win is None: return None
+        c = [x for x in s_.play_impacts() if x[0] == w and x[1] == win and {x[1], x[2]} == {a, b}]
+        return max(c, key=lambda x: x[8]) if c else None
 
     def excitement(s_, w, a, b):
         """Excitement: the weighted average of the pieces (Comeback 25%, Finish 20%, Close 20%, Drama 15%, Lead changes 10%, Scoring 10%).
@@ -3559,13 +3599,13 @@ class Site:
         def ptxt(t, who):
             """The play as it reads on ESPN, cut to what matters to this matchup: no tacklers or long snappers, and the extra point or
             two-point try only when someone in the matchup was in it. A kicker or two-point man alone sees just his part."""
-            t = re.split(r"\s\*\*\s|\.?\s*PENALTY on|\.?\s*Penalty on|\.?\s*The Replay Official", t or "")[0]
-            t = re.sub(r"\s*\((?:[^()]*)\)", "", t)                              # (Shotgun), (B.Branch, D.Moore), (Aborted)
+            t = s_.play_text(t)                                                        # tags, tacklers, replay and injury notes
+            t = re.sub(r"\s*\((?:[^()]*)\)", "", t)
             t = re.sub(r"\s*\[[^\]]*\]", "", t)                                   # [D.Olajiga]
             t = re.sub(r",?\s*Hit (Left|Right) Upright\.?", "", t)
             t = re.sub(r",?\s*(?:Center|Holder)-(?:[A-Z][A-Za-z'\-]*\.)?[A-Za-z'\-]+", "", t)
             t = re.sub(r"\s+", " ", t).strip()
-            ks = {_pb.key_of(s_.s.PL.get(i, {}).get("name", "")) for i in who if i.isdigit()} - {None}
+            ks = {k_ for i in who if i.isdigit() for k_ in _pb.keys_of(s_.s.PL.get(i, {}).get("name", ""))}
             has = lambda x: any(re.search(r"(?<![A-Za-z])" + re.escape(k) + r"(?![a-z])", x) for k in ks)
             dfn = any(not i.isdigit() for i in who)
             parts = []
@@ -4111,6 +4151,15 @@ class Site:
                         f'<span class="gv r {"lead" if wb else ""}">{vb:g}</span></div>' + (f'<div class="gsx"><span>{sa_}</span><span>{sb_}</span></div>' if sa_ or sb_ else ""))
         return f'<section><h2>Game stats</h2><div class="panel gstats"><div class="gsh"><b>{E(s_.TN(a))}</b><b>{E(s_.TN(b))}</b></div>{"".join(out_)}</div></section>'
 
+    def potg_html(s_, w, a, b, pre):
+        x = s_.play_of_game(w, a, b)
+        if not x: return ""
+        w_, r, o, u, when, clk, txt, who, wpa, cpa = x; pid = who[0][0]
+        nm = "".join(f'<span class="pgp"><a href="{pre}player/{i}.html">{E(s_.s.nm(i))}</a> <b>{v:+.2f}</b></span>' for i, v in who if v > 0)
+        return (f'<section class="potg"><h2>Play of the game</h2><div class="panel"><div class="pgh">{s_.logo(r, pre, "lgs", w)}'
+                f'<span class="pgt"><b>{E(s_.TN(r, w))}</b> <span class="pgw">{E(str(when))}, {E(clk)}</span></span><span class="pgv">{wpa * 100:+.1f}%<small>win chance</small></span></div>'
+                f'<p class="pgx">{E(txt)}</p><div class="pgn">{nm}</div></div></section>')
+
     def game_done(s_, w, a, b):
         s_._at = s_.wk_start(w)
         try: return s_._game_done(w, a, b)
@@ -4174,6 +4223,7 @@ class Site:
 {(lambda x_, rk_: f'<div class="xcap"><div class="xhd"><span class="xl">Excitement</span><b>{x_:.1f}</b><span class="exm" aria-hidden="true"><i style="width:{s_.exc_bar(x_)}%"></i></span></div>'
                   + f'<div class="xft"><span class="xrk">{rk_[0]} most exciting of {rk_[1]} games this season</span><a class="xgo" href="#/excitement">All games ranked</a></div>'
                   + '<details class="xdt"><summary>Score breakdown</summary><span class="xbr">' + "".join(f'<i>{E(k_)} <b>{v_:.1f}</b> <small>({int(dict(s_.EXW)[k_] * 100)}%)</small></i>' for k_, v_ in s_.exc_terms(s_._excp[(w, min(a, b), max(a, b))])) + '</span></details></div>')(s_.excitement(w, a, b), s_.exc_rank(w, a, b)) if s_.excitement(w, a, b) is not None else ""}
+{s_.potg_html(w, a, b, pre)}
 {s_.game_stats_html(w, a, b)}
 {f'<section><h2>The pregame line <small>what the model expected before kickoff</small></h2><div class="panel">{pre_txt}</div></section>' if pre_txt else ""}
 {s_.odds_moves(w, a, b)}
@@ -4891,7 +4941,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
       ['Season',[['s_pct','Best record'],['s_pctlo','Worst record'],['s_wins','Most wins'],['s_pf','Most points'],['s_pflow','Fewest points'],['s_pa','Most points against'],['s_xw','Most xWins'],['s_lucky','Luckiest'],['s_unlucky','Unluckiest'],['s_wstreak','Longest win streak'],['s_lstreak','Longest losing streak']],1]],
     player:[['Single game',[['p_start','Most points'],['p_startlo','Fewest points'],['p_pm','Best PAA'],['p_pmlo','Worst PAA'],['p_war1','Most WAR'],['p_war1lo','Fewest WAR'],['p_bench','Most bench points']]],
       ['Single play',[['p_wpa','Biggest play (win chance added, WPA)']]],
-      ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_wpa','Most clutch (wins added, WPA)'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_wi','Most Win Impact'],['py_wilo','Least Win Impact'],['py_luck','Best supporting cast'],['py_unluck','Worst supporting cast'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
+      ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_clutch','Most clutch'],['py_clutchlo','Least clutch'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_wi','Most Win Impact'],['py_wilo','Least Win Impact'],['py_luck','Best supporting cast'],['py_unluck','Worst supporting cast'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
       ['Career',[['pc_pts','Most points'],['pc_ppg','Most points per game'],['pc_ptslo','Fewest points'],['pc_ppglo','Fewest points per game'],['pc_pm','Best PAA'],['pc_pmlo','Worst PAA'],['pc_war','Most WAR'],['pc_warlo','Fewest WAR'],['pc_wins','Most wins'],['pc_loss','Most losses'],['pc_wpct','Best win %'],['pc_wpctlo','Worst win %'],['pc_wi','Most Win Impact'],['pc_wilo','Least Win Impact'],['pc_luck','Best supporting cast'],['pc_unluck','Worst supporting cast'],['pc_gs','Most starts'],['pc_top','Most weeks as the #1 at his position'],['pc_ben','Most bench points'],['pc_benppg','Most bench points per week']],0,1]],
     mgr:[['Single week or move',[['l_add1','Most gut-call wins added'],['m_besttrade','Most wins gained in a trade'],['m_heist','Most lopsided trade'],['m_pick','Best pickup'],['m_drop','Worst drop']]],
       ['Season',[['m_total','Most total wins added'],['l_add','Most gut-call wins added'],['m_gm','Best GM'],['m_eff','Most efficient GM'],['m_trader','Best trader'],['m_treff','Most efficient trader'],['m_waiver','Best waiver work'],['m_wveff','Most efficient waiver work'],['m_dropcost','Costliest drops'],['m_draft','Best draft'],['l_eff','Best lineup efficiency'],['l_bench','Most points lost to start/sit'],['l_over','Most points over projection'],['w_high','Most weekly high scores'],['w_low','Most weekly low scores'],['w_mvp','Most weekly MVPs'],['m_trades','Most trades'],['m_moves','Most waiver and free-agent moves'],['m_allmv','Most total moves']],1],
