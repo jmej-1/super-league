@@ -4680,6 +4680,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   function gpLoad(pg,cb){ var src=pg.getAttribute('data-src'); if(!src){ if(cb) cb(); return; }
     if(pg._ld){ if(cb) pg._ld.push(cb); return; } pg._ld=cb?[cb]:[];
     fetch(src).then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); }).then(function(t){
+      if(/^\\s*<!DOCTYPE/i.test(t)) throw new Error('not a game page');          // the site fallback, not the file: don't nest the whole site
       if(!pg.hasAttribute('data-src')) return; var box=pg.querySelector('.gpb'); box.innerHTML=t; pg.removeAttribute('data-src'); fixLinks(box);
       var q=pg._ld; pg._ld=null; q.forEach(function(f){ f(); }); })
     .catch(function(){ pg._ld=null; var l=pg.querySelector('.gpl'); if(l) l.innerHTML='Couldn\\'t load this game. <a href="">Try again</a>'; }); }
