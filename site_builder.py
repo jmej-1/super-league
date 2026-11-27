@@ -4379,7 +4379,7 @@ class Site:
         chips = "".join(f'<a class="tpp" href="{pre}player/{i}.html">{s_.logo(r, pre, "lgs", w)}{nfl(s_.team_at(w, i))}<span>{E(s_.s.nm(i))}</span><b>{v:+.2f}</b></a>'
                         for i, v in who if v > 0)
         game = f'{nfl(aw)}<b>{E(str(aw))} {asc}</b><span class="tpat">at</span>{nfl(hm)}<b>{E(str(hm))} {hsc}</b>' if aw else ""
-        return (f'<section class="tp"><h2>The defining play <small>the winner\'s biggest swing</small></h2>'
+        return (f'<section class="tp"><h2>The game-defining play <small>the winner\'s biggest swing</small></h2>'
                 f'<div class="tpc"><div class="tpl"><div class="tpg">{game}<span class="tpk">{E(clk)}</span><span class="tpw">{E(str(when))}</span></div>'
                 f'<p class="tpx">{E(txt)}</p><div class="tpps">{chips}</div></div>'
                 f'<div class="tpr"><div class="tpt">{s_.logo(r, pre, "lgs", w)}<b>{E(s_.TN(r, w))}</b></div>'
