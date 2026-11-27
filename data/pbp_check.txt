@@ -42,7 +42,6 @@ plays don't add up|5|6650|Chase McLaughlin|plays 2.6|final 4.6
 plays don't add up|5|10232|Michael Wilson|plays 3.28|final 5.28
 plays don't add up|5|3163|Jared Goff|plays 29.22|final 28.94
 plays don't add up|5|13330|Kenyon Sadiq|plays -0.5|final -0.7
-plays don't add up|5|8259|Cameron Dicker|plays 11.4|final 4.2
 plays don't add up|5|9224|Chase Brown|plays 7.5|final 5.5
 plays don't add up|6|8130|Trey McBride|plays 6.8|final 8.8
 plays don't add up|6|6083|Matt Gay|plays 7.5|final 8.0
@@ -87,7 +86,6 @@ plays don't add up|10|4984|Josh Allen|plays 16.24|final 22.34
 plays don't add up|10|7594|Chuba Hubbard|plays 32.6|final 31.7
 plays don't add up|10|3294|Dak Prescott|plays 34.14|final 34.42
 plays don't add up|10|11632|Malik Nabers|plays 5.3|final 4.9
-plays don't add up|10|13545|Trey Smack|plays 12.2|final 2.5
 plays don't add up|10|9224|Chase Brown|plays 17.4|final 24.3
 plays don't add up|10|8146|Garrett Wilson|plays 12.4|final 12.1
 plays don't add up|10|11792|Will Reichard|plays 6.1|final 8.1

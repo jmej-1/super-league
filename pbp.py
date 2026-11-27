@@ -21,6 +21,10 @@ def key_of(full):
     first, rest = full.split(" ", 1)
     return f"{first[0]}.{rest}"
 
+def LAT(t):
+    """Each lateral in a play: (where the man's name starts, the yards he ran), in order."""
+    return [(m.start(1), int(m.group(2)) if m.group(2) else 0) for m in re.finditer(r"Lateral to ([A-Z][a-z]{0,2}\.\s?[A-Z][A-Za-z'\-\.]*)[^.]*?(?:for (-?\d+) yards?|for no gain)", t)]
+
 def keys_of(full):
     """Every way ESPN writes a name: 'B.Robinson', and 'Bi.Robinson' / 'Bri.Thomas' when two players share the short form."""
     k = key_of(full)
@@ -111,23 +115,24 @@ def parse_game(g, cands):
             qb = next((h[1] for h in reversed(hits) if pm_ and h[0] < pm_.start()), None)
             m = re.search(r" to ([A-Z][^ ]*)", main_[pm_.end():] if pm_ else main_)
             st_ = (pm_.end() + m.start()) if (pm_ and m) else None
-            rc = next((h[1] for h in hits if st_ is not None and h[0] >= st_ and h[0] < len(main_)), None)
-            lat = re.search(r"Lateral to ([A-Z][a-z]{0,2}\.\s?[A-Z][A-Za-z'\-\.]*)[^.]*?for (-?\d+) yards?", main_)
-            if lat:                                                     # a lateral: the catcher keeps his yards, the man after it runs the rest
-                ly = int(lat.group(2)); tot_ = yd + ly
-                lr = next((h[1] for h in hits if abs(h[0] - lat.start(1)) <= 1), None)
-                if qb: run[qb] += tot_ * 0.04 + (4 if td else 0)
-                if rc and rc != qb: run[rc] += 0.5 + yd * 0.1
-                if lr: run[lr] += ly * 0.1 + (6 if td else 0)
-            else:
-                if qb: run[qb] += yd * 0.04 + (4 if td else 0)
-                if rc and rc != qb: run[rc] += 0.5 + yd * 0.1 + (6 if td else 0)
+            rc = next((h[1] for h in hits if st_ is not None and abs(h[0] - (st_ + 4)) <= 1), None)   # the name right after " to"
+            # laterals: the catcher gets the catch and his yards up to the lateral; each man after gets receiving yards for what he
+            # ran (no catch); the last one gets the touchdown; the passer gets passing yards for the whole play
+            ch = [(st_, yd)] + [(st_l, ly) for st_l, ly in LAT(main_)]
+            if qb: run[qb] += sum(v for _, v in ch) * 0.04 + (4 if td else 0)
+            for k_, (pos_, v) in enumerate(ch):
+                who_ = next((h[1] for h in hits if pos_ is not None and abs(h[0] - pos_) <= 1), None) if k_ else rc
+                if not who_ or (k_ == 0 and who_ == qb): continue
+                run[who_] += (0.5 if k_ == 0 else 0) + v * 0.1 + (6 if td and k_ == len(ch) - 1 else 0)
         elif is_rush and names:
             cut = 0
             for m_ in re.finditer(r"reported in as eligible\.\s*|Direct snap to [^.]*\.[A-Za-z'\-]*\.?\s*", txt): cut = m_.end()
             fm = re.search(r"(?<![A-Za-z])[A-Z][a-z]{0,2}\.\s?[A-Z]", txt[cut:])
             ru = next((h[1] for h in hits if fm and abs(h[0] - (cut + fm.start())) <= 1), None)   # the runner: the first name after any eligibility / direct-snap notes
-            if ru: run[ru] += yd * 0.1 + (6 if td else 0)
+            ch = [(None, yd)] + LAT(main0)                                    # a run with laterals: each man gets his own rushing yards, the last the TD
+            for k_, (pos_, v) in enumerate(ch):
+                who_ = ru if k_ == 0 else next((h[1] for h in hits if abs(h[0] - pos_) <= 1), None)
+                if who_: run[who_] += v * 0.1 + (6 if td and k_ == len(ch) - 1 else 0)
         elif typ in ("Pass Interception Return", "Interception Return Touchdown"):
             if names: run[names[0]] += -2
             if dfn: run[dfn] += 2 + (6 if td else 0)
