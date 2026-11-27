@@ -1,6 +1,6 @@
 {
   "installCommand": "python3 -m pip install -r requirements.txt || pip install -r requirements.txt || python3 -m pip install --break-system-packages -r requirements.txt",
-  "buildCommand": "python3 superleague.py data out > /dev/null && mkdir -p site && cp -r out/stubs/. site/ && cp out/site/index.html site/index.html && cp -r out/site/og site/og",
+  "buildCommand": "python3 superleague.py data out > /dev/null && mkdir -p site && cp -r out/stubs/. site/ && cp out/site/index.html site/index.html && cp -r out/site/og site/og && cp -r out/site/gp site/gp",
   "outputDirectory": "site",
   "framework": null,
   "rewrites": [

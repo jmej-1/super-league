@@ -502,7 +502,8 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 .gr .s small{display:block;font:600 12px var(--body);color:var(--mute);text-align:right}
 .stg{display:inline-block;margin-left:6px;padding:2px 5px;border-radius:3px;font:700 10px/1.2 var(--body);letter-spacing:.02em;vertical-align:1px;white-space:nowrap}
 .stg.fin{background:#DDEEE3;color:var(--win)} .stg.inj{background:#F4DDD7;color:var(--loss)} .stg.pk{background:#FBEFC4;color:#7A5C00}
-.lu .pl .pts.pj{color:var(--mute);font-weight:600} .lu .pl .pts.pj small{font-style:normal}
+.lu .pl .pts.pj{color:var(--mute);font-weight:600}
+.bpj{color:var(--mute);font-weight:600;font-style:italic}.bpj small{font-style:normal;font-size:11px;margin-left:3px;font-weight:500} .lu .pl .pts.pj small{font-style:normal}
 .pfilt{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px} .pfilt .chips{margin:0}
 .pown{font:600 14px var(--body);padding:7px 12px;border-radius:999px;border:1px solid var(--rule);background:var(--paper)}
 .ptable th.sortable{cursor:pointer;user-select:none;white-space:nowrap} .ptable th.sortable:hover,.ptable th[aria-sort]{color:var(--ink)}
@@ -2818,7 +2819,7 @@ class Site:
                 if k > 0 and E_[k] is not None and E_[k - 1] is not None:
                     span = (E_[k] - E_[k - 1]).total_seconds() or 1
                     for r_ in rows:
-                        if E_[k - 1] < r_[0] < E_[k]:
+                        if E_[k - 1] < r_[0] <= E_[k]:          # a slot's last play shares its second with the slot's end: keep it
                             newp.append(("·", r_[1], r_[0], (r_[2], r_[3]), f"{r_[0].strftime('%a %-I:%M %p')}", r_[6] if len(r_) > 6 else None)); pos.append(k - 1 + (r_[0] - E_[k - 1]).total_seconds() / span)
                 if k > 0 and E_[k] is not None and (done or all(fin[t] for t, kk in kick.items() if kk == x[2])):
                     r_ = at(E_[k])
@@ -2833,6 +2834,11 @@ class Site:
                     for j, r_ in enumerate(tail):
                         newp.insert(len([q for q in pos if q <= k0]) + j, ("·", r_[1], r_[0], (r_[2], r_[3]), f"Live, {r_[0].strftime('%a %-I:%M %p')}", r_[6] if len(r_) > 6 else None))
                         pos.insert(len([q for q in pos if q <= k0]) + j, k0 + 0.9 * (j + 1) / (len(tail) + 1))
+            n_in = sum(1 for r_ in rows if len(r_) > 6 and r_[6]); n_out = sum(1 for x in newp if len(x) > 5 and x[5])
+            if n_in != n_out:                                # check: every play that scored for someone here is on the chart
+                if not hasattr(s_, "_chartmiss"): s_._chartmiss = []
+                s_._chartmiss.append(f"W{w} {s_.M[a]} v {s_.M[b]}: {n_in - n_out} scoring play(s) off the chart")
+                print("CHART CHECK:", s_._chartmiss[-1])
             for j in range(1, len(pos)):                     # plays in different games at the same second: one after the other, not on top of each other
                 if pos[j] <= pos[j - 1] and newp[j][0] == "·": pos[j] = pos[j - 1] + 0.004
             # a time slot nobody in this game plays in (no starter, or in a live week no one on either roster) gets squeezed to a
@@ -3798,11 +3804,13 @@ class Site:
                 ga = sum(x[2] for e in ev for x in e["who"] if x[1] == 0); gb = sum(x[2] for e in ev for x in e["who"] if x[1] == 1)
                 xa0, xb0 = xa - ga, xb - gb
             split = ""
+            def part(lbl, d):
+                if abs(d) < 0.0005: return ""
+                return f'<span>{lbl} <b class="up">{E(s_.M[a] if d > 0 else s_.M[b])} {abs(d) * 100:+.1f}%</b></span>'
             if ev and prv and mix is not None and abs(mix[0]) + abs(mix[1]) >= 0.003:   # the move since the last stop = projections + the clock + this play
-                def part(lbl, d):
-                    if abs(d) < 0.0005: return ""
-                    return f'<span>{lbl} <b class="up">{E(s_.M[a] if d > 0 else s_.M[b])} {abs(d) * 100:+.1f}%</b></span>'
                 split = f'<span class="sbx">{part("Projections", mix[1])}{part("Clock since last play", mix[0])}{part("This play", mix[2])}</span>'
+            elif not ev and not pm and prv and mix is not None and abs(mix[0] + mix[2]) + abs(mix[1]) >= 0.0005:   # a check-in with no play: the clock running out (and any projection news) is the whole move
+                split = f'<span class="sbx">{part("Projections", mix[1])}{part("Clock since last play", mix[0] + mix[2])}</span>'
             left = f'<span class="sbL"><span class="sbh">{E(when)}</span>{row(a, xa, p, "#DCE3F0", xa0, p0)}{row(b, xb, 1 - p, "#C9A21A", xb0, 1 - p0)}{split}</span>'
             return left + ((pjblk(pm) if pm else play(ev, nev)) if PBP_ else "")
         def nfl_(t): return f'<i class="nfl N{t}" role="img" aria-label="{t}"></i>' if t in NFL_NICK else ""
@@ -3929,7 +3937,7 @@ class Site:
                   ''
                   )
         for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
-            card = sb(when, xa, xb, p, prv=((pts[sh_[k]][3][0], pts[sh_[k]][3][1], pts[sh_[k]][1]) if sh_[k] is not None else None), mix=MX_[k], pm=PM_.get(k), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Final" if "final" in str(when) else "Time slot check-in"))
+            card = sb(when, xa, xb, p, prv=((pts[sh_[k]][3][0], pts[sh_[k]][3][1], pts[sh_[k]][1]) if sh_[k] is not None else None), mix=MX_[k], pm=PM_.get(k), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Final" if "final" in str(when) else "Final whistle, no time left to score"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})          # a play-by-play point: no dot, a small tap target
             if pl_ and not shw[k]: continue      # nobody in the matchup scored on it: the line keeps it, dragging skips it
             g += (f'<circle class="wpd" cx="{X[k]:.1f}" cy="{Y[k]:.1f}" r="{6 if pl_ else 22}" fill="transparent" '
@@ -3966,7 +3974,7 @@ class Site:
         h2 += (f'<polyline points="{ln(sb_, XF)}" fill="none" stroke="#C9A21A" stroke-width="3" stroke-dasharray="7 4" stroke-linejoin="round"/>'
                f'<polyline points="{ln(sa_, XF)}" fill="none" stroke="var(--turf)" stroke-width="3.2" stroke-linejoin="round"/>')
         for k, (lab, p, _, (xa, xb), when, *ev_) in enumerate(pts):
-            card = sb(when, xa, xb, p, prv=((pts[sh_[k]][3][0], pts[sh_[k]][3][1], pts[sh_[k]][1]) if sh_[k] is not None else None), mix=MX_[k], pm=PM_.get(k), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Final" if "final" in str(when) else "Time slot check-in"))
+            card = sb(when, xa, xb, p, prv=((pts[sh_[k]][3][0], pts[sh_[k]][3][1], pts[sh_[k]][1]) if sh_[k] is not None else None), mix=MX_[k], pm=PM_.get(k), ev=ev_[0] if ev_ else None, nev=("Pregame odds" if k == 0 else "Latest update" if lab == "·" else "Final" if "final" in str(when) else "Final whistle, no time left to score"))
             pl_ = lab == "·" and (w, a, b) in getattr(s_, "_wpos", {})
             if pl_ and not shw[k]: continue
             if pl_:                                  # play-by-play points: no dot, but dragging across the chart stops on each one
@@ -4120,11 +4128,12 @@ class Site:
                     if rr == r and i in on_: out[i] = "Dropped"
         return out
 
-    def bench_tbl(s_, r, items, title, ir=(), wk=None, pts=None, bw=None):
+    def bench_tbl(s_, r, items, title, ir=(), wk=None, pts=None, bw=None, lpts=None):
         """items: [(id, value_text, tag_html)] already sorted. Players in the IR slot go last, below a red line, in red."""
         s = s_.s
         reg = [x for x in items if x[0] not in ir]; irs = [x for x in items if x[0] in ir]
-        ca = lambda i: f' class="tap" data-card="{E(s_.statcard(wk, i, pts[i]))}" tabindex="0" role="button"' if (wk is not None and pts) else ""
+        ca = lambda i: (f' class="tap" data-card="{E(s_.statcard(wk, i, pts[i]))}" tabindex="0" role="button"' if (wk is not None and pts) else
+                        f' class="tap" data-card="{E(s_.statcard(bw, i, lpts[i]))}" tabindex="0" role="button"' if (lpts and i in lpts) else "")   # live week: his game has started
         ex = any(len(x) > 3 for x in items); xc = lambda x: f'<td class="r">{x[3]}</td>' if ex else ""
         bwk = wk if wk is not None else bw
         if bwk is not None:          # bye week: a chip instead of 0.0
@@ -4436,9 +4445,7 @@ class Site:
         n9 = len(s.R) - 1
         outsc = lambda r: sum(G["scores"][r] > G["scores"][x] for x in s.R if x != r)
         extra = {r: [("outscored", f"{outsc(r)} of {n9}"), (f"of best possible ({fp(opt[r])})", pct(G["scores"][r] / opt[r] if opt[r] else 1))] for r in (a, b)}
-        ser = [w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b} and w2 != w]     # every other meeting, not this one
-        series = "".join(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if s.G[w2]["scores"][a] > s.G[w2]["scores"][b] else "l"}">{s_.logo(a, pre, "lgs", w2)}<span class="t">{E(s_.TN(a, w2))}</span><span class="s">{s.G[w2]["scores"][a]:.1f}</span></div>'
-                         f'<div class="row {"w" if s.G[w2]["scores"][b] > s.G[w2]["scores"][a] else "l"}">{s_.logo(b, pre, "lgs", w2)}<span class="t">{E(s_.TN(b, w2))}</span><span class="s">{s.G[w2]["scores"][b]:.1f}</span></div><div class="foot">Week {w2}</div></a>' for w2 in ser)
+        series = s_.series_html(w, a, b, pre)      # every other meeting this season, played or still to come
         mid = f'<span class="tag">Final</span><div style="margin-top:8px">by {fp(abs(sa - sb))}</div>'
         body = f"""<section class="field"><div class="wrap"><a class="back" href="../schedule.html#wk{w}">Week {w} schedule</a>
 {s_.board(w, a, b, pre, fp(sa), fp(sb), mid, True, extra)}</div></section>
@@ -4477,6 +4484,23 @@ class Site:
         s_._at = s_.wk_start(w)
         try: return s_._game_next(w, a, b)
         finally: s_._at = None
+    def series_html(s_, w, a, b, pre):
+        """Season series on a game page: every other meeting of these two this season, in week order. Played ones show the score;
+        ones still to come (or under way) show the week. None: a gray italic line."""
+        s = s_.s; cards = []
+        wks = sorted({w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b}} | {w2 for w2, ps in s.fut.items() for g in ps if set(g) == {a, b}})
+        for w2 in wks:
+            if w2 == w: continue
+            if w2 in s.G and s.G[w2].get("scores"):
+                sc = s.G[w2]["scores"]
+                cards.append(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if sc[a] > sc[b] else "l"}">{s_.logo(a, pre, "lgs", w2)}<span class="t">{E(s_.TN(a, w2))}</span><span class="s">{sc[a]:.1f}</span></div>'
+                             f'<div class="row {"w" if sc[b] > sc[a] else "l"}">{s_.logo(b, pre, "lgs", w2)}<span class="t">{E(s_.TN(b, w2))}</span><span class="s">{sc[b]:.1f}</span></div><div class="foot">Week {w2}</div></a>')
+            else:
+                tag = "Live" if (w2 == s.nxt and s_.wk_live(w2)) else "Upcoming"
+                cards.append(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row">{s_.logo(a, pre, "lgs")}<span class="t">{E(s_.TN(a))}</span></div>'
+                             f'<div class="row">{s_.logo(b, pre, "lgs")}<span class="t">{E(s_.TN(b))}</span></div><div class="foot">Week {w2}, {tag.lower()}</div></a>')
+        return "".join(cards) or '<p class="muted" style="font-style:italic">No other matchups this season.</p>'
+
     def _game_next(s_, w, a, b):
         s = s_.s; pre = "../"; nm = s_.s.nm; yr = s_.yr; out = s_.SIM[0]
         A, B = s_.upcoming(w, a), s_.upcoming(w, b); pa = s_.win_p(A, B)
@@ -4496,11 +4520,23 @@ class Site:
         live = s_.wk_live(w)
         tot = (lambda r, mu: f'{fp(s_.now_pts(w, r))}<small>Proj {mu:.1f}</small>') if live else (lambda r, mu: f"{mu:.1f}")
         lu = s_.slot_rows(lineup(a), lineup(b), (tot(a, A[0]), tot(b, B[0])), fmt="{:.1f}", hl=False, kw=w)
+        LV_ = getattr(s, "LIVE", None) or {}
+        def bstate(i):                          # live week: a bench player whose game has started is locked on the bench, with real points
+            if not (live and LV_.get("week") == w): return None
+            tm_ = s_.team_at(w, i)
+            if tm_ in LV_.get("done", ()): return "fin"
+            if tm_ in (LV_.get("prog") or {}): return "live"
+            return None
         def bench(r):
             t = s_.TEAM[(w, r)]; ch = set(t["live"]["starters"]) if t.get("live") else set(t["lineup"])
-            items = [(i, f"{s_.proj(i, w)[0]:.1f}", (inj_tag(s.PL.get(i, {}).get("inj")) if s.PL.get(i, {}).get("inj") else ("" if s_.proj(i, w)[1] == "bye" else f'<span class="muted">{E(s_.proj(i, w)[1])}</span>')))
-                     for i in sorted([i for i in t["all"] if i not in ch], key=lambda i: (s_.pos_key(i), -s_.proj(i, w)[0]))]
-            return s_.bench_tbl(r, items, f"{s_.M[r]}{chr(39) if s_.M[r].endswith('s') else chr(39) + 's'} bench", s_.ir_set(r, None, [i for i in t["all"] if i not in ch]), bw=w)
+            pool = [i for i in t["all"] if i not in ch]; np_ = LV_.get("np") or {}
+            lp = {i: np_.get(i, 0.0) for i in pool if bstate(i)}
+            def item(i):
+                st_ = bstate(i); pj, why = s_.proj(i, w)
+                if st_: return (i, f'{fp(lp[i])}', stg("pk", "Live") if st_ == "live" else stg("fin", "Final"))
+                return (i, f'<span class="bpj">{pj:.1f}<small>proj</small></span>', (inj_tag(s.PL.get(i, {}).get("inj")) if s.PL.get(i, {}).get("inj") else ("" if why == "bye" else f'<span class="muted">{E(why)}</span>')))
+            items = [item(i) for i in sorted(pool, key=lambda i: (s_.pos_key(i), -(lp[i] if i in lp else s_.proj(i, w)[0])))]
+            return s_.bench_tbl(r, items, f"{s_.M[r]}{chr(39) if s_.M[r].endswith('s') else chr(39) + 's'} bench", s_.ir_set(r, None, pool), bw=w, lpts=lp)
         la, lb = s_.lev[(w, a)], s_.lev[(w, b)]
         def stakes(r, x):
             row = lambda k, wv, lv: f'<tr><td>{k}</td><td class="r">{pct(wv)}</td><td class="r">{pct(lv)}</td><td class="r {"pos" if wv - lv > 0.005 else "muted"}">{(wv - lv) * 100:+.0f}</td></tr>'
@@ -4520,9 +4556,7 @@ class Site:
                 + tape_row("Playoff odds", out[a]["po"], out[b]["po"], pct) + tape_row("Title odds", out[a]["ti"], out[b]["ti"], pct)
                 + h2h_row("Head-to-head<small>this season</small>", [w2 for w2 in s.weeks if w2 != w and any(set(g) == {a, b} for g in s.G[w2]["pairs"]) and s.G[w2]["scores"]])
                 + h2h_row("Head-to-head<small>all-time</small>", [w2 for w2 in s.weeks if w2 != w and any(set(g) == {a, b} for g in s.G[w2]["pairs"]) and s.G[w2]["scores"]]) + "</div>")
-        ser = [w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b} and w2 != w]     # every other meeting, not this one
-        series = "".join(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if s.G[w2]["scores"][a] > s.G[w2]["scores"][b] else "l"}">{s_.logo(a, pre, "lgs", w2)}<span class="t">{E(s_.TN(a, w2))}</span><span class="s">{s.G[w2]["scores"][a]:.1f}</span></div>'
-                         f'<div class="row {"w" if s.G[w2]["scores"][b] > s.G[w2]["scores"][a] else "l"}">{s_.logo(b, pre, "lgs", w2)}<span class="t">{E(s_.TN(b, w2))}</span><span class="s">{s.G[w2]["scores"][b]:.1f}</span></div><div class="foot">Week {w2}</div></a>' for w2 in ser) or '<p class="muted">First meeting this season.</p>'
+        series = s_.series_html(w, a, b, pre)      # every other meeting this season, played or still to come
         is_live = s_.wk_live(w)
         mid = ('<span class="livedot">LIVE</span>' if is_live else f'<span class="tag soft">{"Up next" if w == s.nxt else "Upcoming"}</span><div style="margin-top:8px">Projected</div>')
         split = s_.rope(a, b, pa, "chance to win")
@@ -4544,6 +4578,9 @@ class Site:
 {s_.story_block(w, a, b, pre, "more")}
 </main>{s_.footer(pre)}"""
         return page(f"Week {w}: {s_.TN(a)} vs {s_.TN(b)}, Super League {yr}", body, pre, "schedule")
+
+
+GP_FILES = {}          # game page bodies, fetched when a game is opened
 
 
 def bundle(files, s, logo_dir, font_dir, site=None):
@@ -4606,6 +4643,12 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         body = re.sub(r'href="(?:\.\./)?(index|news|standings|playoffs|schedule|teams|players|h2h|draft|races|awards|trades|transactions|excitement|analyzer|records)\.html(?:#([\w-]+))?"', lambda m: f'href="#/{"" if m.group(1) == "index" else m.group(1)}' + (f'/{m.group(2)}' if m.group(2) else "") + '"', body)
         body = re.sub(r'href="#([\w-]+)"', lambda m: f'href="#/{me}/{m.group(1)}"', body)
         body = re.sub(r'id="(wk\d+)"', lambda m: f'id="{me.replace("/", "-")}-{m.group(1)}"', body)
+        if me.startswith("game/") and "\n" in body.lstrip("\n"):      # game pages load when opened: the chrome stays here, the rest is its own file
+            b0 = body.lstrip("\n"); cut = b0.index("\n"); chrome_, rest = b0[:cut + 1], b0[cut + 1:]
+            nm_ = me.split("/", 1)[1]; GP_FILES[f"gp/{nm_}.html"] = rest
+            import hashlib; v_ = hashlib.md5(rest.encode()).hexdigest()[:8]
+            pages.append(f'<div class="pg" data-p="{me}" data-t="{title}" data-src="/gp/{nm_}.html?v={v_}" hidden>{chrome_}<div class="gpb"><main class="wrap"><p class="muted gpl">Loading the game...</p></main></div></div>')
+            continue
         pages.append(f'<div class="pg" data-p="{me}" data-t="{title}"{"" if me == "home" else " hidden"}>{body}</div>')
     js = """<script>
 (function(){
@@ -4634,6 +4677,17 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   function fixLinks(root){ [].forEach.call((root||document).querySelectorAll('a[href^="#/"]'),function(a){ a.setAttribute('href',short(a.getAttribute('href').slice(1))); }); }
   fixLinks();
   var pgs=[].slice.call(document.querySelectorAll('.pg'));
+  function gpLoad(pg,cb){ var src=pg.getAttribute('data-src'); if(!src){ if(cb) cb(); return; }
+    if(pg._ld){ if(cb) pg._ld.push(cb); return; } pg._ld=cb?[cb]:[];
+    fetch(src).then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); }).then(function(t){
+      if(!pg.hasAttribute('data-src')) return; var box=pg.querySelector('.gpb'); box.innerHTML=t; pg.removeAttribute('data-src'); fixLinks(box);
+      var q=pg._ld; pg._ld=null; q.forEach(function(f){ f(); }); })
+    .catch(function(){ pg._ld=null; var l=pg.querySelector('.gpl'); if(l) l.innerHTML='Couldn\\'t load this game. <a href="">Try again</a>'; }); }
+  // warm a game page as soon as a link to it is pointed at or touched, so it's usually there by the click
+  function gpWarm(e){ var a=e.target.closest&&e.target.closest('a[href]'); if(!a) return; var h=a.getAttribute('href')||'', m=/^\\/?#?\\/?game\\/(w\\d+-\\d+-\\d+)/.exec(h), id=null;
+    if(m) id='game/'+m[1]; else { var wk=/^\\/week(\\d+)\\/([^\\/]+)$/i.exec(h); if(wk&&window.GOF){ var r=TMR[decodeURIComponent(wk[2]).toLowerCase()], o=r&&GOF[wk[1]]&&GOF[wk[1]][r]; if(o) id='game/w'+wk[1]+'-'+Math.min(+r,+o)+'-'+Math.max(+r,+o); } }
+    if(!id) return; var pg=document.querySelector('.pg[data-p="'+id+'"][data-src]'); if(pg) gpLoad(pg); }
+  document.addEventListener('mouseover',gpWarm,{passive:true}); document.addEventListener('touchstart',gpWarm,{passive:true});
   function go(){
     var h=decodeURIComponent(RH().replace(/^#\\/?/,'')), p=h.split('/'), id, sub;
     var tmn=TMN[(p[0]||'').toLowerCase()]; if(tmn){ p=['team',tmn].concat(p.slice(1)); }
@@ -4642,6 +4696,8 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     else if(p[0]==='nfl'&&window.PD){ var nsame=(window._lastNFL===p[1]); window._lastNFL=p[1]; renderNFL(p[1],p[2]); id='nfl'; if(nsame) window._keepY=1; }
     else if(p[0]==='team'||p[0]==='game'||(p[0]==='news'&&p[1])){id=p[0]+'/'+p[1];sub=p[2];}else{id=p[0]||'home';sub=p[1];}
     var hit=pgs.filter(function(e){return e.getAttribute('data-p')===id;})[0]||pgs[0];
+    if(hit.hasAttribute('data-src')){ pgs.forEach(function(e){e.hidden=(e!==hit);}); document.title=hit.getAttribute('data-t'); window.scrollTo({top:0,left:0,behavior:'instant'});
+      gpLoad(hit,function(){ window.dispatchEvent(new Event('hashchange')); }); return; }      // a game page: fetch it, then route again
     var same=(window._lastP===hit.getAttribute('data-p')); window._lastP=hit.getAttribute('data-p');
     pgs.forEach(function(e){e.hidden=(e!==hit);});
     if(p[0]==='players'&&p[1]){ var sec=hit.querySelector('.psearch').closest('section');
@@ -5560,4 +5616,6 @@ def build_site(s, T, TEAM, SIM, L, weeks_left, starts_pm, season_pm, logo_dir="d
     for w, a, b, done in S.games:
         x, y = sorted((a, b))
         files[S.gurl(w, a, b, "")] = S.game_done(w, x, y) if done else S.game_next(w, x, y)
-    return {"index.html": bundle(files, s, logo_dir, font_dir, S)} if single else files
+    if not single: return files
+    GP_FILES.clear(); idx = bundle(files, s, logo_dir, font_dir, S)
+    return {"index.html": idx, **GP_FILES}

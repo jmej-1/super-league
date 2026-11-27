@@ -1340,7 +1340,7 @@ def main():
     for k, v in docs.items(): open(f"{O}/{k}.md", "w").write(v + "\n")
     try:
         import site_builder
-        os.makedirs(f"{O}/site/team", exist_ok=True); os.makedirs(f"{O}/site/game", exist_ok=True)
+        os.makedirs(f"{O}/site/team", exist_ok=True); os.makedirs(f"{O}/site/game", exist_ok=True); os.makedirs(f"{O}/site/gp", exist_ok=True)
         s.mval = move_values(s)       # every move graded: best lineup with it minus without it, each week since
         for fn, page in site_builder.build_site(s, T, TEAM, SIM, L, weeks_left, starts_pm, season_pm, f"{D}/logos", proj, f"{D}/fonts").items():
             open(f"{O}/site/{fn}", "w").write(page)
