@@ -3562,6 +3562,7 @@ class Site:
             t = re.split(r"\s\*\*\s|\.?\s*PENALTY on|\.?\s*Penalty on|\.?\s*The Replay Official", t or "")[0]
             t = re.sub(r"\s*\((?:[^()]*)\)", "", t)                              # (Shotgun), (B.Branch, D.Moore), (Aborted)
             t = re.sub(r"\s*\[[^\]]*\]", "", t)                                   # [D.Olajiga]
+            t = re.sub(r",?\s*Hit (Left|Right) Upright\.?", "", t)
             t = re.sub(r",?\s*(?:Center|Holder)-(?:[A-Z][A-Za-z'\-]*\.)?[A-Za-z'\-]+", "", t)
             t = re.sub(r"\s+", " ", t).strip()
             ks = {_pb.key_of(s_.s.PL.get(i, {}).get("name", "")) for i in who if i.isdigit()} - {None}
