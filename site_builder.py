@@ -353,7 +353,7 @@ main.book{background:var(--turf);color:var(--chalk);padding:6px 0 60px}
 .rrow.flash,.ptable tr.flash td{animation:rflash 2.2s ease-out}
 a.hrank{display:flex;flex-direction:column;color:#B8C2D6;font-size:13px;text-decoration:none} a.hrank b{font:900 30px/1 var(--disp);color:var(--flag)} a.hrank:hover b{text-decoration:underline} @keyframes rflash{0%,35%{background:rgba(226,174,42,.28)}100%{background:transparent}}
 @media (prefers-reduced-motion:reduce){.rrow.flash{animation:none;background:rgba(226,174,42,.2)}} .rrow:hover .rval{color:#fff}
-.rlab{font:600 14px var(--body);color:#B8C2D6}.rlab .rhelp{display:block;margin-top:4px;font:500 12px/1.35 var(--body);color:#8C99B3;max-width:220px}
+.rlab{font:600 14px var(--body);color:#B8C2D6}.rhold small.rwho{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:3px}.rhold small.rwho span{white-space:nowrap}.rhold small.rwho b{color:#EEF2F8;font:700 12.5px var(--body);margin-left:2px}.rlab .rhelp{display:block;margin-top:4px;font:500 12px/1.35 var(--body);color:#8C99B3;max-width:220px}
 .rcols{display:grid;grid-template-columns:200px 52px minmax(0,1fr) 150px 150px;gap:16px;padding:12px 4px 6px;font:600 12px var(--body);color:#8792A8;border-bottom:1px solid var(--yard)}
 .rcols span:nth-child(2){grid-column:2/4} .rcols span:nth-child(3){grid-column:4}
 .rrow.rties{grid-template-columns:200px minmax(0,1fr) 150px 150px}
@@ -1591,7 +1591,11 @@ class Site:
                 for i, r in who_: top[i][r] += 1
         if yr == s_.yr:                                   # single plays: what each play did to the win chance (WPA) and the title odds (CPA)
             for w, r, o, _u, when, clk, txt, who, wpa, cpa, *_x in s_.play_impacts():
-                a_, b_ = s_.game_of[(w, r)]; pid = who[0][0]; tx_ = f"{clk}: {txt}" if len(txt) <= 90 else f"{clk}: {txt[:87].rsplit(' ', 1)[0]}..."
+                a_, b_ = s_.game_of[(w, r)]; pid = who[0][0]
+                raw_ = _x[4] if len(_x) > 4 else txt
+                tx_ = f"{clk}, {s_.play_simple(raw_)}"
+                if any(s.pos(i) == "K" and v > 0 for i, v in who) and "extra point is GOOD" in raw_ and "field goal" not in raw_: tx_ += " + XP"
+                if len([1 for _, v in who if v > 0]) > 1: tx_ += "\n" + ", ".join(f"{s.nm(i)} {fp(v)}" for i, v in who if v > 0)   # a team play: who scored what
                 tp_ = sum(v for _, v in who)                            # the team's single-play marks: everything the play scored for it
                 if tp_ > 0: add("t_ppts", tp_, fp(tp_), r, [r], o=o, w=w, u=G_(w, a_, b_), x=tx_)
                 if wpa > 0: add("t_wpa", wpa, f"{wpa * 100:+.1f}%", r, [r], o=o, w=w, u=G_(w, a_, b_), x=tx_)
@@ -3279,6 +3283,35 @@ class Site:
         t = re.sub(r"(yards?|gain|loss)\.(?=[A-Z][a-z])", r"\1. ", t); t = re.sub(r"(No Good|BLOCKED)(?![.,])", r"\1.", t)       # "yards.Minnesota" -> "yards. Minnesota"
         return re.sub(r"\s+", " ", t).strip()
 
+    @staticmethod
+    def play_simple(t):
+        """A play in a few words for the record book: "Purdy to McCaffrey, 66-yd TD + 2-pt run", "Henry 2-yd TD run", "Bates 54-yd FG"."""
+        t = re.sub(r"\s*\((?:[^()]*)\)", "", t or ""); t = re.sub(r"\s+", " ", t)
+        ln = lambda n: re.sub(r"^[A-Z][a-z]*\.\s?", "", n)                      # "C.McCaffrey" -> "McCaffrey"
+        NM = r"(?<![A-Za-z])([A-Z][a-z]{0,2}\.\s?[A-Z][A-Za-z'\-\.]*)"
+        main = re.split(r"\s*TWO-POINT CONVERSION ATTEMPT\.|\s*" + NM + r" extra point", t)[0]
+        td = "TOUCHDOWN" in main and "NULLIFIED" not in main
+        yd = re.search(r"for (-?\d+) yards?", main); n = int(yd.group(1)) if yd else 0
+        m = re.search(NM + r" pass [^.]*?to " + NM + r"[^.]*?for (-?\d+) yards?", main)
+        if m: out = f"{ln(m.group(1))} to {ln(m.group(2))}, " + (f"{int(m.group(3))}-yd TD" if td else f"{int(m.group(3))} yds")
+        elif re.search(r"INTERCEPTED by", main):
+            q = re.search(NM + r" pass", main); out = (f"{ln(q.group(1))} " if q else "") + ("pick-six" if td else "intercepted")
+        elif re.search(r"field goal is (GOOD|No Good|BLOCKED)", main):
+            q = re.search(NM + r" (\d+) yard field goal is (GOOD|No Good|BLOCKED)", main)
+            out = f"{ln(q.group(1))} {q.group(2)}-yd FG" + ("" if q.group(3) == "GOOD" else (" missed" if q.group(3) == "No Good" else " blocked")) if q else "Field goal"
+        elif "sacked" in main:
+            q = re.search(NM + r" sacked", main); out = (f"{ln(q.group(1))} sacked" if q else "Sack") + (", fumble lost" if "RECOVERED by" in main else "")
+        elif re.search(r"punts|kicks", main) and td: out = "Return TD"
+        else:
+            q = re.search(NM + r" (?:scrambles |up the middle|left|right|kneels|pushed)", main) or re.search("^" + NM, main)
+            out = (f"{ln(q.group(1))} " if q else "") + (f"{n}-yd TD run" if td else (f"{n}-yd run" if yd else "play"))
+            if "FUMBLES" in main and "RECOVERED by" in main: out += ", fumble lost"
+        tw = re.search(r"TWO-POINT CONVERSION ATTEMPT\.\s*(.*?)\s*ATTEMPT SUCCEEDS", t)
+        if tw:
+            q = re.search(NM + r" pass to " + NM, tw.group(1)); r_ = re.search(NM + r" (?:rushes|up the middle|left|right)", tw.group(1))
+            out += f" + 2-pt ({ln(q.group(1))} to {ln(q.group(2))})" if q else (f" + 2-pt run ({ln(r_.group(1))})" if r_ else " + 2-pt")
+        return out
+
     def play_impacts(s_):
         """Every scoring play of every finished game, with what it did: WPA, the change in the team's chance to win that matchup, and
         CPA, the title odds it added (WPA times what the game was worth: title odds with a win minus with a loss, as of that week's start).
@@ -3322,7 +3355,7 @@ class Site:
                     pb_, pa_ = (y[1], x[1]) if sd == 0 else (1 - y[1], 1 - x[1])
                     sc_ = (e0.get("aw"), e0.get("asc"), e0.get("hm"), e0.get("hsc"))
                     out.append((w, r, o, f"game/w{w}-{min(a, b)}-{max(a, b)}.html", x[4], clk, ptx,
-                                sorted(who.items(), key=lambda z: -z[1]), g, g * lev, pb_, pa_, sc_, x[3] if sd == 0 else (x[3][1], x[3][0])))
+                                sorted(who.items(), key=lambda z: -z[1]), g, g * lev, pb_, pa_, sc_, x[3] if sd == 0 else (x[3][1], x[3][0]), e0["txt"]))
         # What a start's WPA "should" be from its points alone, by position (a straight-line fit over every finished start):
         # the rest is clutch, when the points came and how close the game was. That part is the one that isn't skill.
         st_ = []
@@ -4776,7 +4809,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     if(v>0&&L.pos[pos]&&Math.abs(v-L.pos[pos][k])<1e-9){ flag.i=1; return '<i class="ldp">'+txt+'</i>'; }
     return txt; }
   // position rank: points in Super League starts (QB8 = 8th-most points started at QB); overall rank: WAR, the one measure across positions
-  function prank(id,yr,all){ var d=PD[id], war=function(x){ var t=0,g=0; Object.keys(x.sea).forEach(function(y){ if(!yr||y===yr){ t+=x.sea[y].s[all?3:1]; g+=x.sea[y].s[0]; } }); return g?t:null; };
+  function prank(id,yr,all,ix){ ix=ix==null?(all?3:1):ix; var d=PD[id], war=function(x){ var t=0,g=0; Object.keys(x.sea).forEach(function(y){ if(!yr||y===yr){ t+=x.sea[y].s[ix]; g+=x.sea[y].s[0]; } }); return g?t:null; };
     var me=war(d); if(me===null) return null; var r=1;
     Object.keys(PD).forEach(function(i){ var x=PD[i]; if(i===id||(!all&&x.p!==d.p)) return; var v=war(x); if(v!==null&&Math.round(v*100)>Math.round(me*100)) r++; });
     return all?r:d.p+r; }
@@ -4869,7 +4902,9 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     var yrl=function(ex){ return ex===0?'Rookie':ord(ex+1)+' year'; };
     var off_=0, ag_=d.ag!=null?d.ag-off_:null, ex_=d.ex!=null?d.ex-off_:null, rkp=prank(id,yr||null), rko=prank(id,yr||null,1), rlk='#/players/'+d.p+'/pts/'+id;
     var hs=(ag_!=null?'<span><b>'+ag_+'</b>age</span>':'')+(ex_!=null&&ex_>=0?'<span><b>'+(ex_===0?'R':(ex_+1))+'</b>NFL year</span>':'')
-      +(rko?'<a class="hrank" href="#/players"><b>#'+rko+'</b>'+(yr?yr+' overall':'overall')+'</a>':'')+(rkp?'<a class="hrank" href="'+rlk+'"><b>'+rkp+'</b>'+(yr?yr:'all-time')+'</a>':'');
+      +(function(){ var pp=prank(id,yr||null,0,1), po=prank(id,yr||null,1,1), wp=prank(id,yr||null,0,3), wo=prank(id,yr||null,1,3);    // points started and WAR, at his position and overall
+        var c=function(v,lab,href){ return v?'<a class="hrank" href="'+href+'"><b>'+v+'</b>'+lab+'</a>':''; };
+        return c(pp,'points','#/players/'+d.p+'/pts/'+id)+c(po?'#'+po:0,'points overall','#/players/All/pts/'+id)+c(wp,'WAR','#/players/'+d.p+'/war/'+id)+c(wo?'#'+wo:0,'WAR overall','#/players/All/war/'+id); })();
     h+='<div class="herostats">'+hs+'</div></div></section>';
     h+='<nav class="subnav" aria-label="Seasons"><div class="wrap"><a href="#/player/'+id+'"'+(yr?'':' aria-current="page"')+'>Career</a>'+yrs.map(function(y){return '<a href="#/player/'+id+'/'+y+'"'+(y===yr?' aria-current="page"':'')+'>'+y+'</a>';}).join('')+'</div></nav>';
     h+='<main class="wrap">';
@@ -5037,7 +5072,8 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   function ychip(k,e,h){ return yrOf(k)&&!h.ym?'<b>'+e[5]+'</b>'+(h.st?'<small>'+esc(h.st)+'</small>':''):''; }
   function rlogo(k,e,h){ if(h.one) return e[4]&&e[3]?'<i class="im rlg L'+(String(e[1])===String(RSC)?e[3]:e[1])+'"></i>':'<i class="im rlg L'+e[1]+'"></i>'; if(h.rsl) return '<span class="rlg2">'+h.rsl.slice(0,2).map(function(x){return '<i class="im L'+x+'"></i>';}).join('')+(h.rsl.length>2?'<b class="rlgn" title="'+h.rsl.length+' teams">+'+(h.rsl.length-2)+'</b>':'')+'</span>';
     return h.pair?'<span class="rlg2"><i class="im L'+e[1]+'"></i><i class="im L'+e[3]+'"></i></span>':'<i class="im rlg L'+e[1]+'"></i>'; }
-  function rsm(h){ return (h.sub?'<small>'+esc(h.sub)+'</small>':'')+(h.det?'<small>'+esc(h.det)+'</small>':''); }
+  function rsm(h){ var dd=(h.det||'').split('\\n');
+    return (h.sub?'<small>'+esc(h.sub)+'</small>':'')+(dd[0]?'<small>'+esc(dd[0])+'</small>':'')+(dd[1]?'<small class="rwho">'+dd[1].split(', ').map(function(x){ var m=/^(.*) (-?[\\d.]+)$/.exec(x); return m?'<span>'+esc(m[1])+' <b>'+esc(m[2])+'</b></span>':''; }).join('')+'</small>':''); }
   function rrow(k,t,e,tag){ var h=hold(k,e);
     return '<'+tag+' class="rrow"'+(tag==='button'?' type="button" data-k="'+k+'" data-t="'+esc(t)+'"':' href="'+toHash(e[6])+'"')+'><span class="rlab">'+esc(t)+(RHELP[rbase(k)]?'<small class="rhelp">'+esc(RHELP[rbase(k)])+'</small>':'')+'</span>'+rlogo(k,e,h)
       +'<span class="rhold"><b>'+hname(h)+'</b>'+nflc(h)+rsm(h)+'</span><span class="ryear">'+ychip(k,e,h)+'</span><span class="rval">'+esc(e[0])+(RUNIT[rbase(k)]?'<small class="runit">'+RUNIT[rbase(k)]+'</small>':'')+'</span></'+tag+'>'; }
