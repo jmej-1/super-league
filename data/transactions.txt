@@ -223,6 +223,9 @@
 11|free_agent|complete|3|CHI:3|13346:3|2026-11-20T00:19Z
 11|free_agent|complete|1|12533:1||2026-11-18T08:32Z
 11|free_agent|complete|6|2020:6||2026-11-18T08:21Z
+12|free_agent|complete|6|5947:6||2026-11-27T18:59Z
+12|trade|complete|5,6|4866:6;5859:5|4866:5;5859:6|2026-11-27T19:08Z
+12|free_agent|complete|6||2747:6|2026-11-27T18:59Z
 12|free_agent|complete|2|NYJ:2||2026-11-27T15:49Z
 12|free_agent|complete|9|1373:9|9480:9|2026-11-26T20:20Z
 12|free_agent|complete|4|4017:4|3163:4|2026-11-26T19:34Z

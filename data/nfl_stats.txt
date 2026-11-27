@@ -106,6 +106,7 @@
 1|5859|rec_tgt=4;rec=3;rec_yd=26
 1|5892|rush_att=20;rush_yd=60;rush_td=2;rec_tgt=3;rec=3;rec_yd=19;rec_td=1
 1|5927|rec_tgt=4;rec=2;rec_yd=14
+1|5947|rush_att=1;rush_yd=2;rec_tgt=2;rec=2;rec_yd=40;rec_td=1
 1|5967|rush_att=7;rush_yd=35;rec_tgt=2;rec=1;rec_yd=-1
 1|6083|fgm=2;fga=2;fgm_lng=47;xpm=3;xpa=3
 1|650|fgm=2;fga=4;fgm_lng=51;xpm=1;xpa=1
@@ -307,6 +308,7 @@
 2|5846|rec_tgt=9;rec=4;rec_yd=27
 2|5892|rush_att=6;rush_yd=10;rec_tgt=2;rec=2;rec_yd=14
 2|5927|rec_tgt=9;rec=2;rec_yd=50
+2|5947|rec_tgt=1;rec=1;rec_yd=28
 2|5967|rush_att=14;rush_yd=64;rec_tgt=1;rec=1;rec_yd=1
 2|6083|fgm=1;fga=1;fgm_lng=59;xpm=3;xpa=3
 2|650|fgm=1;fga=2;fgm_lng=41
@@ -497,6 +499,7 @@
 3|5849|pass_att=29;pass_cmp=15;pass_yd=168;pass_td=1;pass_int=1;rush_att=2;rush_yd=17
 3|5892|rush_att=11;rush_yd=33;rec_tgt=2;rec=2;rec_yd=15
 3|5927|rec_tgt=9;rec=6;rec_yd=77;rec_td=1
+3|5947|rec_tgt=8;rec=7;rec_yd=64;rec_td=1
 3|5967|rush_att=17;rush_yd=74;rec_tgt=4;rec=4;rec_yd=22
 3|6083|fgm=3;fga=3;fgm_lng=41;xpm=2;xpa=2
 3|650|fgm=2;fga=2;fgm_lng=44;xpm=3;xpa=3
@@ -684,6 +687,7 @@
 4|5846|rec_tgt=9;rec=5;rec_yd=115
 4|5849|pass_att=37;pass_cmp=27;pass_yd=247;rush_att=6;rush_yd=16
 4|5892|rush_att=10;rush_yd=24;rec_yd=19
+4|5947|rec_tgt=4;rec=3;rec_yd=33
 4|5967|rush_att=16;rush_yd=48;rush_td=1;rec_tgt=4;rec=2;rec_yd=2
 4|6083|fgm=4;fga=4;fgm_lng=48;xpm=1;xpa=1
 4|650|fgm=1;fga=1;fgm_lng=29;xpm=6;xpa=6
@@ -858,6 +862,7 @@
 5|5849|pass_att=30;pass_cmp=24;pass_yd=229;pass_td=1;rush_att=10;rush_yd=51
 5|5892|rush_att=5;rush_yd=11
 5|5927|rec_tgt=4;rec=4;rec_yd=62;rec_2pt=1
+5|5947|rec_tgt=3;rec=2;rec_yd=37
 5|5967|rush_att=14;rush_yd=52;rec_tgt=1
 5|6083|fgm=1;fga=2;fgm_lng=46;xpm=2;xpa=2
 5|650|fgm=3;fga=3;fgm_lng=48;xpm=2;xpa=2
@@ -1024,6 +1029,7 @@
 6|5846|rec_tgt=15;rec=11;rec_yd=93
 6|5859|rec_tgt=10;rec=3;rec_yd=27
 6|5927|rec_tgt=1;rec=1;rec_yd=27
+6|5947|rec_tgt=10;rec=5;rec_yd=83
 6|5967|rush_att=19;rush_yd=76;rec_tgt=1
 6|6083|fgm=3;fga=3;fgm_lng=35;xpm=3;xpa=3
 6|650|xpm=1;xpa=1
@@ -1342,6 +1348,7 @@
 8|5846|rec_tgt=6;rec=1;rec_yd=4
 8|5849|pass_att=29;pass_cmp=17;pass_yd=210;pass_td=2;pass_int=1;pass_2pt=1;rush_att=4;rush_yd=35
 8|5850|rush_att=21;rush_yd=39;rush_td=1;rec_tgt=6;rec=6;rec_yd=13;rec_td=1
+8|5947|rec_tgt=3;rec=2;rec_yd=24
 8|5967|rush_att=21;rush_yd=117;rush_td=2;rec_tgt=5;rec=3;rec_yd=20
 8|6083|fgm=1;fga=1;fgm_lng=53;xpm=5;xpa=5
 8|650|fga=1
@@ -1510,6 +1517,7 @@
 9|5119|fgm=4;fga=5;fgm_lng=54
 9|5844|rec_tgt=7;rec=4;rec_yd=33
 9|5850|rush_att=4;rush_yd=5
+9|5947|rec_tgt=6;rec=4;rec_yd=65
 9|6083|fgm=1;fga=1;fgm_lng=50;xpm=2;xpa=2
 9|650|fgm=1;fga=2;fgm_lng=31;xpm=2;xpa=2
 9|6650|fgm=3;fga=3;fgm_lng=35;xpm=1;xpa=1
@@ -1663,6 +1671,7 @@
 10|5119|fgm=4;fga=4;fgm_lng=48
 10|5846|rec_tgt=6;rec=2;rec_yd=54;rec_td=1;rec_2pt=1
 10|5859|rec_tgt=6;rec=2;rec_yd=27
+10|5947|rush_att=1;rec_tgt=6;rec=3;rec_yd=34
 10|5967|rush_att=9;rush_yd=33;rec_tgt=9;rec=8;rec_yd=66;rec_td=1
 10|6083|fgm=2;fga=2;fgm_lng=43;xpm=1;xpa=1
 10|6770|pass_att=44;pass_cmp=35;pass_yd=409;pass_td=4;rush_att=1;rush_yd=8
@@ -1818,6 +1827,7 @@
 11|5844|rec_tgt=7;rec=6;rec_yd=55
 11|5846|rec_tgt=4;rec=1;rec_yd=2
 11|5892|rush_att=26;rush_yd=107;rec_tgt=4;rec=3;rec_yd=17
+11|5947|rec_tgt=10;rec=4;rec_yd=85
 11|5967|rush_att=21;rush_yd=110;rec_tgt=1
 11|6083|fgm=1;fga=1;fgm_lng=28;xpm=3;xpa=3
 11|6650|xpm=3;xpa=3

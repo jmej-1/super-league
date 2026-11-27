@@ -189,7 +189,7 @@
 2353|Denzel Perryman|LB|LAC||11|
 2359|Ameer Abdullah|RB|JAX||11|
 2393|Danielle Hunter|DE|HOU|Questionable|11|DL,LB
-2427|Za'Darius Smith|LB|ATL|Questionable|11|DL,LB
+2427|Za'Darius Smith|LB|ATL||11|DL,LB
 2449|Stefon Diggs|WR|WAS||11|
 2468|Bradley Pinion|P|MIA|Questionable|11|
 2469|Joe Cardona|LS|LAR||11|
@@ -473,7 +473,7 @@
 5862|Brian Burns|DE|NYG|IR|7|DL,LB
 5864|Byron Murphy Jr.|CB|MIN||7|
 5865|Dre'Mont Jones|DE|NE|Questionable|7|
-5867|Dalton Risner|G|CIN|Questionable|7|
+5867|Dalton Risner|G|CIN|Out|7|
 5869|Michael Jordan|G|BAL||7|OG,OL
 5870|Daniel Jones|QB|||7|
 5871|Zach Allen|DE|DEN||7|
@@ -499,7 +499,7 @@
 5917|Mecole Hardman Jr.|WR|IND||7|
 5927|Terry McLaurin|WR|WAS|IR|7|
 5934|Charles Omenihu|DE|WAS|Questionable|7|
-5938|Lil'Jordan Humphrey|WR|DEN||7|
+5938|Lil'Jordan Humphrey|WR|DEN|Out|7|
 5944|Bobby Okereke|LB|CAR|Questionable|7|
 5946|Jamel Dean|CB|PIT||7|
 5947|Jakobi Meyers|WR|JAX|Questionable|7|
@@ -525,7 +525,7 @@
 6039|Ty Johnson|RB|BUF||7|
 6045|Gary Jennings|WR|||7|
 6056|Dre Greenlaw|LB|SF|Questionable|7|
-6060|Sean Murphy-Bunting|CB|PIT||7|
+6060|Sean Murphy-Bunting|CB|PIT|Out|7|
 6065|Cody Barton|LB|TEN||7|
 6083|Matt Gay|K|LV||7|
 6084|Hjalte Froholdt|G|ARI||7|OG,OL
@@ -555,7 +555,7 @@
 6216|Ugo Amadi|DB|||7|
 6217|Blake Cashman|LB|MIN||7|
 6218|E.J. Speed|LB|HOU|PUP|7|
-6220|Cole Holcomb|LB|PIT|Questionable|7|
+6220|Cole Holcomb|LB|PIT|Out|7|
 6221|Justin Skule|OT|TB||7|OL,OT
 6271|Olamide Zaccheaus|WR|ATL||7|
 6284|Marcus Epps|DB|PHI|Out|7|
@@ -659,7 +659,7 @@
 6887|Larrell Murchison|DT|LAR|Out|6|
 6888|Antoine Winfield Jr.|DB|TB|Questionable|6|
 6889|Colton McKivitz|OL|SF|IR|6|
-6896|Amik Robertson|CB|WAS|Questionable|6|
+6896|Amik Robertson|CB|WAS|Out|6|
 6899|Terence Steele|T|DAL||6|
 6900|Jonathan Greenard|DE|PHI||6|DL,LB
 6901|Joshua Metellus|DB|MIN||6|DB,LB
@@ -995,7 +995,7 @@
 8205|Isiah Pacheco|RB|DET|IR|4|
 8206|Skylar Thompson|QB|BAL|IR|4|
 8207|Tyler Goodson|RB|DAL|IR|4|
-8208|Tyler Badie|RB|DEN|Questionable|4|
+8208|Tyler Badie|RB|DEN||4|
 8210|Chig Okonkwo|TE|WAS||4|
 8214|Cole Turner|TE|MIA|IR|4|
 8219|Jelani Woods|TE|NYJ||4|
@@ -1083,7 +1083,7 @@
 8380|Thomas Booker IV|DL|LV||4|
 8381|Cobie Durant|DB|DAL||4|
 8382|Kingsley Enagbare|DL|NYJ||4|
-8383|Cameron Thomas|DL|ATL|Questionable|4|
+8383|Cameron Thomas|DL|ATL||4|
 8384|Zyon McCollum|DB|TB||4|
 8385|George Karlaftis|DL|KC||4|
 8386|Damarri Mathis|DB|CLE|IR|4|
@@ -2425,7 +2425,7 @@
 13420|Bryce Lance|WR|NO||0|
 13421|Eli Raridon|TE|NE||0|
 13422|Jaren Kanak|TE|TEN|IR|0|
-13423|Eli Heidenreich|RB|PIT||0|
+13423|Eli Heidenreich|RB|PIT|Out|0|
 13424|Seth McGowan|RB|IND|Out|0|
 13425|Jalon Daniels|QB|TB||0|
 13428|Joey Aguilar|QB|ARI||0|
@@ -2479,7 +2479,7 @@
 13479|Kyle Louis|LB|MIA||0|
 13480|LT Overton|DE|DAL||0|
 13481|Bryce Boettcher|LB|IND||0|
-13482|Kendal Daniels|LB|ATL|Questionable|0|
+13482|Kendal Daniels|LB|ATL||0|
 13483|Jeremiah Wright|G|NO||0|
 13484|Trey Moore|LB|MIA|IR|0|
 13485|Will Lee III|CB|CAR||0|
@@ -2488,7 +2488,7 @@
 13488|Kaleb Elarms-Orr|LB|BUF||0|
 13489|Malik Muhammad II|CB|CHI||0|
 13490|Wade Woodaz|LB|HOU||0|
-13491|Kaden Wetjen|WR|PIT||0|
+13491|Kaden Wetjen|WR|PIT|Out|0|
 13492|Dani Dennis-Sutton|DE|GB||0|
 13493|Wesley Williams|DE|JAX||0|
 13494|Jimmy Rolder|LB|DET|IR|0|
@@ -2543,7 +2543,7 @@
 13545|Trey Smack|K|GB||0|
 13546|Brian Parker II|OT|CIN||0|
 13547|Skyler Gill-Howard|DT|DET|IR|0|
-13548|Gabriel Rubio|DL|PIT||0|
+13548|Gabriel Rubio|DL|PIT|Out|0|
 13550|Pat Coogan|C|TEN||0|
 13551|Karson Sharar|LB|ARI|Questionable|0|
 13552|Anterio Thompson|DT|ATL|PUP|0|
@@ -2569,7 +2569,7 @@
 13572|Aiden Fisher|LB|KC||0|
 13573|Quintayvious Hutchins|DE|NE|IR|0|
 13576|Robert Spears-Jennings|DB|PIT||0|
-13577|Dallen Bentley|TE|DEN||0|
+13577|Dallen Bentley|TE|DEN|Out|0|
 13578|Miles Scott|DB|DEN||0|
 13579|Red Murdock|LB|DEN||0|
 13580|Carsen Ryan|TE|CLE||0|
