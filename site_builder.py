@@ -210,6 +210,7 @@ a.res .w{font-weight:600}
 .chips a:hover,.subnav a:hover{color:var(--ink);border-color:var(--ink)}
 .chips a.nx,.subnav a[aria-current=page]{background:var(--turf);border-color:var(--turf);color:var(--chalk)}
 .chips{margin-bottom:22px;flex-wrap:wrap}
+.tchips{padding-top:16px}
 .wk{margin-bottom:30px;scroll-margin-top:16px}
 .wk h3{font:800 26px/1 var(--disp);margin:0 0 10px} .wk h3 span{font:500 14px var(--body);color:var(--mute);margin-left:8px}
 .mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0 18px;border-top:2px solid var(--ink)}
@@ -728,6 +729,29 @@ CSS += """
 .txsides{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 18px}.txt{display:flex;align-items:center;gap:8px;margin:4px 0 2px;font-size:14px}.txt a{color:var(--ink)}
 @media(max-width:600px){.txc time{margin-left:0;width:100%}.txp{grid-template-columns:16px 34px minmax(0,1fr)}.txp .sn{grid-column:3;text-align:left;margin-top:-4px}}
 """
+
+def nfl_sched(s):
+    """{team: {week: [opponent, home 1/0, team score, opp score, final 1/0]}} from the ESPN schedule and the play-by-play files."""
+    import pbp as _pb
+    D = getattr(s, "ddir", "data"); out = {}
+    fin = {}
+    try:
+        for g in _pb.load(D).values():
+            pl = [p for p in g.get("plays", []) if len(p) > 6]
+            if pl: fin[(int(g["w"]), g["away"], g["home"])] = (int(pl[-1][5]), int(pl[-1][6]), bool(g.get("final")))
+    except Exception: pass
+    fp_ = os.path.join(D, "schedule.txt")
+    if not os.path.exists(fp_): return out
+    for ln in open(fp_):
+        if ln.startswith("#") or not ln.strip(): continue
+        r_ = ln.strip().split("|"); w, aw, hm = int(r_[0]), r_[2], r_[3]
+        sc = fin.get((w, aw, hm)); done = "FINAL" in r_[4]
+        for t, o, h in ((aw, hm, 0), (hm, aw, 1)):
+            x = [o, h]
+            if sc: x += ([sc[0], sc[1]] if h == 0 else [sc[1], sc[0]]) + [1 if (done or sc[2]) else 0]
+            out.setdefault(t, {})[str(w)] = x
+    return out
+
 
 NAV = [("index.html", "Home", "home"), ("news.html", "News", "news"), ("standings.html", "Standings", "standings"), ("schedule.html", "Schedule", "schedule"), ("playoffs.html", "Playoffs", "playoffs"),
        ("teams.html", "Teams", "teams"), ("players.html", "Players", "players"),
@@ -4047,7 +4071,8 @@ class Site:
             if i is None: return f'<div class="pl {"right" if right else ""}"><div class="who"><b class="muted">Empty</b></div><div class="pts">0.0</div></div>'
             team = s_.team_at(wk_, i)
             badge = '<span class="mvpb">MVP</span>' if (mvp and (i in mvp if isinstance(mvp, (set, list, tuple)) else i == mvp)) else ""
-            card = f' data-card="{E(s_.statcard(wk, i, p))}" tabindex="0" role="button"' if wk is not None else ""
+            cw = wk if wk is not None else (kw if sub[0] == "final" else None)          # live week: games underway or over have real stats too
+            card = f' data-card="{E(s_.statcard(cw, i, p))}" tabindex="0" role="button"' if cw is not None else ""
             kt = s_.kick_str(wk_, team); dot = '<i class="ksep" aria-hidden="true"></i>'
             if team in s.byes.get(wk_, []) and not p:          # bye week: a chip, not 0.0
                 return (f'<div class="pl {"right" if right else ""}"><div class="who"><b>{s_.pa(i, s.nm(i))}</b><small>{s_.nl_r(team) if right else s_.nl(team)}</small></div>'
@@ -4843,7 +4868,37 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     return items.length?'<section><h2>Moves</h2><ol class="mvl">'+items.reverse().join('')+'</ol></section>':'';
   }
   var INJ={Questionable:'Q',Doubtful:'D',Out:'O',Sus:'SUS'}; function ij(j){return j?' <span class="stg inj">'+esc(INJ[j]||j)+'</span>':'';}
+  function ngame(ab,x){ var g=x.y===YR&&window.NSCH&&NSCH[ab]&&NSCH[ab][x.w]; if(!g) return '<span class="muted">-</span>';
+    var opp=(g[1]?'vs ':'at ')+'<a href="#/nfl/'+g[0]+'">'+esc(g[0])+'</a>'; if(g.length<5) return opp;
+    var r=g[2]>g[3]?'W':(g[2]<g[3]?'L':'T'); return opp+' <span class="'+(r==='W'?'pos':(r==='L'?'neg':'muted'))+'">'+(g[4]?r+' ':'')+g[2]+'-'+g[3]+'</span>'+(g[4]?'':' <span class="muted">live</span>'); }
+  function renderNFLAll(yr){          // every NFL team, sortable, like the Players page
+    var el=document.getElementById('nv'), YRS={};
+    Object.keys(PD).forEach(function(i){ Object.keys(PD[i].sea).forEach(function(y){ YRS[y]=1; }); });
+    var yrs=Object.keys(YRS).sort().reverse(); if(!yr||!YRS[yr]) yr='all';
+    var T={}; Object.keys(NFLN).forEach(function(t){ T[t]={on:0,pl:0,gs:0,wr:0,pts:0,war:0,edge:0,top:null}; });
+    Object.keys(PD).forEach(function(i){ var d=PD[i], seen={};
+      if(d.o&&T[d.t]) T[d.t].on++;
+      Object.keys(d.sea).forEach(function(y){ if(yr!=='all'&&y!==yr) return; var S=d.sea[y], x=S.s, nt=(S.nt||[]).length?S.nt:(d.t?[d.t]:[]);
+        nt.forEach(function(t){ var a=T[t]; if(!a) return; if(!seen[t]){ seen[t]={war:0}; a.pl++; }
+          a.gs+=x[0]; a.pts+=x[1]; a.war+=x[3]; a.edge+=x[4]; a.wr+=S.w.filter(function(q){return q[1];}).length; seen[t].war+=x[3]; }); });
+      Object.keys(seen).forEach(function(t){ var a=T[t]; if(seen[t].war&&(!a.top||seen[t].war>a.top[1])) a.top=[i,seen[t].war]; }); });
+    var ks=Object.keys(T).sort(function(a,b){ return (T[b].war-T[a].war)||(T[b].pts-T[a].pts); });
+    var cv=function(v){ return v>0.005?'pos':(v<-0.005?'neg':'muted'); }, th=function(lab,c,k,def){ return '<th class="'+c+' srt" data-c="'+k+'" tabindex="0" role="button"'+(def?' aria-sort="descending"':'')+'>'+lab+'</th>'; };
+    var h='<section class="field"><div class="wrap"><a class="back" href="#/players">All players</a><h1>NFL teams</h1><p class="lede">All 32 teams by what their players have done on Super League rosters. Tap a column to sort.</p></div></section>';
+    h+='<div class="tchips wrap"><div class="chips"><a class="'+(yr==='all'?'nx':'')+'" href="#/nfl/all">All-time</a>'+yrs.map(function(y){ return '<a class="'+(yr===y?'nx':'')+'" href="#/nfl/'+y+'">'+y+'</a>'; }).join('')+'</div></div><main class="wrap">';
+    h+='<section><div class="scroll"><table class="srtab nflt" style="min-width:0"><thead><tr>'+th('Team','',0)+th('WAR','r',1,1)+th('PAA','r',2)+th('Pts started','r',3)
+      +'<th class="r srt" data-c="4" tabindex="0" role="button"><span class="tip" tabindex="0" data-tip="Starts, of the weeks their players spent on Super League rosters.">Started</span></th>'+th('Players','r',5)+th('On rosters now','r',6)+'<th>Best player</th></tr></thead><tbody>';
+    ks.forEach(function(t){ var a=T[t], tp=a.top;
+      h+='<tr class="'+(a.pl?'':'bn')+'"><td data-v="'+esc(NFLN[t].toLowerCase())+'"><a class="pn" href="#/nfl/'+t+'"><i class="nfl nflm N'+t+'"></i> <b>'+esc(NFLN[t])+'</b></a></td>'
+        +'<td class="r '+cv(a.war)+'" data-v="'+a.war+'">'+(a.gs?sgn(+a.war.toFixed(2)):'-')+'</td><td class="r '+cv(a.edge)+'" data-v="'+a.edge+'">'+(a.gs?(a.edge>=0?'+':'')+a.edge.toFixed(1):'-')+'</td>'
+        +'<td class="r big" data-v="'+a.pts+'">'+(a.gs?fpt(a.pts):'-')+'</td><td class="r" data-v="'+(a.gs+a.wr/1000)+'">'+(a.wr?a.gs+' of '+a.wr:'-')+'</td>'
+        +'<td class="r" data-v="'+a.pl+'">'+a.pl+'</td><td class="r" data-v="'+a.on+'">'+a.on+'</td>'
+        +'<td style="white-space:nowrap">'+(tp?'<a class="pn" href="#/player/'+tp[0]+'">'+esc(PD[tp[0]].n)+'</a> <span class="muted">'+sgn(+tp[1].toFixed(2))+' WAR</span>':'<span class="muted">-</span>')+'</td></tr>'; });
+    h+='</tbody></table></div><p class="note">Stats count only Super League starts while the player was on that NFL team. </p></section></main><footer><div class="wrap">Super League '+YR+'.</div></footer>';
+    el.innerHTML=h; document.querySelector('.pg[data-p="nfl"]').setAttribute('data-t', 'NFL teams, Super League '+YR);
+  }
   function renderNFL(ab, sub){
+    if(!ab||!NFLN[ab]) return renderNFLAll(ab);
     var el=document.getElementById('nv'), full=(NFLN[ab]||ab), YRS={};
     Object.keys(PD).forEach(function(i){ Object.keys(PD[i].sea).forEach(function(y){ YRS[y]=1; }); });
     var yrs=Object.keys(YRS).sort().reverse(), m=/^(\\d{4}|all)?-?(\\w+)?$/.exec(sub||'')||[], yr=m[1]||'all', tab=m[2]||'players';
@@ -4860,27 +4915,27 @@ def bundle(files, s, logo_dir, font_dir, site=None):
       agg[i]=a; st+=a.gs; pts+=a.pts; war+=a.war; edge+=a.edge; });
     var on=ids.filter(function(i){return PD[i].o&&PD[i].t===ab;}).length;
     var base='#/nfl/'+ab+'/';
-    var h='<section class="field"><div class="wrap"><a class="back" href="#/players">All players</a><div class="hero"><i class="nfl nflh N'+ab+'"></i><div><h1>'+esc(full)+'</h1><div class="sub">'+esc(ab)+(BY[ab]?', bye Week '+BY[ab]:'')+'</div></div></div>';
-    h+='<div class="herostats"><span><b>'+on+'</b>on rosters now</span><span><b>'+ids.length+'</b>Super League players</span><span><b>'+st+'</b>starts</span><span><b>'+fpt(pts)+'</b>pts started</span><span><b>'+sgn(+war.toFixed(2))+'</b>WAR</span><span><b>'+(edge>=0?'+':'')+edge.toFixed(1)+'</b>PAA</span></div></div></section>';
+    var h='<section class="field"><div class="wrap"><a class="back" href="#/nfl">NFL teams</a><div class="hero"><i class="nfl nflh N'+ab+'"></i><div><h1>'+esc(full)+'</h1><div class="sub">'+esc(ab)+(BY[ab]?', bye Week '+BY[ab]:'')+'</div></div></div>';
+    h+='<div class="herostats"><span><b>'+on+'</b>on rosters now</span><span><b>'+ids.length+'</b>Super League players</span><span><b>'+st+' of '+ids.reduce(function(t,i){ return t+agg[i].wr; },0)+'</b>started</span><span><b>'+fpt(pts)+'</b>pts started</span><span><b>'+sgn(+war.toFixed(2))+'</b>WAR</span><span><b>'+(edge>=0?'+':'')+edge.toFixed(1)+'</b>PAA</span></div></div></section>';
     h+='<div class="tchips wrap"><div class="chips">'+'<a class="'+(yr==='all'?'nx':'')+'" href="'+base+'all-'+tab+'">All-time</a>'+yrs.map(function(y){ return '<a class="'+(yr===y?'nx':'')+'" href="'+base+y+'-'+tab+'">'+y+'</a>'; }).join('')+'</div></div>';
     h+='<nav class="ttabs"><div class="wrap">'+[['players','Players'],['weekly','By week'],['teams','Super League teams']].map(function(x){ return '<a href="'+base+yr+'-'+x[0]+'" data-tab="'+x[0]+'" aria-current="'+(x[0]===tab?'true':'false')+'">'+x[1]+'</a>'; }).join('')+'</div></nav><main class="wrap">';
     var cv=function(v){ return v>0.005?'pos':(v<-0.005?'neg':'muted'); }, th=function(lab,c,k,def){ return '<th class="'+c+' srt" data-c="'+k+'" tabindex="0" role="button"'+(def?' aria-sort="descending"':'')+'>'+lab+'</th>'; };
     if(tab==='players'){
       ids.sort(function(a,b){ return agg[b].war-agg[a].war; });
-      h+='<section><div class="scroll"><table class="srtab nflt" style="min-width:0"><thead><tr>'+th('Player','',0)+th('Pos','c',1)+th('Team','',2)+th('WAR','r',3,1)+th('Pts','r',4)+th('Avg','r',5)+th('PAA','r nx',6)+th('Starts','r',7)+'</tr></thead><tbody>';
+      h+='<section><div class="scroll"><table class="srtab nflt" style="min-width:0"><thead><tr>'+th('Player','',0)+th('Pos','c',1)+th('Team','',2)+th('WAR','r',3,1)+th('Pts','r',4)+th('Avg','r',5)+th('PAA','r nx',6)+'<th class="r srt" data-c="7" tabindex="0" role="button"><span class="tip" tabindex="0" data-tip="Weeks he started, of the weeks he was on a Super League roster.">Started</span></th></tr></thead><tbody>';
       ids.forEach(function(i){ var d=PD[i], a=agg[i], avg=a.gs?a.pts/a.gs:null, cur=d.o&&d.t===ab;
         h+='<tr class="'+(cur?'':'bn')+'"><td data-v="'+esc(d.n.toLowerCase())+'"><a class="pn" href="#/player/'+i+'">'+(cur?'<b>'+esc(d.n)+'</b>':esc(d.n))+'</a>'+ij(d.j)+'</td><td class="c" data-v="'+['QB','RB','WR','TE','K','DEF'].indexOf(d.p)+'">'+esc(d.p)+'</td>'
           +'<td data-v="'+(d.o?esc(TM[d.o][0].toLowerCase()):'zzz')+'">'+tlink(d.o)+'</td><td class="r '+cv(a.war)+'" data-v="'+a.war+'">'+(a.gs?sgn(+a.war.toFixed(2)):'-')+'</td><td class="r big" data-v="'+a.pts+'">'+(a.gs?fpt(a.pts):'-')+'</td>'
-          +'<td class="r" data-v="'+(avg==null?-1:avg)+'">'+(avg==null?'-':avg.toFixed(1))+'</td><td class="r nx '+cv(a.edge)+'" data-v="'+a.edge+'">'+(a.gs?(a.edge>=0?'+':'')+a.edge.toFixed(1):'-')+'</td><td class="r" data-v="'+a.gs+'">'+a.gs+'</td></tr>'; });
+          +'<td class="r" data-v="'+(avg==null?-1:avg)+'">'+(avg==null?'-':avg.toFixed(1))+'</td><td class="r nx '+cv(a.edge)+'" data-v="'+a.edge+'">'+(a.gs?(a.edge>=0?'+':'')+a.edge.toFixed(1):'-')+'</td><td class="r" data-v="'+(a.gs+a.wr/1000)+'">'+(a.wr?a.gs+' of '+a.wr:'-')+'</td></tr>'; });
       if(!ids.length) h+='<tr><td colspan="8" class="muted">No Super League players.</td></tr>';
       h+='</tbody></table></div><p class="note">Every '+esc(full)+' player who has been on a Super League roster. Bold = on a roster now. Stats are from Super League starts.</p></section>';
     } else if(tab==='weekly'){
       var ks=Object.keys(wk).sort(function(a,b){ var x=wk[a], y=wk[b]; return (y.y-x.y)||(y.w-x.w); });
-      h+='<section><div class="scroll"><table class="srtab nflt" style="min-width:0"><thead><tr>'+th('Week','c',0)+th('Rostered','r',1)+th('Starts','r',2)+th('Pts started','r',3)+'<th>Best start</th></tr></thead><tbody>';
+      h+='<section><div class="scroll"><table class="srtab nflt" style="min-width:0"><thead><tr>'+th('Week','c',0)+'<th>Game</th>'+th('Rostered','r',2)+th('Starts','r',3)+th('Pts started','r',4)+'<th>Best start</th></tr></thead><tbody>';
       ks.forEach(function(k){ var x=wk[k], bye=BY[ab]===x.w&&x.y===YR, tp=x.top;
-        h+='<tr><td class="c" data-v="'+x.y+String(x.w).padStart(2,'0')+'">'+(yr==='all'&&yrs.length>1?x.y+' ':'')+'W'+x.w+'</td><td class="r" data-v="'+x.ros+'">'+x.ros+'</td><td class="r" data-v="'+x.gs+'">'+(bye?'<span class="byec">BYE</span>':x.gs)+'</td><td class="r big" data-v="'+x.pts+'">'+(x.gs?fpt(x.pts):'-')+'</td>'
+        h+='<tr><td class="c" data-v="'+x.y+String(x.w).padStart(2,'0')+'">'+(yr==='all'&&yrs.length>1?x.y+' ':'')+'W'+x.w+'</td><td>'+ngame(ab,x)+'</td><td class="r" data-v="'+x.ros+'">'+x.ros+'</td><td class="r" data-v="'+x.gs+'">'+(bye?'<span class="byec">BYE</span>':x.gs)+'</td><td class="r big" data-v="'+x.pts+'">'+(x.gs?fpt(x.pts):'-')+'</td>'
           +'<td>'+(tp?'<a class="pn" href="#/player/'+tp[0]+'">'+esc(PD[tp[0]].n)+'</a> <span class="muted">'+fpt(tp[2])+', '+(tp[1]>=0?'+':'')+tp[1].toFixed(1)+' PAA</span>':'<span class="muted">-</span>')+'</td></tr>'; });
-      if(!ks.length) h+='<tr><td colspan="5" class="muted">No weeks yet.</td></tr>';
+      if(!ks.length) h+='<tr><td colspan="6" class="muted">No weeks yet.</td></tr>';
       h+='</tbody></table></div><p class="note">How many '+esc(full)+' players were on Super League rosters and started each week, and the best start by PAA.</p></section>';
     } else {
       var ts=Object.keys(sl).sort(function(a,b){ return sl[b].pts-sl[a].pts; });
@@ -4989,7 +5044,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     KC:['#E31837','#FFFFFF','#FFB81C'],LV:['#000000','#FFFFFF','#A5ACAF'],LAC:['#0080C6','#FFFFFF','#FFC20E'],LAR:['#003594','#FFD100','#FFD100','#FFFFFF'],MIA:['#008E97','#FFFFFF','#FC4C02'],
     MIN:['#4F2683','#FFFFFF','#FFC62F','#FFC62F'],NE:['#002244','#FFFFFF','#C60C30'],NO:['#101820','#D3BC8D','#D3BC8D','#FFFFFF'],NYG:['#0B2265','#FFFFFF','#A71930'],NYJ:['#125740','#FFFFFF','#000000'],
     PHI:['#004C54','#FFFFFF','#FFFFFF','#000000'],PIT:['#101820','#FFFFFF','#FFB612','#FFB612'],SF:['#AA0000','#FFFFFF','#B3995D'],SEA:['#002244','#A5ACAF','#69BE28'],TB:['#D50A0A','#FFFFFF','#34302B'],
-    TEN:['#4B92DB','#FFFFFF','#C8102E','#C8102E'],WAS:['#5A1414','#FFFFFF','#FFB612','#FFB612']};
+    TEN:['#4B92DB','#FFFFFF','#FFFFFF','#C8102E'],WAS:['#5A1414','#FFFFFF','#FFB612','#FFB612']};
   var NLA=(function(){ var m=/\/\*NLA:([^*]*)\*\//.exec(document.head.innerHTML)||/\/\*NLA:([^*]*)\*\//.exec(document.documentElement.innerHTML.slice(0,4e6)); return m&&m[1]?m[1].split(','):[]; })();      // seasons whose logo was archived and later changed
   var JCOLY={'2026':JCOL};      // team colors frozen by season; add a new season's map when a team changes its look
   function renderPlayer(id, yr){
@@ -5014,7 +5069,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     var hs=(ag_!=null?'<span><b>'+ag_+'</b>age</span>':'')+(ex_!=null&&ex_>=0?'<span><b>'+(ex_===0?'R':(ex_+1))+'</b>NFL year</span>':'')
       +(function(){ var pp=prank(id,yr||null,0,1), po=prank(id,yr||null,1,1), wp=prank(id,yr||null,0,3), wo=prank(id,yr||null,1,3);    // points started and WAR, at his position and overall
         var c=function(v,lab,href){ return v?'<a class="hrank" href="'+href+'"><b>'+v+'</b>'+lab+'</a>':''; };
-        return c(pp,'points','#/players/'+d.p+'/pts/'+id)+c(po?'#'+po:0,'points overall','#/players/All/pts/'+id)+c(wp,'WAR','#/players/'+d.p+'/war/'+id)+c(wo?'#'+wo:0,'WAR overall','#/players/All/war/'+id); })();
+        return c(wp,'WAR','#/players/'+d.p+'/war/'+id)+c(wo?'#'+wo:0,'WAR overall','#/players/All/war/'+id)+c(pp,'points','#/players/'+d.p+'/pts/'+id)+c(po?'#'+po:0,'points overall','#/players/All/pts/'+id); })();
     h+='<div class="herostats">'+hs+'</div></div></section>';
     h+='<nav class="subnav" aria-label="Seasons"><div class="wrap"><a href="#/player/'+id+'"'+(yr?'':' aria-current="page"')+'>Career</a>'+yrs.map(function(y){return '<a href="#/player/'+id+'/'+y+'"'+(y===yr?' aria-current="page"':'')+'>'+y+'</a>';}).join('')+'</div></nav>';
     h+='<main class="wrap">';
@@ -5382,7 +5437,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   (function(){   // menu and search: every page in one panel, plus teams, players, NFL teams, stories and records
     var GR=[['This week',[['','Home'],['news','News'],['schedule','Schedule'],['playoffs','Playoffs']]],
             ['Standings and honors',[['standings','Standings'],['races','Awards'],['records','Records'],['excitement','Excitement']]],
-            ['Teams and players',[['teams','Teams'],['players','Players'],['h2h','Head to head']]],
+            ['Teams and players',[['teams','Teams'],['players','Players'],['nfl','NFL teams'],['h2h','Head to head']]],
             ['Front office',[['transactions','Transactions'],['trades','Trades'],['analyzer','Trade analyzer'],['draft','Draft']]]];
     var ov=document.createElement('div'); ov.className='nvo'; ov.hidden=true;
     ov.innerHTML='<div class="nvp" role="dialog" aria-modal="true" aria-label="Menu and search"><div class="nvh"><input type="search" placeholder="Search players, teams, pages, stories" aria-label="Search" autocomplete="off"><button type="button" class="nvx" aria-label="Close">&times;</button></div><div class="nvb"><div class="nvr" hidden></div><div class="nvgs"></div></div></div>';
@@ -5441,7 +5496,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
         import json as _json
         teams = {r: [site.TN(r), s.M[r]] for r in s.R}
         pdata = ("<script>var TA=" + _json.dumps(site.ta_data(), separators=(",", ":")) + ";</script>" + open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "ta.js")).read() + "<script>var WKD=" + _json.dumps(site.week_data(), separators=(",", ":")) + ";var PD=" + _json.dumps(site.players_data(), separators=(",", ":")) + ";var TM=" + _json.dumps(teams, separators=(",", ":")) + ";var TMW=" + _json.dumps(site.names_js(), separators=(",", ":")) +
-                 ";var NG=" + _json.dumps({n["slug"]: "game/w%s-%s-%s" % ((lambda w, a, b: (w, min(a, b), max(a, b)))(*(int(x) for x in n["game"].split("-")))) for n in site.news_list() if n.get("kind") not in ("feature", "cover") and n.get("game")}, separators=(",", ":")) + ";var NFLN=" + _json.dumps({k: f"{NFL_CITY[k]} {NFL_NICK[k]}" for k in NFL_NICK if k in NFL_CITY}, separators=(",", ":")) + ";var NFLK=" + _json.dumps(NFL_NICK, separators=(",", ":")) + ";var OH=" + _json.dumps([[lab, ts, {str(r): [round(v[0], 4), round(v[1], 4), round(v[2], 4)] + ([round(v[3], 3)] if len(v) > 3 and v[3] is not None else []) for r, v in d.items()}] for lab, ts, d in site.oh_ext()], separators=(",", ":")) + ";var NWS=" + _json.dumps([[n["title"], n["slug"], n.get("week")] for n in site.news_list()], separators=(",", ":")) + ";var GOF=" + _json.dumps({str(w): {str(r): (g[1] if g[0] == r else g[0]) for (w_, r), g in site.game_of.items() if w_ == w} for w in sorted({k[0] for k in site.game_of})}, separators=(",", ":")) + ";var YR=" + _json.dumps(str(site.yr)) + ";var BY=" + _json.dumps({t: 0 for t in NFL_NICK} | {t: w for w, ts in s.byes.items() for t in ts}) + ";</script>")
+                 ";var NG=" + _json.dumps({n["slug"]: "game/w%s-%s-%s" % ((lambda w, a, b: (w, min(a, b), max(a, b)))(*(int(x) for x in n["game"].split("-")))) for n in site.news_list() if n.get("kind") not in ("feature", "cover") and n.get("game")}, separators=(",", ":")) + ";var NFLN=" + _json.dumps({k: f"{NFL_CITY[k]} {NFL_NICK[k]}" for k in NFL_NICK if k in NFL_CITY}, separators=(",", ":")) + ";var NFLK=" + _json.dumps(NFL_NICK, separators=(",", ":")) + ";var OH=" + _json.dumps([[lab, ts, {str(r): [round(v[0], 4), round(v[1], 4), round(v[2], 4)] + ([round(v[3], 3)] if len(v) > 3 and v[3] is not None else []) for r, v in d.items()}] for lab, ts, d in site.oh_ext()], separators=(",", ":")) + ";var NWS=" + _json.dumps([[n["title"], n["slug"], n.get("week")] for n in site.news_list()], separators=(",", ":")) + ";var GOF=" + _json.dumps({str(w): {str(r): (g[1] if g[0] == r else g[0]) for (w_, r), g in site.game_of.items() if w_ == w} for w in sorted({k[0] for k in site.game_of})}, separators=(",", ":")) + ";var NSCH=" + _json.dumps(nfl_sched(s), separators=(",", ":")) + ";var YR=" + _json.dumps(str(site.yr)) + ";var BY=" + _json.dumps({t: 0 for t in NFL_NICK} | {t: w for w, ts in s.byes.items() for t in ts}) + ";</script>")
         chrome = first[first.index("<body>") + 6:first.index("</div></div></div>", first.index('class="top"')) + 18]
         chrome = re.sub(r' aria-current=page', '', chrome)
         chrome = re.sub(r'href="(index|news|standings|playoffs|schedule|teams|players|h2h|draft|races|awards|trades|transactions|excitement|analyzer|records)\.html"', lambda m: f'href="#/{"" if m.group(1) == "index" else m.group(1)}"', chrome)
