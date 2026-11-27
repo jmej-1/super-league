@@ -140,7 +140,7 @@ tr.tstart td{border-top:2px solid var(--rule)}
 .wpcard .sbws{display:flex;gap:6px;overflow:hidden;white-space:nowrap}.wpcard .sbw{display:inline-flex;align-items:center;gap:4px;background:rgba(238,242,248,.08);border-radius:999px;padding:2px 8px 2px 2px;font-size:12px;flex:none}.wpcard .sbw.s0{box-shadow:inset 2px 0 0 #DCE3F0}.wpcard .sbw.s1{box-shadow:inset 2px 0 0 #C9A21A}
 .wpcard .sbw .im{width:18px;height:18px}.wpcard .sbw .nfl{width:15px;height:15px;margin:0}.wpcard .sbwn{font-weight:600}.wpcard .sbw b.up{color:#8FD6A4}.wpcard .sbw b.dn{color:#F08F8F}
 .wpcard .sbh{display:block;font-size:12px;font-weight:600;color:#AFC0DA;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wpcard .sbd{font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;text-align:left;color:transparent}.wpcard .sbd.up{color:#8FD6A4}.wpcard .sbd.dn{color:#F08F8F}
+.wpcard .sbd{font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;text-align:left;color:transparent}.wpcard .sbd.z{color:#8FA0BC}.wpcard .sbw b.z{color:#8FA0BC}.pbtab .pbw b.z{color:var(--mute)}.wpcard .sbd.up{color:#8FD6A4}.wpcard .sbd.dn{color:#F08F8F}
 .wpcard .sbtt{margin-right:14px;white-space:nowrap}.wpcard .sbtt b{color:#EEF2F8}.wpcard .sbtt.s0{box-shadow:inset 2px 0 0 #DCE3F0;padding-left:6px}.wpcard .sbtt.s1{box-shadow:inset 2px 0 0 #C9A21A;padding-left:6px}
 .wpcard .sbx{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:5px;font-size:11.5px;color:#8FA0BC}.wpcard .sbx b{font-weight:700;color:#DCE3F0}.wpcard .sbx b.up{color:#8FD6A4}
 .wpcard .sbv{display:flex;align-items:baseline;justify-content:flex-end;gap:6px}.wpcard .sbv .sbd{min-width:38px}
@@ -3707,12 +3707,14 @@ class Site:
     def wp_chart(s_, w, a, b, pre):
         def sb(when, xa, xb, p, proj=False, ev=None, nev=None, prv=None, mix=None, pm=None):
             """The scoreboard over the charts: when, both teams' points so far and win chances, what each gained on this play, and the play."""
-            def dl(v, f, pctg=False):
+            inv = {x[1] for e in (ev or []) for x in e["who"]}                 # sides with a player on this play
+            def dl(v, f, pctg=False, sd=None):
+                if prv is not None and not pctg and sd in inv and abs(v) < 0.005: return f'<small class="sbd z">{0:+.{f}f}</small>'   # on the play, but a wash
                 if prv is None or abs(v) < (0.0005 if pctg else 0.005): return '<small class="sbd"></small>'
                 return f'<small class="sbd {"up" if v > 0 else "dn"}">{v * 100:+.1f}%</small>' if pctg else f'<small class="sbd {"up" if v > 0 else "dn"}">{v:+.{f}f}</small>'
             def row(r, x, q, col, x0, q0):
                 return (f'<span class="sbr{" lead" if q > 0.5 else ""}"><i class="sbc" style="background:{col}"></i>{s_.logo(r, pre, "lgs", w)}'
-                        f'<span class="sbn">{E(s_.TN(r, w))}</span><span class="sbv"><b class="sbs">{(f"{x:.1f}" if proj else fp(x))}</b>{dl(x - x0, 2) if prv else dl(0, 2)}</span>'
+                        f'<span class="sbn">{E(s_.TN(r, w))}</span><span class="sbv"><b class="sbs">{(f"{x:.1f}" if proj else fp(x))}</b>{dl(x - x0, 2, sd=(0 if r == a else 1)) if prv else dl(0, 2)}</span>'
                         f'<span class="sbv"><span class="sbp">{pct(q)}</span>{dl(q - q0, 1, True) if prv and q > q0 else dl(0, 1, True)}</span></span>')
             xa0, xb0, p0 = prv if prv else (xa, xb, p)
             if ev:                                     # the points this play was worth to each side, same as the chips
@@ -3770,8 +3772,8 @@ class Site:
             gl = (f'<span class="sbg">{nfl_(g0["aw"])}<b>{E(g0["aw"])} {g0["asc"]}</b><span class="sbgx">at</span>{nfl_(g0["hm"])}<b>{E(g0["hm"])} {g0["hsc"]}</b>'
                   f'<span class="sbq">{qn} {int(g0["c"]) // 60}:{int(g0["c"]) % 60:02d}</span></span>')
             who = "".join(f'<span class="sbw s{sd}">{s_.logo(a if sd == 0 else b, pre, "lgs", w)}{nfl_(nt)}'
-                          f'<span class="sbwn">{E(s_.s.nm(pid))}</span><b class="{"up" if d > 0 else "dn"}">{d:+.2f}</b></span>'
-                          for (pid, sd, nt), d in sorted(tot.items(), key=lambda z: -abs(z[1])) if abs(d) >= 0.05)
+                          f'<span class="sbwn">{E(s_.s.nm(pid))}</span><b class="{"up" if d >= 0.005 else "dn" if d <= -0.005 else "z"}">{d:+.2f}</b></span>'
+                          for (pid, sd, nt), d in sorted(tot.items(), key=lambda z: -abs(z[1])))
             return f'<span class="sbpl">{gl}<span class="sbt">{E(ptxt(g0["txt"], [x[0] for x in g0["who"]]))}</span><span class="sbws">{who}</span></span>'
         pts = s_.wp_series(w, a, b)
         PBP_ = (w, a, b) in getattr(s_, "_wpos", {}); PM_ = {}
@@ -3954,8 +3956,8 @@ class Site:
             for e in x[5]:
                 for q in e["who"]: tot_[(q[0], q[1])] = tot_.get((q[0], q[1]), 0.0) + q[2]
             q_ = e0["q"]; qn_ = f"Q{q_}" if q_ <= 4 else "OT"
-            who_ = "".join(f'<span class="pbw s{sd}">{s_.logo(a if sd == 0 else b, pre, "lgs", w)}{E(s_.s.nm(i))} <b class="{"up" if d > 0 else "dn"}">{d:+.2f}</b></span>'
-                           for (i, sd), d in sorted(tot_.items(), key=lambda z: -abs(z[1])) if abs(d) >= 0.005)
+            who_ = "".join(f'<span class="pbw s{sd}">{s_.logo(a if sd == 0 else b, pre, "lgs", w)}{E(s_.s.nm(i))} <b class="{"up" if d >= 0.005 else "dn" if d <= -0.005 else "z"}">{d:+.2f}</b></span>'
+                           for (i, sd), d in sorted(tot_.items(), key=lambda z: -abs(z[1])))
             ca = last_sc is None or abs(x[3][0] - last_sc[0]) > 1e-6; cb = last_sc is None or abs(x[3][1] - last_sc[1]) > 1e-6; last_sc = x[3]
             ga, gb = dp_ > 0.0005, dp_ < -0.0005                          # who the play moved toward
             tb_rows.append(f'<tr><td class="pbt">{E(str(x[2].strftime("%a %-I:%M %p") if hasattr(x[2], "strftime") else ""))}<small>{qn_} {int(e0["c"]) // 60}:{int(e0["c"]) % 60:02d}</small></td>'
