@@ -166,7 +166,7 @@
 2033|Shelby Harris|DE|NYG|Out|12|
 2036|Khalil Mack|LB|LAC||12|DL,LB
 2063|Casey Kreiter|LS|ARI||12|
-2064|DeMarcus Lawrence|DE|SEA|Questionable|12|
+2064|DeMarcus Lawrence|DE|SEA||12|
 2078|Odell Beckham Jr.|WR|MIN||12|
 2098|Morgan Moses|OL|NE||12|OL,OT
 2130|Kyle Van Noy|LB|MIN||12|DL,LB
@@ -178,7 +178,7 @@
 2306|Jameis Winston|QB|NYG||11|
 2307|Marcus Mariota|QB|WAS||11|
 2308|Dante Fowler Jr.|LB|SEA||11|DL,LB
-2311|Leonard Williams|DE|SEA|Questionable|11|
+2311|Leonard Williams|DE|SEA||11|
 2322|Arik Armstead|DE|JAX||11|
 2327|Bud Dupree|LB|LAC||11|DL,LB
 2330|Shaq Thompson|LB|BUF||11|
@@ -393,7 +393,7 @@
 5054|Carlton Davis III|CB|NE|Out|8|
 5055|M.J. Stewart|DB|HOU||8|
 5060|Braden Smith|OL|HOU||8|OG,OL
-5061|Uchenna Nwosu|LB|SEA|Questionable|8|DL,LB
+5061|Uchenna Nwosu|LB|SEA||8|DL,LB
 5067|Arden Key|DE|IND||8|DL,LB
 5071|DeShon Elliott|DB|PIT||8|
 5073|Sebastian Joseph-Day|DT|PIT|IR|8|
@@ -465,7 +465,7 @@
 5848|Marquise Brown|WR|||7|
 5849|Kyler Murray|QB|MIN||7|
 5850|Josh Jacobs|RB|GB|Out|7|
-5854|Drew Lock|QB|SEA|Questionable|7|
+5854|Drew Lock|QB|SEA||7|
 5855|Garrett Bradbury|C|CHI||7|
 5857|Noah Fant|TE|NO|Questionable|7|
 5859|A.J. Brown|WR|NE|Out|7|
@@ -831,7 +831,7 @@
 7669|Paulson Adebo|CB|NYG||5|
 7670|Joshua Palmer|WR|BUF|IR|5|
 7671|Benjamin St-Juste|DB|GB||5|
-7672|Ernest Jones IV|LB|SEA|Questionable|5|
+7672|Ernest Jones IV|LB|SEA||5|
 7673|Chazz Surratt|LB|SEA||5|
 7674|Patrick Jones II|DE|CAR|Questionable|5|
 7676|Malcolm Koonce|DE|LV||5|
@@ -891,7 +891,7 @@
 7816|Jason Pinnock|CB|NYG||5|
 7817|Earnest Brown IV|DE|CHI||5|
 7818|T.J. Slaton Jr.|DT|CIN||5|
-7819|Deommodore Lenoir|DB|SF|Questionable|5|
+7819|Deommodore Lenoir|DB|SF||5|
 7821|Garret Wallow|LB|SF||5|
 7823|Nate Hobbs|CB|SF||5|
 7827|Darrick Forrest|DB|SF|IR|5|
@@ -1361,7 +1361,7 @@
 10956|Dawand Jones|OL|CLE||3|
 10957|Adetomiwa Adebawore|DL|IND||3|
 10958|Dylan Horton|DL|HOU|IR|3|
-10959|Anthony Bradford|OL|SEA|Questionable|3|
+10959|Anthony Bradford|OL|SEA||3|
 10960|Jake Andrews|OL|HOU||3|
 10961|Blake Freeland|OL|NYJ||3|
 10962|Kelee Ringo|DB|PHI||3|
@@ -1456,7 +1456,7 @@
 11194|Keshawn Banks|LB|MIN||3|
 11199|Emari Demercado|RB|HOU||3|
 11201|Blake Whiteheart|TE|CLE||3|
-11230|Patrick O'Connell|LB|SEA|Questionable|3|
+11230|Patrick O'Connell|LB|SEA||3|
 11233|Ty Okada|DB|SEA||3|
 11237|Jacob Saylors|RB|DET||3|
 11240|C.J. Okoye|DL|NYG||3|
@@ -1908,7 +1908,7 @@
 12507|Omarion Hampton|RB|LAC||1|
 12508|Jaxson Dart|QB|NYG|IR|1|
 12509|Tre' Harris|WR|LAC||1|
-12510|Jalen Milroe|QB|SEA|Questionable|1|
+12510|Jalen Milroe|QB|SEA||1|
 12512|Quinshon Judkins|RB|CLE||1|
 12514|Emeka Egbuka|WR|TB||1|
 12516|Kalel Mullings|RB|TEN||1|
@@ -2021,7 +2021,7 @@
 12631|Upton Stout|CB|SF|Questionable|1|
 12632|Caleb Ransaw|DB|JAX|IR|1|
 12633|Wyatt Milum|OL|JAX||1|
-12634|Jordan Watkins|WR|SF|Questionable|1|
+12634|Jordan Watkins|WR|SF|Out|1|
 12635|Tonka Hemingway|DT|LV|Out|1|
 12636|Que Robinson|LB|DEN||1|DL,LB
 12638|Quincy Riley|CB|NO||1|
@@ -2484,7 +2484,7 @@
 13484|Trey Moore|LB|MIA|IR|0|
 13485|Will Lee III|CB|CAR||0|
 13486|Connor Lew|C|CIN||0|
-13487|Carver Willis|OL|SF|Questionable|0|
+13487|Carver Willis|OL|SF||0|
 13488|Kaleb Elarms-Orr|LB|BUF||0|
 13489|Malik Muhammad II|CB|CHI||0|
 13490|Wade Woodaz|LB|HOU||0|
