@@ -1,0 +1,1 @@
+# finished starts with points but no plays found in the play-by-play (should be empty)

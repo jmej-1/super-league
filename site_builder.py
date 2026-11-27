@@ -353,7 +353,7 @@ main.book{background:var(--turf);color:var(--chalk);padding:6px 0 60px}
 .rrow.flash,.ptable tr.flash td{animation:rflash 2.2s ease-out}
 a.hrank{display:flex;flex-direction:column;color:#B8C2D6;font-size:13px;text-decoration:none} a.hrank b{font:900 30px/1 var(--disp);color:var(--flag)} a.hrank:hover b{text-decoration:underline} @keyframes rflash{0%,35%{background:rgba(226,174,42,.28)}100%{background:transparent}}
 @media (prefers-reduced-motion:reduce){.rrow.flash{animation:none;background:rgba(226,174,42,.2)}} .rrow:hover .rval{color:#fff}
-.rlab{font:600 14px var(--body);color:#B8C2D6}
+.rlab{font:600 14px var(--body);color:#B8C2D6}.rlab .rhelp{display:block;margin-top:4px;font:500 12px/1.35 var(--body);color:#8C99B3;max-width:220px}
 .rcols{display:grid;grid-template-columns:200px 52px minmax(0,1fr) 150px 150px;gap:16px;padding:12px 4px 6px;font:600 12px var(--body);color:#8792A8;border-bottom:1px solid var(--yard)}
 .rcols span:nth-child(2){grid-column:2/4} .rcols span:nth-child(3){grid-column:4}
 .rrow.rties{grid-template-columns:200px minmax(0,1fr) 150px 150px}
@@ -645,7 +645,15 @@ CSS += """
 .gfm{text-align:center}.gfm b{font-size:22px}.gfl{display:inline-block;width:16px;border-top:3px solid var(--turf)}.gfl.d{border-top:3px dashed #C9A21A}
 .xcap{display:flex;align-items:center;gap:8px;margin:10px 0 26px;padding:0 2px;font-size:12px;color:var(--mute)}.xcap b{font:800 15px var(--disp);color:var(--ink)}.xcap small{margin-left:-6px}
 .xcap .xbr{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:12px;color:var(--mute)}.xcap .xbr i{font-style:normal}.xcap .xbr small{margin-left:3px;font-size:11px}.xcap .xbr b{color:var(--ink)}.exm{width:72px;height:5px;border-radius:3px;background:var(--rule);overflow:hidden}.exm i{display:block;height:100%;background:var(--flag)}.xcap{display:block;margin:12px 0 26px;padding:12px 14px;border:1px solid var(--rule);border-radius:10px;background:var(--paper)}.xcap .xhd{display:flex;align-items:center;gap:12px}.xcap .xl{font-weight:700;font-size:14px;color:var(--ink)}.xcap .xhd b{font:800 26px var(--disp);color:var(--ink);line-height:1}.xcap .exm{flex:1;width:auto;height:10px;border-radius:5px}.xcap .xft{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:13px}.xcap .xrk{color:var(--ink)}.xcap .xgo{margin-left:auto;color:var(--mute);text-decoration:underline}.xcap .xgo:hover{color:var(--turf)}.xcap .xdt{margin-top:8px}.xcap .xdt summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--mute)}.xcap .xdt[open] summary{color:var(--ink)}.xcap .xbr{margin-top:8px}.tat2x{display:inline-flex;align-items:center;gap:8px}
-.potg .pgh{display:flex;align-items:center;gap:10px}.potg .pgt{flex:1;min-width:0}.potg .pgt b{display:block;font-size:15px;color:var(--ink)}.potg .pgw{font-size:12.5px;color:var(--mute)}.potg .pgv{font:800 28px var(--disp);color:var(--turf);text-align:right;line-height:1}.potg .pgv small{display:block;font:600 11px var(--body);color:var(--mute)}.potg .pgx{margin:10px 0 6px;font-size:14.5px;line-height:1.45;color:var(--ink)}.potg .pgn{font-size:13px;color:var(--mute)}.potg .pgn{display:flex;flex-wrap:wrap;gap:4px 14px}.potg .pgn b{color:var(--ink)}
+.tp .tpc{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(250px,1fr);background:radial-gradient(120% 140% at 100% 0%,#1d2c52 0%,#0f1a33 55%,#0b1428 100%);color:#EEF2F8;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(11,20,40,.18)}
+.tp .tpl{padding:22px 24px 20px}.tp .tpg{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13px;color:#C7D2E4}.tp .tpg .nfl{width:18px;height:18px;margin:0}.tp .tpg b{color:#EEF2F8;margin-right:2px}.tp .tpat{opacity:.6;margin:0 2px}.tp .tpk{margin-left:10px;padding:2px 8px;border-radius:999px;background:rgba(201,162,26,.16);color:#E2C25A;font-weight:700}.tp .tpw{margin-left:auto;color:#8FA0BC}
+.tp .tpx{margin:14px 0 16px;font:800 clamp(22px,3.1vw,31px)/1.08 var(--disp);letter-spacing:.2px;color:#fff;text-wrap:balance}
+.tp .tpps{display:flex;flex-wrap:wrap;gap:8px}.tp .tpp{display:inline-flex;align-items:center;gap:6px;padding:4px 12px 4px 4px;border-radius:999px;background:rgba(238,242,248,.09);color:#EEF2F8;text-decoration:none;font-size:13.5px;font-weight:600}.tp .tpp:hover{background:rgba(238,242,248,.16)}.tp .tpp .im{width:22px;height:22px}.tp .tpp .nfl{width:16px;height:16px;margin:0}.tp .tpp b{color:#8FD6A4}
+.tp .tpr{padding:22px 24px 20px;background:rgba(201,162,26,.07);border-left:1px solid rgba(238,242,248,.1);display:flex;flex-direction:column;justify-content:center;gap:10px}.tp .tpt{display:flex;align-items:center;gap:8px;font-size:15px}.tp .tpt .im{width:26px;height:26px}
+.tp .tpn{display:flex;align-items:baseline;gap:10px;font:800 44px/1 var(--disp)}.tp .tpn span{color:#8FA0BC;font-size:30px}.tp .tpn i{font-style:normal;color:#C9A21A;font-size:26px}.tp .tpn strong{color:#E2C25A}
+.tp .tpbar{position:relative;height:10px;border-radius:5px;background:rgba(238,242,248,.12);overflow:hidden}.tp .tpbar i{position:absolute;top:0;bottom:0;left:0}.tp .tpbar .b0{background:rgba(238,242,248,.35)}.tp .tpbar .b1{background:#C9A21A}.tp .tpbar em{position:absolute;top:-2px;bottom:-2px;width:1px;background:rgba(255,255,255,.55)}
+.tp .tps{font:800 20px var(--disp);color:#8FD6A4}.tp .tps small{font:600 12px var(--body);color:#8FA0BC;margin-left:4px}.tp .tpf{font-size:12.5px;color:#8FA0BC}
+@media (max-width:760px){.tp .tpc{grid-template-columns:1fr}.tp .tpr{border-left:0;border-top:1px solid rgba(238,242,248,.1)}.tp .tpl,.tp .tpr{padding:18px 16px}.tp .tpw{margin-left:0;flex-basis:100%}.tp .tpn{font-size:38px}}
 .rhold b{display:inline-block;max-width:calc(100% - 64px);vertical-align:middle}.rnfl{display:inline-flex;align-items:center;gap:4px;margin-left:8px;font:600 12px var(--body);color:#8E99AF;vertical-align:middle}.rnfl .nfl{width:16px;height:16px;margin:0}
 .vs .gut{white-space:nowrap}.vs .gut small{font:700 13px var(--body);margin-left:5px}
 .gsx{display:flex;justify-content:space-between;gap:12px;margin:0;padding:0 0 10px;font-size:12px;color:var(--mute);border-bottom:1px solid var(--rule)}.gsr:has(+ .gsx){border-bottom:0;padding-bottom:4px}.vs .vsh{display:flex;align-items:center;gap:6px;font:700 13px var(--body);color:var(--mute);justify-content:flex-end}.vs .b.vsh{justify-content:flex-start}
@@ -1557,7 +1565,7 @@ class Site:
             for _, (p, who_) in best.items():
                 for i, r in who_: top[i][r] += 1
         if yr == s_.yr:                                   # single plays: what each play did to the win chance (WPA) and the title odds (CPA)
-            for w, r, o, _u, when, clk, txt, who, wpa, cpa in s_.play_impacts():
+            for w, r, o, _u, when, clk, txt, who, wpa, cpa, *_x in s_.play_impacts():
                 a_, b_ = s_.game_of[(w, r)]; pid = who[0][0]; tx_ = f"{clk}: {txt}" if len(txt) <= 90 else f"{clk}: {txt[:87].rsplit(' ', 1)[0]}..."
                 for P in ("ALL", s.pos(pid)):
                     if wpa > 0: add(f"p_wpa_{P}", wpa, f"{wpa * 100:+.1f}%", r, [r], p=pid, o=o, w=w, u=G_(w, a_, b_), x=tx_)
@@ -1650,8 +1658,7 @@ class Site:
                         if gw_: A("wi", wi_ - gp, f"{wi_:+.2f}", f"{gw_} starts"); A("wilo", -wi_ - gp, f"{wi_:+.2f}", f"{gw_} starts")
                         if n1: A("top", n1 - g_ * 1e-4, str(n1), f"of {g_} starts")          # ties: fewer starts wins (a higher rate)
                         if X.get("hasp", 0) >= 4 and pre_ == "py":    # clutch: the wins his plays added beyond what his points alone are worth
-                            cl = X["cw"] - X["ce"]; cx = f"{X['cw']:+.2f} WPA, {X['ce']:+.2f} expected from his points"
-                            A("clutch", cl - gp, f"{cl:+.2f}", cx); A("clutchlo", -cl - gp, f"{cl:+.2f}", cx)
+                            A("wpa", X["cw"] - gp, f"{X['cw']:+.2f}", f"{g_} starts")
                             A("cpa", X.get("cpa", 0.0) - gp, f"{X.get('cpa', 0.0) * 100:+.2f}%", f"{g_} starts")
                     bn_ = X.get("bn", 0)
                     if X["ben"] > 0: A("ben", X["ben"] - bn_ * 1e-6, fp(X["ben"]), f"{bn_} week{'' if bn_ == 1 else 's'} on the bench", sq="bseq")
@@ -3250,9 +3257,12 @@ class Site:
             if w > s.last or w > reg: continue                     # finished weeks only
             pts = s_.wp_series(w, a, b)
             if not pts or (w, a, b) not in getattr(s_, "_wpos", {}): continue
-            for k in range(1, len(pts)):
-                x, y = pts[k], pts[k - 1]
-                if not (x[0] == "·" and len(x) > 5 and x[5]) or not (y[0] == "·" and len(y) > 5): continue
+            prow = None                                              # the last play-by-play row: rows share one projection basis,
+            for k in range(len(pts)):                                # so row to row is the play alone (check-ins and logged updates don't count)
+                x = pts[k]
+                if not (x[0] == "·" and len(x) > 5): continue
+                y, prow = prow, x
+                if y is None or not x[5]: continue
                 dp = x[1] - y[1]
                 for sd, (r, o) in enumerate(((a, b), (b, a))):
                     who = {}
@@ -3274,8 +3284,10 @@ class Site:
                     ptx = s_.play_text(e0["txt"])
                     if s.pos(max(who, key=lambda z: who[z])) != "K":           # the kick after a touchdown isn't part of the play unless it's his
                         ptx = re.sub(r"\s*TWO-POINT CONVERSION ATTEMPT\..*$", "", re.sub(r"\s*[A-Z][\w'.\-]* extra point is (GOOD|No Good|BLOCKED)\.?", "", ptx)).strip()
+                    pb_, pa_ = (y[1], x[1]) if sd == 0 else (1 - y[1], 1 - x[1])
+                    sc_ = (e0.get("aw"), e0.get("asc"), e0.get("hm"), e0.get("hsc"))
                     out.append((w, r, o, f"game/w{w}-{min(a, b)}-{max(a, b)}.html", x[4], clk, ptx,
-                                sorted(who.items(), key=lambda z: -z[1]), g, g * lev))
+                                sorted(who.items(), key=lambda z: -z[1]), g, g * lev, pb_, pa_, sc_, x[3] if sd == 0 else (x[3][1], x[3][0])))
         # What a start's WPA "should" be from its points alone, by position (a straight-line fit over every finished start):
         # the rest is clutch, when the points came and how close the game was. That part is the one that isn't skill.
         st_ = []
@@ -3291,6 +3303,16 @@ class Site:
             mx, my = sum(xs) / len(xs), sum(ys) / len(ys); vx = sum((v - mx) ** 2 for v in xs) or 1.0
             b_ = sum((u - mx) * (v - my) for u, v in zip(xs, ys)) / vx; fit[ps] = (my - b_ * mx, b_)
         s_._clutch = {(w, r, i): (wp, fit[s.pos(i)][0] + fit[s.pos(i)][1] * p) for w, r, i, p, wp in st_ if s.pos(i) in fit}
+        # Check: every finished start with points should have plays behind them. A miss means the play-by-play couldn't find him
+        # (ESPN wrote his name a way we don't know). Logged every build so it gets caught the same day.
+        miss = [(w, r, i, p) for w, r, i, p, wp in st_ if abs(p) >= 1 and (w, r, i) not in cred and s.pos(i) != "DEF"]
+        s_._pbpmiss = miss
+        try:
+            with open(os.path.join(getattr(s, "ddir", "data"), "pbp_check.txt"), "w") as f:
+                f.write("# finished starts with points but no plays found in the play-by-play (should be empty)\n")
+                for w, r, i, p in miss: f.write(f"{w}|{r}|{i}|{s.nm(i)}|{p}\n")
+        except Exception: pass
+        if miss: print(f"PBP CHECK: {len(miss)} start(s) with points but no plays:", ", ".join(f"W{w} {s.nm(i)} {p}" for w, r, i, p in miss[:12]))
         s_._pimp = out; s_._pcred = cred
         return out
 
@@ -4152,13 +4174,24 @@ class Site:
         return f'<section><h2>Game stats</h2><div class="panel gstats"><div class="gsh"><b>{E(s_.TN(a))}</b><b>{E(s_.TN(b))}</b></div>{"".join(out_)}</div></section>'
 
     def potg_html(s_, w, a, b, pre):
+        """The turning point: the winner's biggest swing, told like a highlight. The play, the NFL score and clock, the win
+        chance before and after, and everyone in the matchup it scored for."""
         x = s_.play_of_game(w, a, b)
-        if not x: return ""
-        w_, r, o, u, when, clk, txt, who, wpa, cpa = x; pid = who[0][0]
-        nm = "".join(f'<span class="pgp"><a href="{pre}player/{i}.html">{E(s_.s.nm(i))}</a> <b>{v:+.2f}</b></span>' for i, v in who if v > 0)
-        return (f'<section class="potg"><h2>Play of the game</h2><div class="panel"><div class="pgh">{s_.logo(r, pre, "lgs", w)}'
-                f'<span class="pgt"><b>{E(s_.TN(r, w))}</b> <span class="pgw">{E(str(when))}, {E(clk)}</span></span><span class="pgv">{wpa * 100:+.1f}%<small>win chance</small></span></div>'
-                f'<p class="pgx">{E(txt)}</p><div class="pgn">{nm}</div></div></section>')
+        if not x or len(x) < 14: return ""
+        w_, r, o, u, when, clk, txt, who, wpa, cpa, pb, pa_, sc, xs = x[:14]
+        aw, asc, hm, hsc = sc
+        nfl = lambda t: f'<i class="nfl N{t}" role="img" aria-label="{t}"></i>' if t in NFL_NICK else ""
+        chips = "".join(f'<a class="tpp" href="{pre}player/{i}.html">{s_.logo(r, pre, "lgs", w)}{nfl(s_.team_at(w, i))}<span>{E(s_.s.nm(i))}</span><b>{v:+.2f}</b></a>'
+                        for i, v in who if v > 0)
+        game = f'{nfl(aw)}<b>{E(str(aw))} {asc}</b><span class="tpat">at</span>{nfl(hm)}<b>{E(str(hm))} {hsc}</b>' if aw else ""
+        return (f'<section class="tp"><h2>The turning point <small>the play that swung it most toward the winner</small></h2>'
+                f'<div class="tpc"><div class="tpl"><div class="tpg">{game}<span class="tpk">{E(clk)}</span><span class="tpw">{E(str(when))}</span></div>'
+                f'<p class="tpx">{E(txt)}</p><div class="tpps">{chips}</div></div>'
+                f'<div class="tpr"><div class="tpt">{s_.logo(r, pre, "lgs", w)}<b>{E(s_.TN(r, w))}</b></div>'
+                f'<div class="tpn"><span>{pb * 100:.0f}%</span><i aria-hidden="true">&#8594;</i><strong>{pa_ * 100:.0f}%</strong></div>'
+                f'<div class="tpbar" aria-hidden="true"><i class="b0" style="width:{pb * 100:.1f}%"></i><i class="b1" style="left:{pb * 100:.1f}%;width:{max(0.0, pa_ - pb) * 100:.1f}%"></i><em style="left:50%"></em></div>'
+                f'<div class="tps">{wpa * 100:+.1f}% <small>win chance on one play</small></div>'
+                f'<div class="tpf">Fantasy score after it: {fp(xs[0])} to {fp(xs[1])}</div></div></div></section>')
 
     def game_done(s_, w, a, b):
         s_._at = s_.wk_start(w)
@@ -4940,8 +4973,8 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   var BOOK={team:[['Single game',[['g_high','Highest score'],['g_low','Lowest score'],['g_blow','Biggest blowout'],['g_close','Closest game'],['g_comb','Most combined points'],['g_hiloss','Highest score in a loss'],['g_lowin','Lowest score in a win'],['g_upset','Biggest upset'],['g_excite','Most exciting game'],['g_flips','Most lead changes'],['g_dull','Least exciting game'],['g_bench','Most points lost to start/sit']]],['Biggest comebacks',[['g_improb','Lowest win chance overcome'],['g_down','Biggest deficit overcome']]],
       ['Season',[['s_pct','Best record'],['s_pctlo','Worst record'],['s_wins','Most wins'],['s_pf','Most points'],['s_pflow','Fewest points'],['s_pa','Most points against'],['s_xw','Most xWins'],['s_lucky','Luckiest'],['s_unlucky','Unluckiest'],['s_wstreak','Longest win streak'],['s_lstreak','Longest losing streak']],1]],
     player:[['Single game',[['p_start','Most points'],['p_startlo','Fewest points'],['p_pm','Best PAA'],['p_pmlo','Worst PAA'],['p_war1','Most WAR'],['p_war1lo','Fewest WAR'],['p_bench','Most bench points']]],
-      ['Single play',[['p_wpa','Biggest play (win chance added, WPA)']]],
-      ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_clutch','Most clutch'],['py_clutchlo','Least clutch'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_wi','Most Win Impact'],['py_wilo','Least Win Impact'],['py_luck','Best supporting cast'],['py_unluck','Worst supporting cast'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
+      ['Single play',[['p_wpa','Biggest play (WPA)'],['p_cpa','Biggest play for the title (CPA)']]],
+      ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_wpa','Most win probability added (WPA)'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_wi','Most Win Impact'],['py_wilo','Least Win Impact'],['py_luck','Best supporting cast'],['py_unluck','Worst supporting cast'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
       ['Career',[['pc_pts','Most points'],['pc_ppg','Most points per game'],['pc_ptslo','Fewest points'],['pc_ppglo','Fewest points per game'],['pc_pm','Best PAA'],['pc_pmlo','Worst PAA'],['pc_war','Most WAR'],['pc_warlo','Fewest WAR'],['pc_wins','Most wins'],['pc_loss','Most losses'],['pc_wpct','Best win %'],['pc_wpctlo','Worst win %'],['pc_wi','Most Win Impact'],['pc_wilo','Least Win Impact'],['pc_luck','Best supporting cast'],['pc_unluck','Worst supporting cast'],['pc_gs','Most starts'],['pc_top','Most weeks as the #1 at his position'],['pc_ben','Most bench points'],['pc_benppg','Most bench points per week']],0,1]],
     mgr:[['Single week or move',[['l_add1','Most gut-call wins added'],['m_besttrade','Most wins gained in a trade'],['m_heist','Most lopsided trade'],['m_pick','Best pickup'],['m_drop','Worst drop']]],
       ['Season',[['m_total','Most total wins added'],['l_add','Most gut-call wins added'],['m_gm','Best GM'],['m_eff','Most efficient GM'],['m_trader','Best trader'],['m_treff','Most efficient trader'],['m_waiver','Best waiver work'],['m_wveff','Most efficient waiver work'],['m_dropcost','Costliest drops'],['m_draft','Best draft'],['l_eff','Best lineup efficiency'],['l_bench','Most points lost to start/sit'],['l_over','Most points over projection'],['w_high','Most weekly high scores'],['w_low','Most weekly low scores'],['w_mvp','Most weekly MVPs'],['m_trades','Most trades'],['m_moves','Most waiver and free-agent moves'],['m_allmv','Most total moves']],1],
@@ -4985,9 +5018,13 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     return h.pair?'<span class="rlg2"><i class="im L'+e[1]+'"></i><i class="im L'+e[3]+'"></i></span>':'<i class="im rlg L'+e[1]+'"></i>'; }
   function rsm(h){ return (h.sub?'<small>'+esc(h.sub)+'</small>':'')+(h.det?'<small>'+esc(h.det)+'</small>':''); }
   function rrow(k,t,e,tag){ var h=hold(k,e);
-    return '<'+tag+' class="rrow"'+(tag==='button'?' type="button" data-k="'+k+'" data-t="'+esc(t)+'"':' href="'+toHash(e[6])+'"')+'><span class="rlab">'+esc(t)+'</span>'+rlogo(k,e,h)
-      +'<span class="rhold"><b>'+hname(h)+'</b>'+nflc(h)+rsm(h)+'</span><span class="ryear">'+ychip(k,e,h)+'</span><span class="rval">'+esc(e[0])+(RUNIT[k]?'<small class="runit">'+RUNIT[k]+'</small>':'')+'</span></'+tag+'>'; }
-  var RUNIT={g_excite:'excitement score',g_dull:'excitement score',g_flips:'lead changes'};
+    return '<'+tag+' class="rrow"'+(tag==='button'?' type="button" data-k="'+k+'" data-t="'+esc(t)+'"':' href="'+toHash(e[6])+'"')+'><span class="rlab">'+esc(t)+(RHELP[rbase(k)]?'<small class="rhelp">'+esc(RHELP[rbase(k)])+'</small>':'')+'</span>'+rlogo(k,e,h)
+      +'<span class="rhold"><b>'+hname(h)+'</b>'+nflc(h)+rsm(h)+'</span><span class="ryear">'+ychip(k,e,h)+'</span><span class="rval">'+esc(e[0])+(RUNIT[rbase(k)]?'<small class="runit">'+RUNIT[rbase(k)]+'</small>':'')+'</span></'+tag+'>'; }
+  var RUNIT={g_excite:'excitement score',g_dull:'excitement score',g_flips:'lead changes',p_wpa:'win chance',p_cpa:'title odds',py_wpa:'wins'};
+  var RHELP={p_wpa:"How much one play raised its team's chance to win that week's matchup.",
+    p_cpa:"How much one play raised its team's chance to win the title: its swing in win chance times how much that game mattered for the championship.",
+    py_wpa:"Every swing in win chance his plays caused all season, added up. +1.00 is a whole win's worth."};
+  function rbase(k){ return k.replace(/_(ALL|QB|RB|WR|TE|K|DEF)$/,''); }
   function trow(k,t,L){ var T=L.filter(function(e){return tv(e)===tv(L[0]);}), nT=T.length, more=''; T=T.slice(0,4);
     if(nT<2) return rrow(k,t,L[0],'button');
     var hs='', ys='';

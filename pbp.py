@@ -158,7 +158,12 @@ def parse_game(g, cands):
     while k >= 0: keep.append(k); k = par[k]
     keep.reverse()
     if len(keep) < len(fracs):
-        times = [times[k] for k in keep]; fracs = [fracs[k] for k in keep]; cum = [cum[k] for k in keep]; pas = [pas[k] for k in keep]; info = [info[k] for k in keep]
+        ks_ = set(keep); extra = {}; nxt = None
+        for k in range(len(fracs) - 1, -1, -1):               # a dropped row's play still happened: it rides along on the next row kept
+            if k in ks_: nxt = k
+            elif info[k][5]: extra.setdefault(nxt if nxt is not None else keep[-1], []).insert(0, info[k])
+        info = [info[k] + (extra.get(k, []),) for k in keep]
+        times = [times[k] for k in keep]; fracs = [fracs[k] for k in keep]; cum = [cum[k] for k in keep]; pas = [pas[k] for k in keep]
     g["_info"] = info                              # (quarter, clock, play text, away score, home score) for each row kept
     return times, fracs, cum, pas
 
@@ -292,19 +297,20 @@ def wp_timeline(sides, paths, kick, cv, corr, pos_of):
         pk = (gid(t),) + tuple(inf[k][:3]) if k < len(inf) and inf[k] else (gid(t), k)
         if pk not in seen_k:                       # each play once, though both of its NFL teams have players in the matchup
             seen_k[pk] = 1
-            who = []
+            aw, hm = pp.get(("game",), ("", ""))
             if k < len(inf) and inf[k]:
-                q, clk, txt, asc, hsc = inf[k][:5]; dl = inf[k][5] if len(inf[k]) > 5 else {}
-                for sd, X in enumerate(sides):
-                    for pid, tt, pj, act in X:
-                        if tt not in paths or gid(tt) != gid(t): continue
-                        d = dl.get(pid, 0.0)                                   # what this play itself was worth to him
-                        if not pid.isdigit() and ("pa", pid) in pp and before is not None:
-                            d += tier(pp[("pa", pid)][k]) - tier(pp[("pa", pid)][before])
-                        if abs(d) > 1e-6: who.append((pid, sd, round(d, 2), tt))
-            if who:
-                aw, hm = pp.get(("game",), ("", ""))
-                ev.append(dict(t=t, q=q, c=clk, txt=txt, aw=aw, hm=hm, asc=asc, hsc=hsc, who=who))
+                rows_ = list(inf[k][6]) if len(inf[k]) > 6 else []
+                for n_, I in enumerate(rows_ + [inf[k]]):            # plays the time filter folded in first, then the row's own play
+                    q, clk, txt, asc, hsc = I[:5]; dl = I[5] if len(I) > 5 else {}
+                    who = []
+                    for sd, X in enumerate(sides):
+                        for pid, tt, pj, act in X:
+                            if tt not in paths or gid(tt) != gid(t): continue
+                            d = dl.get(pid, 0.0)                               # what this play itself was worth to him
+                            if I is inf[k] and not pid.isdigit() and ("pa", pid) in pp and before is not None:
+                                d += tier(pp[("pa", pid)][k]) - tier(pp[("pa", pid)][before])
+                            if abs(d) > 1e-6: who.append((pid, sd, round(d, 2), tt))
+                    if who: ev.append(dict(t=t, q=q, c=clk, txt=txt, aw=aw, hm=hm, asc=asc, hsc=hsc, who=who))
         if j + 1 < len(tl) and tl[j + 1][0] == tm and gid(tl[j + 1][1]) == gid(t): continue   # the same play (same game, same second): one point
         (ma, sa, la), (mb, sb, lb) = side_state(sides[0]), side_state(sides[1])
         p = (1.0 if ma > mb else 0.0 if mb > ma else 0.5) if sa + sb == 0 else float(norm.cdf((ma - mb) / math.hypot(sa, sb)))
