@@ -508,7 +508,7 @@
 5969|Chuma Edoga|OT|BAL||7|OL,OT
 5970|Greg Dortch|WR|BUF||7|
 5973|Josh Oliver|TE|MIN|IR|7|
-5981|Greg Gaines|DT|BUF||7|
+5981|Greg Gaines|DT|BUF|Out|7|
 5985|Foster Moreau|TE|HOU||7|
 5991|Maxx Crosby|DE|LV||7|
 5995|Justice Hill|RB|BAL||7|
@@ -558,7 +558,7 @@
 6220|Cole Holcomb|LB|PIT|Questionable|7|
 6221|Justin Skule|OT|TB||7|OL,OT
 6271|Olamide Zaccheaus|WR|ATL||7|
-6284|Marcus Epps|DB|PHI||7|
+6284|Marcus Epps|DB|PHI|Out|7|
 6290|Scotty Miller|WR|CHI||7|
 6292|Nick Allegretti|G|WAS||7|OG,OL
 6296|Quinton Bell|LB|NYJ||7|DL,LB
@@ -684,7 +684,7 @@
 6950|Braden Mann|P|PHI||6|
 6952|Jonah Jackson|G|CHI||6|
 6957|James Proche II|WR|||6|
-6958|Mike Danna|DE|BUF||6|
+6958|Mike Danna|DE|BUF|Out|6|
 6960|Tyler Johnson|WR|||6|
 6972|DaVon Hamilton|DT|JAX|IR|6|
 6977|Justin Strnad|LB|DEN||6|
@@ -895,7 +895,7 @@
 7821|Garret Wallow|LB|SF||5|
 7823|Nate Hobbs|CB|SF||5|
 7827|Darrick Forrest|DB|SF|IR|5|
-7828|Noah Gray|TE|KC|Questionable|5|
+7828|Noah Gray|TE|KC||5|
 7830|Shaun Wade|CB|||5|
 7833|Isaiahh Loudermilk|DE|||5|
 7834|Jaylon Moore|OL|KC|Out|5|OL,OT
@@ -995,7 +995,7 @@
 8205|Isiah Pacheco|RB|DET|IR|4|
 8206|Skylar Thompson|QB|BAL|IR|4|
 8207|Tyler Goodson|RB|DAL|IR|4|
-8208|Tyler Badie|RB|DEN|IR|4|
+8208|Tyler Badie|RB|DEN|Questionable|4|
 8210|Chig Okonkwo|TE|WAS||4|
 8214|Cole Turner|TE|MIA|IR|4|
 8219|Jelani Woods|TE|NYJ||4|
@@ -1139,7 +1139,7 @@
 8484|Ko Kieft|TE|TB||4|
 8485|Luke Tenuta|OL|IND||4|
 8486|Matt Araiza|P|KC||4|
-8487|Christian Benford|DB|BUF|Questionable|4|
+8487|Christian Benford|DB|BUF|Out|4|
 8489|Drew Ogletree|TE|IND||4|
 8491|Austin Deculus|T|ARI||4|
 8494|James Houston|LB|DAL||4|DL,LB
@@ -1276,7 +1276,7 @@
 10232|Michael Wilson|WR|ARI|IR|3|
 10234|Derius Davis|WR|LAC||3|
 10235|Roschon Johnson|RB|CHI|Out|3|
-10236|Dalton Kincaid|TE|BUF|Questionable|3|
+10236|Dalton Kincaid|TE|BUF||3|
 10444|Cedric Tillman|WR|NO||3|
 10857|Stetson Bennett IV|QB|LAR||3|
 10859|Sam LaPorta|TE|DET||3|
@@ -1306,7 +1306,7 @@
 10892|Will Anderson Jr.|DL|HOU||3|DL,LB
 10893|Juice Scruggs|OL|DET||3|
 10894|DJ Turner II|DB|CIN||3|
-10895|O'Cyrus Torrence|OL|BUF|Questionable|3|
+10895|O'Cyrus Torrence|OL|BUF||3|
 10896|John Michael Schmitz Jr.|OL|NYG||3|
 10897|Tyrique Stevenson Sr.|CB|CHI||3|
 10898|Tuli Tuipulotu|DL|LAC|Questionable|3|DL,LB
@@ -1332,7 +1332,7 @@
 10920|Tyler Steen|OL|PHI||3|
 10921|Yaya Diaby|DL|TB||3|DL,LB
 10922|Wanya Morris|OL|IND||3|
-10923|Dorian Williams|LB|BUF|Questionable|3|
+10923|Dorian Williams|LB|BUF||3|
 10924|Zacch Pickens|DL|ATL||3|
 10925|Byron Young|DL|PHI||3|
 10926|Marte Mapu|DB|PIT||3|
@@ -1747,7 +1747,7 @@
 11823|C.J. Hanson|OG|||2|
 11824|Travis Clayton|OT|BUF||2|
 11827|Jonah Laulu|DL|TEN||2|
-11828|Marcus Harris|DL|KC||2|
+11828|Marcus Harris|DL|KC|Out|2|
 11829|Solomon Byrd|DE|HOU|IR|2|
 11830|Kalen King|CB|ARI||2|
 11833|Nick Gargiulo|OL|DEN|PUP|2|
@@ -1999,7 +1999,7 @@
 12609|Fadil Diggs|DL|NO||1|
 12610|Princely Umanmielen|DL|CAR||1|
 12611|Lathan Ransom|DB|CAR||1|
-12612|T.J. Sanders|DL|BUF|Questionable|1|
+12612|T.J. Sanders|DL|BUF||1|
 12613|Tate Ratledge|OL|DET|Questionable|1|
 12614|Shemar James|LB|DAL||1|
 12615|Omarr Norman-Lott|DT|KC|Out|1|
@@ -2015,7 +2015,7 @@
 12625|Justin Walley|CB|IND||1|
 12626|Jaylin Smith|CB|HOU||1|
 12627|Dylan Fairchild|OL|CIN||1|
-12628|Sai'vion Jones|DE|DEN|Out|1|
+12628|Sai'vion Jones|DE|DEN|IR|1|
 12629|Emery Jones Jr.|OL|BAL||1|
 12630|Nick Martin|LB|SF|IR|1|
 12631|Upton Stout|CB|SF|Questionable|1|
@@ -2261,7 +2261,7 @@
 13104|Adin Huntington|DT|CLE||1|
 13107|Johnathan Edwards|DB|IND||1|
 13116|Tre Watson|TE|MIA||1|
-13118|Melvin Smith Jr.|DB|KC||1|
+13118|Melvin Smith Jr.|DB|KC|Out|1|
 13121|Ben Yurosek|TE|MIN||1|
 13122|Carter Runyon|TE|LV||1|
 13124|Jeremiah Webb|WR||Questionable|1|
@@ -2396,7 +2396,7 @@
 13387|Christen Miller|DL|NO|IR|0|
 13388|CJ Allen|LB|IND||0|
 13389|Avieon Terrell|DB|ATL||0|
-13390|Peter Woods|DL|KC|Questionable|0|
+13390|Peter Woods|DL|KC||0|
 13391|Jake Golday|LB|MIN||0|
 13392|Jeff Caldwell|WR|KC|IR|0|
 13393|Brent Austin|DB|DEN||0|
@@ -2408,7 +2408,7 @@
 13399|Genesis Smith|DB|LAC||0|
 13400|Justin Joly|TE|MIA||0|
 13401|Michael Trigg|TE|DAL||0|
-13402|Skyler Bell|WR|BUF||0|
+13402|Skyler Bell|WR|BUF|Out|0|
 13403|Jam Miller|RB|ATL||0|
 13405|Kaytron Allen|RB|MIA||0|
 13406|Kamari Ramsey|DB|HOU||0|
@@ -2501,13 +2501,13 @@
 13502|Febechi Nwaiwu|OL|HOU||0|
 13503|Kaleb Proctor|DT|ARI|IR|0|
 13504|Darrell Jackson Jr.|DT|NYJ||0|
-13505|Jude Bowry|OT|BUF||0|
+13505|Jude Bowry|OT|BUF|Out|0|
 13506|Zane Durant|DT|BUF|IR|0|
 13507|Enrique Cruz Jr.|OL|SF||0|
 13508|Hezekiah Masses|CB|LV||0|
 13509|Lorenzo Styles|DB|NO||0|
 13510|Karon Prunty|DB|NE||0|
-13511|Jalon Kilgore|CB|BUF||0|
+13511|Jalon Kilgore|CB|BUF|Out|0|
 13512|Keyshaun Elliott|LB|CHI||0|
 13513|Charles Demmings|CB|MIN||0|
 13514|Chandler Rivers|CB|BAL||0|
@@ -2650,7 +2650,7 @@
 13726|Camden Brown|WR|DAL||0|
 13727|Lardarius Webb Jr.|DB|BAL||0|
 13728|Nick Dawkins|OL|NYJ||0|
-13730|Diego Pounds|OT|KC||0|
+13730|Diego Pounds|OT|KC|Out|0|
 13732|Aaron Graves|DT|||0|
 13733|Ethan Burke|DE|BAL||0|
 13735|Dominic DeLuca|LB|||0|
