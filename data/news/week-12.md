@@ -139,3 +139,42 @@ Harrison's hole is tight end: {p:10236} has averaged 6.6 over his last six, the 
 - **{t:10}** added {p:10219} and dropped {p:13424}.
 - **{t:3}** added {p:13346} for {p:8136} and swapped Seattle's defense for Cincinnati's.
 - **{t:4}** took {p:3163} for {p:96}.
+=====
+slug: w12-thanksgiving
+title: Gibbs Carves Up Thanksgiving, and Jesse Is the Turkey
+dek: 45.7 points, the best start of the season, flips Jesse vs Jason from 62% to 4%. Ben is nearly done, and Sammy's 68% is down to a coin flip.
+week: 12
+kind: feature
+teams: 1,2,3,4,5,6,7,8,9,10
+date: 2026-11-27 00:45
+---
+One game Wednesday night, three on Thursday, and not one matchup looks the way it did when the week started. Every number below is through Thanksgiving, with the rest based on the lineups as they're set right now. Those can still change before Sunday.
+
+## Jason 52.1, Jesse 34.4
+{t:2} was a **62% favorite** going into Wednesday night. Now {t:6} is **96%** to win.
+
+{p:9221} did it almost by himself: 205 rushing yards, three touchdowns and five catches for **45.7 points**, the most by any starter in any week this season. The old mark was {p:4034}'s 44.3 in Week 10. On the other side, {p:4984} had his worst start of the year: 10 of 21 for 81 yards and two interceptions, **3.54 points** against a projection of 20.4. His previous low was 12.16.
+
+{p:13337} (17.6) was the bright spot for Jesse. His lineup as set has 43.5 projected points left and an open defense slot. Jason's has 81.1 left, led by {p:7523} (22.5).
+
+## Zack 66.1, Harrison 16.8
+Zack bet on Chicago at Detroit, and it paid. {p:11560} threw for 345 yards and two scores and ran in a two-point try for **25.3**, {p:11620} added **23.7** and {p:7547} **18.1**. {p:12517} was the only miss at -1.0, after a lost fumble.
+
+{t:7} got 14.5 from {p:8167} on Wednesday night and 2.3 from {p:10236}. Harrison has the bigger Sunday on paper, 83.1 projected points left to Zack's 56.7, but it isn't enough to make up 49 points. Zack went from **59%** before Wednesday to **77%**.
+
+## Nick 48.9, Sammy 15.2
+{t:4} got something from everybody who played. {p:8138} (19.0), {p:10859} (12.4) and the Rams defense (12.0) all landed. {t:1} only had two starters go, {p:12519} (6.0) and {p:8137} (9.2).
+
+Sammy is still the favorite because of what he has left: 101.7 projected points, with {p:6770} (23.1), {p:9488} (20.2) and {p:11584} (19.3). Nick's lineup has 60.8 left. That 34-point lead cut Sammy's odds from **68%** to **54%**.
+
+## Ben 79.1, Beck 30.3
+{t:5} had two starters on Thanksgiving and both went off. {p:7525} caught 11 balls for 200 yards and two touchdowns (**37.5**), and {p:7588} ran for 101 and scored three times (**31.8**). {p:1466} added 9.1. {p:4866} was the lone dud at 0.7.
+
+{p:3294} did his part for {t:8} with 25.54, but Beck trails by 48.8 with 54.6 projected points left. Ben went from **72%** to **99%**.
+
+## Hamish 44.4, Thomas 25.7
+{p:11586} ran for 184 yards and a touchdown Wednesday night (**27.5**), and {p:6786} added **16.9**. For {t:10}, {p:6790} matched Corum almost exactly with 25.7.
+
+The quiet decision of the week: Hamish had started {p:4046} in 8 of the 9 weeks he's had him, and he sat him for {p:1373}. Mahomes managed 7.16 in Buffalo. Geno goes Sunday against Miami, projected 17.4.
+
+Thomas has more left, 95.4 projected to 83.4, but Hamish's 18.7-point lead is enough to flip it. Thomas was a **54% favorite** going in. Hamish is now **59%**.
