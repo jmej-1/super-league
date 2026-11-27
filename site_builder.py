@@ -19,6 +19,17 @@ def ncdf(z):
     return min(max(float(norm.cdf(z)), 1e-6), 1 - 1e-6)
 
 
+def pctf(p):
+    """Win chance to as many digits as it takes to tell two long shots apart: 0.05%, 0.037%, 99.963%, 99.9998%.
+    Used where a number gets compared or ranked (records, the play table); headlines use pct."""
+    if p <= 0 or p >= 1: return pct(p)
+    q = min(p, 1 - p)
+    if q >= 0.001: return pct(p)
+    d = max(1, -math.floor(math.log10(q * 100)) + 1)              # two significant digits of the small side
+    v = f"{q * 100:.{d}f}"
+    return (v if p < 0.5 else f"{100 - float(v):.{d}f}") + "%"
+
+
 def pct(p, dp=1):
     """Percent with at most one decimal, no trailing .0 (66.7%, 50%, 100%)."""
     if 0.9995 <= p < 1: return "&gt;99.9%"
@@ -1311,7 +1322,7 @@ class Site:
         imp = sorted((x for x in s_.improbable() if x["w"] in s.weeks), key=lambda x: x["low"])[:10]
         def im_sub(k):
             x = imp[k]
-            return (s_.logo(x["wi"], pre, "lg", x["w"]), f'{E(s_.TN(x["wi"], x["w"]))} over {E(s_.TN(x["lo"], x["w"]))}', f'Week {x["w"]}: down to {pct(x["low"])} {"before kickoff" if x["at"] == "Pregame" else ("at " + x["at"][1:].replace("Live, ", "")) if x["at"].startswith("@") else "after " + ("the " + x["at"] + " games" if ":" in x["at"] else x["at"])}{f", trailed by as much as {x['down']:.1f}" if x["down"] > 0.05 else ""}, won {fp(s.G[x["w"]]["scores"][x["wi"]])} to {fp(s.G[x["w"]]["scores"][x["lo"]])}')
+            return (s_.logo(x["wi"], pre, "lg", x["w"]), f'{E(s_.TN(x["wi"], x["w"]))} over {E(s_.TN(x["lo"], x["w"]))}', f'Week {x["w"]}: down to {pctf(x["low"])} {"before kickoff" if x["at"] == "Pregame" else ("at " + x["at"][1:].replace("Live, ", "")) if x["at"].startswith("@") else "after " + ("the " + x["at"] + " games" if ":" in x["at"] else x["at"])}{f", trailed by as much as {x['down']:.1f}" if x["down"] > 0.05 else ""}, won {fp(s.G[x["w"]]["scores"][x["wi"]])} to {fp(s.G[x["w"]]["scores"][x["lo"]])}')
         b9 = block("Comeback of the Year race", "The lowest win chance a winner came back from.",
                    [(k, imp[k]["low"]) for k in range(len(imp))], pct, "lowest win chance", im_sub, lambda k: s_.gurl(imp[k]["w"], imp[k]["wi"], imp[k]["lo"], pre)) if imp else ""
         exl = sorted(((g, s_.excitement(*g)) for g in [(w_, x, y) for w_ in s.weeks for x, y in s.G[w_]["pairs"]] if s_.excitement(*g) is not None), key=lambda kv: -kv[1])[:10]
@@ -1591,9 +1602,9 @@ class Site:
                 if fl_: add("g_flips", fl_, str(fl_), wi, [wi, lo], o=lo, w=w, u=G_(w, wi, lo), x=f'{fp(sc_[wi])} to {fp(sc_[lo])}')
         for x in s_.improbable():
             sc_ = s.G[x["w"]]["scores"]
-            add("g_improb", -x["low"], pct(x["low"]), x["wi"], [x["wi"]], o=x["lo"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=(("at " + x["at"][1:].replace("Live, ", "") + ", ") if x["at"].startswith("@") else "") + f'won {fp(sc_[x["wi"]])} to {fp(sc_[x["lo"]])}')
+            add("g_improb", -x["low"], pctf(x["low"]), x["wi"], [x["wi"]], o=x["lo"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=(("at " + x["at"][1:].replace("Live, ", "") + ", ") if x["at"].startswith("@") else "") + f'won {fp(sc_[x["wi"]])} to {fp(sc_[x["lo"]])}')
             if x["down"] > 0.05: add("g_down", x["down"], fp(x["down"]), x["wi"], [x["wi"]], o=x["lo"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=f'won {fp(sc_[x["wi"]])} to {fp(sc_[x["lo"]])}')
-            add("g_choke", 1 - x["low"], pct(1 - x["low"]), x["lo"], [x["lo"]], o=x["wi"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=f'lost {fp(sc_[x["lo"]])} to {fp(sc_[x["wi"]])}')   # the same games from the other side
+            add("g_choke", 1 - x["low"], pctf(1 - x["low"]), x["lo"], [x["lo"]], o=x["wi"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=f'lost {fp(sc_[x["lo"]])} to {fp(sc_[x["wi"]])}')   # the same games from the other side
             if x["down"] > 0.05: add("g_blown", x["down"], fp(x["down"]), x["lo"], [x["lo"]], o=x["wi"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=f'lost {fp(sc_[x["lo"]])} to {fp(sc_[x["wi"]])}')
         # ---- team: season
         n = len(s.weeks)
@@ -3689,16 +3700,17 @@ class Site:
             # still open, and nothing for a slot nobody can fill. Lineup news then never shows up as a jump on game day.
             anc = [((x[0], (lambda q: x[1] if q is None else q)(s_.pregame_p(w, a, b, x[0], x[2], x[3], kick))) + tuple(x[2:])) for x in anc]
             preA = [x for x in anc if k0 and x[0] < k0]
-            pre_shift = (preA[-1][1] - o0) if preA else pts[0][1] - o0
+            pre_shift = (lg(preA[-1][1]) - lg(o0)) if preA else lg(pts[0][1]) - lg(o0)
         elif preA:                                         # no projection history: keep the updates' shape, end them on the real lineups
             dl = lg(o0) - lg(preA[-1][1])
             anc = [((x[0], ex(lg(x[1]) + dl)) + tuple(x[2:])) if (k0 and x[0] < k0) else x for x in anc]
             preA = [x for x in anc if k0 and x[0] < k0]
             pre_shift = 0.0
-        else: pre_shift = pts[0][1] - o0
-        A = [(None, pre_shift)] + [(tm, p - model_at(tm)) for tm, p, *_ in anc if not (k0 and tm < k0)]
+        else: pre_shift = lg(pts[0][1]) - lg(o0)
+        # shifts are in log-odds, so a nudge near the ends bends toward 0% or 100% but never lands on it
+        A = [(None, pre_shift)] + [(tm, lg(p) - lg(model_at(tm))) for tm, p, *_ in anc if not (k0 and tm < k0)]
         end_t = max((t_ for t_, _ in timed if t_ is not None), default=None)
-        A.append((end_t, (pts[-1][1] - oN) if not done else 0.0))
+        A.append((end_t, (lg(pts[-1][1]) - lg(oN)) if not done else 0.0))
         def off(tm):
             if tm is None: return pre_shift
             prev = (k0, pre_shift)
@@ -3714,8 +3726,7 @@ class Site:
         for x in pts[1:-1]:
             tm = T_(x)
             if tm is None and x[2] is not None: tm = KEY(x)          # time-slot ticks shift with the line too, so they sit on it
-            lo_, hi_ = (1e-4, 1 - 1e-4) if 0 < x[1] < 1 else (0.0, 1.0)   # a shift never turns a live chance into a sure thing
-            out.append((x[0], min(hi_, max(lo_, x[1] + off(tm))) if tm is not None else x[1]) + x[2:])
+            out.append((x[0], min(1 - 1e-6, max(1e-6, ex(lg(x[1]) + off(tm)))) if (tm is not None and 0 < x[1] < 1) else x[1]) + x[2:])
         out.append(pts[-1])
         # logged updates as their own points, in time order among the plays
         npre = 0
@@ -4037,7 +4048,7 @@ class Site:
                            f'<td class="pbg">{E(str(e0.get("aw", "")))} {e0.get("asc", "")}-{e0.get("hsc", "")} {E(str(e0.get("hm", "")))}</td>'
                            f'<td class="pbp">{E(s_.play_simple(e0["txt"]))}<div class="pbws">{who_}</div></td>'
                            f'<td class="r pbn{" chg" if ca else ""}">{fp(x[3][0])}</td><td class="r pbn{" chg" if cb else ""}">{fp(x[3][1])}</td>'
-                           f'<td class="r pbn{" up" if ga else ""}">{pct(x[1])}</td><td class="r pbn{" up" if gb else ""}">{pct(1 - x[1])}</td>'
+                           f'<td class="r pbn{" up" if ga else ""}">{pctf(x[1])}</td><td class="r pbn{" up" if gb else ""}">{pctf(1 - x[1])}</td>'
                            f'<td class="r pba">{"" if abs(dp_) < 0.0005 else f"{abs(dp_) * 100:+.1f}%"}<small>{"" if abs(dp_) < 0.0005 else E(s_.M[a if ga else b])}</small></td></tr>')
         pbp_tbl = (f'<details class="pbtab"><summary>Every play, as a table</summary><div class="pbsc"><table><thead><tr><th>When</th><th>NFL score</th><th>Play</th>'
                    f'<th class="r">{E(s_.M[a])}</th><th class="r">{E(s_.M[b])}</th><th class="r">{E(s_.M[a])} win %</th><th class="r">{E(s_.M[b])} win %</th><th class="r">Swing</th></tr></thead>'
