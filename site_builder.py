@@ -648,6 +648,12 @@ CSS += """
 .gfm{text-align:center}.gfm b{font-size:22px}.gfl{display:inline-block;width:16px;border-top:3px solid var(--turf)}.gfl.d{border-top:3px dashed #C9A21A}
 .xcap{display:flex;align-items:center;gap:8px;margin:10px 0 26px;padding:0 2px;font-size:12px;color:var(--mute)}.xcap b{font:800 15px var(--disp);color:var(--ink)}.xcap small{margin-left:-6px}
 .xcap .xbr{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:12px;color:var(--mute)}.xcap .xbr i{font-style:normal}.xcap .xbr small{margin-left:3px;font-size:11px}.xcap .xbr b{color:var(--ink)}.exm{width:72px;height:5px;border-radius:3px;background:var(--rule);overflow:hidden}.exm i{display:block;height:100%;background:var(--flag)}.xcap{display:block;margin:12px 0 26px;padding:12px 14px;border:1px solid var(--rule);border-radius:10px;background:var(--paper)}.xcap .xhd{display:flex;align-items:center;gap:12px}.xcap .xl{font-weight:700;font-size:14px;color:var(--ink)}.xcap .xhd b{font:800 26px var(--disp);color:var(--ink);line-height:1}.xcap .exm{flex:1;width:auto;height:10px;border-radius:5px}.xcap .xft{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:13px}.xcap .xrk{color:var(--ink)}.xcap .xgo{margin-left:auto;color:var(--mute);text-decoration:underline}.xcap .xgo:hover{color:var(--turf)}.xcap .xdt{margin-top:8px}.xcap .xdt summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--mute)}.xcap .xdt[open] summary{color:var(--ink)}.xcap .xbr{margin-top:8px}.tat2x{display:inline-flex;align-items:center;gap:8px}
+.pbtab{margin-top:14px;border-top:1px solid var(--rule);padding-top:10px}.pbtab summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--mute)}.pbtab[open] summary{color:var(--ink)}
+.pbsc{max-height:520px;overflow:auto;margin-top:10px;border:1px solid var(--rule);border-radius:8px}.pbtab table{width:100%;min-width:640px;border-collapse:collapse;font-size:13px}
+.pbtab thead th{position:sticky;top:0;background:var(--paper);z-index:1;font-size:12px;color:var(--mute);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule)}.pbtab th.r,.pbtab td.r{text-align:right}
+.pbtab th small,.pbtab td small{display:block;font-size:11.5px;color:var(--mute);font-weight:500}.pbtab td{padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.pbtab .pbt{white-space:nowrap;color:var(--ink)}.pbtab .pbg{white-space:nowrap}.pbtab .pbp{min-width:220px;color:var(--ink)}.pbtab .pbws{display:flex;flex-wrap:wrap;gap:3px 10px;margin-top:4px;font-size:12px;color:var(--mute)}.pbtab .pbw{display:inline-flex;align-items:center;gap:4px}.pbtab .pbw .im{width:16px;height:16px}
+.pbtab .pbw b.up{color:#1E7A43}.pbtab .pbw b.dn{color:#B23A2E}.pbtab .pbs,.pbtab .pbp2,.pbtab .pba{white-space:nowrap;font-variant-numeric:tabular-nums}.pbtab .pba{font-weight:700;color:var(--ink)}
 .omvp{display:flex;align-items:center;gap:12px;padding:14px 16px}.omvp .im{width:34px;height:34px}.omvt{flex:1;min-width:0}.omvt b{display:block;font-size:15px;color:var(--ink)}.omvt small{color:var(--mute);font-size:12.5px}.omvn{display:flex;align-items:baseline;gap:8px;font:800 28px/1 var(--disp)}.omvn span{color:var(--mute);font-size:22px}.omvn i{font-style:normal;color:var(--flag);font-size:20px}.omvn strong{color:var(--ink)}.omvd{min-width:64px;text-align:right;font-weight:700}
 .tp .tpc{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(250px,1fr);background:radial-gradient(120% 140% at 100% 0%,#1d2c52 0%,#0f1a33 55%,#0b1428 100%);color:#EEF2F8;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(11,20,40,.18)}
 .tp .tpl{padding:22px 24px 20px}.tp .tpg{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13px;color:#C7D2E4}.tp .tpg .nfl{width:18px;height:18px;margin:0}.tp .tpg b{color:#EEF2F8;margin-right:2px}.tp .tpat{opacity:.6;margin:0 2px}.tp .tpk{margin-left:10px;padding:2px 8px;border-radius:999px;background:rgba(201,162,26,.16);color:#E2C25A;font-weight:700}.tp .tpw{margin-left:auto;color:#8FA0BC}
@@ -3936,6 +3942,28 @@ class Site:
                 wi_ = a if s_.s.G[w]["scores"][a] > s_.s.G[w]["scores"][b] else b
                 lows = f'<div class="wlos one">{low_(wi_)}</div>'
             else: lows = f'<div class="wlos">{low_(a)}{low_(b)}</div>'
+        # the whole game as a table, Baseball Reference style: every play that scored for someone in the matchup
+        tb_rows = []; prev_ = None
+        for x in pts:
+            if not (x[0] == "·" and len(x) > 5): continue
+            y_, prev_ = prev_, x
+            if not x[5]: continue
+            dp_ = (x[1] - y_[1]) if y_ is not None else 0.0
+            e0 = max(x[5], key=lambda e: max(abs(q[2]) for q in e["who"]))
+            tot_ = {}
+            for e in x[5]:
+                for q in e["who"]: tot_[(q[0], q[1])] = tot_.get((q[0], q[1]), 0.0) + q[2]
+            q_ = e0["q"]; qn_ = f"Q{q_}" if q_ <= 4 else "OT"
+            who_ = "".join(f'<span class="pbw s{sd}">{s_.logo(a if sd == 0 else b, pre, "lgs", w)}{E(s_.s.nm(i))} <b class="{"up" if d > 0 else "dn"}">{d:+.2f}</b></span>'
+                           for (i, sd), d in sorted(tot_.items(), key=lambda z: -abs(z[1])) if abs(d) >= 0.005)
+            gain_ = a if dp_ >= 0 else b
+            tb_rows.append(f'<tr><td class="pbt">{E(str(x[2].strftime("%a %-I:%M %p") if hasattr(x[2], "strftime") else ""))}<small>{qn_} {int(e0["c"]) // 60}:{int(e0["c"]) % 60:02d}</small></td>'
+                           f'<td class="pbg">{E(str(e0.get("aw", "")))} {e0.get("asc", "")}<small>{E(str(e0.get("hm", "")))} {e0.get("hsc", "")}</small></td>'
+                           f'<td class="pbp">{E(s_.play_simple(e0["txt"]))}<div class="pbws">{who_}</div></td>'
+                           f'<td class="r pbs">{fp(x[3][0])}<small>{fp(x[3][1])}</small></td><td class="r pbp2">{x[1] * 100:.0f}%</td>'
+                           f'<td class="r pba">{"" if abs(dp_) < 0.0005 else f"{abs(dp_) * 100:+.1f}%"}<small>{"" if abs(dp_) < 0.0005 else E(s_.M[gain_])}</small></td></tr>')
+        pbp_tbl = (f'<details class="pbtab"><summary>Every play, as a table</summary><div class="pbsc"><table><thead><tr><th>When</th><th>NFL score</th><th>Play</th>'
+                   f'<th class="r">Score<small>{E(s_.M[a])} / {E(s_.M[b])}</small></th><th class="r">{E(s_.M[a])} win %</th><th class="r">Swing</th></tr></thead><tbody>{"".join(tb_rows)}</tbody></table></div></details>') if tb_rows else ""
         _lp = pts[-1]; _lev = next((x[5] for x in reversed(pts) if len(x) > 5 and x[5]), None)
         sbdef = sb(("Now, " if (w not in s_.s.G and s_.wk_live(w)) else "") + str(_lp[4]), _lp[3][0], _lp[3][1], _lp[1], ev=_lev, nev="Latest", prv=(_lp[3][0], _lp[3][1], _lp[1]) if _lev else None)   # the latest score and odds, with the most recent play
         return (f'<section><h2>Win probability and game flow</h2><div class="panel wpc"><div class="rtog chips gft" role="group" aria-label="Chart">'
@@ -3945,7 +3973,7 @@ class Site:
                 f'<div class="wplg"><span><i class="sw" style="background:var(--turf)"></i>{E(s_.M[a])} favored</span><span><i class="sw" style="background:#C9A21A"></i>{E(s_.M[b])} favored</span>'
                 f'{"<span><i class=swd></i>Projection</span>" if fut else ""}</div>{lows}</div>'
                 f'<div class="gfv" data-g="gf" hidden>{fh}<svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Points by game time slot">{h2}<line class="wpg" x1="0" x2="0" y1="{T_}" y2="{Hd - B_}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0" pointer-events="none"/></svg>'
-                f'<p class="note" style="margin:4px 0 0">Points so far, play by play. Drag across it or tap a dot.</p></div></div></section>')
+                f'<p class="note" style="margin:4px 0 0">Points so far, play by play. Drag across it or tap a dot.</p></div>{pbp_tbl}</div></section>')
 
     # ------------------------------------------------------------------ game pages
     def game_nav(s_, w, a, b, pre):

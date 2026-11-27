@@ -112,8 +112,16 @@ def parse_game(g, cands):
             m = re.search(r" to ([A-Z][^ ]*)", main_[pm_.end():] if pm_ else main_)
             st_ = (pm_.end() + m.start()) if (pm_ and m) else None
             rc = next((h[1] for h in hits if st_ is not None and h[0] >= st_ and h[0] < len(main_)), None)
-            if qb: run[qb] += yd * 0.04 + (4 if td else 0)
-            if rc and rc != qb: run[rc] += 0.5 + yd * 0.1 + (6 if td else 0)
+            lat = re.search(r"Lateral to ([A-Z][a-z]{0,2}\.\s?[A-Z][A-Za-z'\-\.]*)[^.]*?for (-?\d+) yards?", main_)
+            if lat:                                                     # a lateral: the catcher keeps his yards, the man after it runs the rest
+                ly = int(lat.group(2)); tot_ = yd + ly
+                lr = next((h[1] for h in hits if abs(h[0] - lat.start(1)) <= 1), None)
+                if qb: run[qb] += tot_ * 0.04 + (4 if td else 0)
+                if rc and rc != qb: run[rc] += 0.5 + yd * 0.1
+                if lr: run[lr] += ly * 0.1 + (6 if td else 0)
+            else:
+                if qb: run[qb] += yd * 0.04 + (4 if td else 0)
+                if rc and rc != qb: run[rc] += 0.5 + yd * 0.1 + (6 if td else 0)
         elif is_rush and names:
             cut = 0
             for m_ in re.finditer(r"reported in as eligible\.\s*|Direct snap to [^.]*\.[A-Za-z'\-]*\.?\s*", txt): cut = m_.end()
