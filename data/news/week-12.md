@@ -89,7 +89,6 @@ dek: Every bubble team has a running back or receiver slot dragging it down. Onl
 week: 12
 kind: feature
 teams: 6,10,3,9,8,4,7,1,2,5
-pin: yes
 date: 2026-11-25 12:30
 ---
 Week 12 is the last week to trade. Sleeper closes the window when the final game ends, Panthers at Buccaneers on Monday night, and trades sit in a one-day review, so a deal agreed to Monday afternoon is living dangerously.

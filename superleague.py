@@ -1142,6 +1142,38 @@ def odds_cond(s, T, k, sims=120000):
     if not wl0 or wl0[0] != k: return None
     return simulate(s0, TEAM0, wl0, sims=sims, joint=True)[4]
 
+def title_leverage(s, T, path, sims=40000):
+    """Each finished regular-season week, as it stood before its games: every team's title and playoff odds with a win and with a loss.
+    It's what a game was worth, so a play's swing in win chance times this is the title odds it added (CPA).
+    Saved once per week (it only depends on how things stood then), so a build only simulates a week the first time."""
+    have = {}
+    if os.path.exists(path):
+        for l in open(path):
+            if l.startswith("#") or "|" not in l: continue
+            w, r, tw, tl, pw, pl = l.rstrip("\n").split("|")[:6]; have[(int(w), int(r))] = (float(tw), float(tl), float(pw), float(pl))
+    reg = s.L.get("regular_season_weeks", 14); new = False
+    for k in [w for w in s.weeks if w <= min(s.last, reg)]:
+        if all((k, r) in have for r in s.R): continue
+        d = {kk: v for kk, v in s.__dict__.items() if kk in ("NS", "L", "M", "PL", "draft", "tx", "reserve", "reserve_wk", "byes", "vegas", "notes", "projlog", "lineslog", "NP", "SP")}
+        d["LIVE"] = None; d["weeks"] = [w for w in s.weeks if w < k]
+        d["W"] = {w: v for w, v in s.W.items() if w < k}; d["G"] = {w: v for w, v in s.G.items() if w < k}
+        d["fut"] = dict(s.fut)
+        for w in s.weeks:
+            if w >= k: d["fut"][w] = [tuple(p) for p in s.G[w]["pairs"]]
+        d["rost"] = {r: [i for i, _ in s.W[k][r]["S"] + s.W[k][r]["B"] if i != "0"] for r in s.R}
+        d["tx"] = [t_ for t_ in s.tx if t_["w"] < k]
+        try:
+            s0 = Ctx(d); TEAM0, _, wl0, _ = projections(s0, T)
+            if not wl0 or wl0[0] != k: continue
+            for x in simulate(s0, TEAM0, wl0, sims=sims)[3]:
+                if x["w"] == k: have[(k, x["r"])] = (x["ti_w"], x["ti_l"], x["po_w"], x["po_l"]); new = True
+        except Exception as ex: print("title_leverage", k, ex)
+    if new:
+        with open(path, "w") as f:
+            f.write("# week|roster_id|title odds with a win|with a loss|playoff odds with a win|with a loss   (before that week's games)\n")
+            for (w, r), v in sorted(have.items()): f.write(f"{w}|{r}|{v[0]:.4f}|{v[1]:.4f}|{v[2]:.4f}|{v[3]:.4f}\n")
+    return have
+
 def american(p):
     if p >= 0.999: return "off the board"
     if p <= 0.001: return "off the board"
@@ -1287,6 +1319,7 @@ def main():
             if k == 9: continue
             try: s.ocond[k] = odds_cond(s, T, k)
             except Exception as ex: print("odds_cond", k, ex)
+    s.tlev = title_leverage(s, T, os.path.join(D, "title_lev.txt"))
     s.mlog = match_history(s, T, TEAM, os.path.join(D, "match_log.txt"))
     s.livewp = live_history(s, T, TEAM, os.path.join(D, "live_wp.txt"))
     s.seedok = seed_possible(s, weeks_left)

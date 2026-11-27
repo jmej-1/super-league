@@ -1458,7 +1458,7 @@ class Site:
         """Home headline: the newest feature if it is from the latest week, else the story of the most important game."""
         NL = s_.news_list(); s = s_.s
         if not NL: return ""
-        fs = [n for n in s_.features() if n["week"] >= s.last]          # previews stay on game pages, never the home headline
+        fs = sorted([n for n in s_.features() if n["week"] >= s.last], key=lambda n: str(n.get("date", "")), reverse=True)   # the newest story leads; previews stay on game pages
         pins = [n for n in s_.features() if str(n.get("pin", "")).lower() in ("yes", "true", "1")]   # "pin: yes" keeps a story as the home cover
         if pins: fs = pins[:1] + [n for n in fs if n is not pins[0]]
         if fs:
@@ -1555,8 +1555,16 @@ class Site:
                     elif i != "0" and p == best.get(s.pos(i), (-1e9, []))[0]: best[s.pos(i)][1].append((i, r))
             for _, (p, who_) in best.items():
                 for i, r in who_: top[i][r] += 1
+        if yr == s_.yr:                                   # single plays: what each play did to the win chance (WPA) and the title odds (CPA)
+            for w, r, o, _u, when, clk, txt, who, wpa, cpa in s_.play_impacts():
+                a_, b_ = s_.game_of[(w, r)]; pid = who[0][0]; tx_ = f"{clk}: {txt}" if len(txt) <= 90 else f"{clk}: {txt[:87].rsplit(' ', 1)[0]}..."
+                for P in ("ALL", s.pos(pid)):
+                    if wpa > 0: add(f"p_wpa_{P}", wpa, f"{wpa * 100:+.1f}%", r, [r], p=pid, o=o, w=w, u=G_(w, a_, b_), x=tx_)
+                    if cpa > 0: add(f"p_cpa_{P}", cpa, f"{cpa * 100:+.2f}%", r, [r], p=pid, o=o, w=w, u=G_(w, a_, b_), x=tx_)
         new = lambda: dict(pts=0.0, war=0.0, g=0, pm=0.0, wins=0, xw=0.0, ben=0.0, by=Counter(), nfl=Counter(), seq=[])
         agg_t = defaultdict(new); agg_p = defaultdict(new)
+        if yr == s_.yr: s_.play_impacts()
+        PC_ = getattr(s_, "_pcred", None) or {}
         for w in s.weeks:
             scw = s.G[w]["scores"]
             for r, d in s.W[w].items():
@@ -1571,7 +1579,9 @@ class Site:
                         add(f"p_startlo_{P}", -p, fp(p), r, [r], p=i, o=o, w=w, u=G_(w, a, b))
                         add(f"p_pmlo_{P}", -pm, f"{pm:+.1f}", r, [r], p=i, o=o, w=w, u=G_(w, a, b), x=f"{fp(p)} pts")
                         add(f"p_war1lo_{P}", -wv, f"{wv:+.2f}", r, [r], p=i, o=o, w=w, u=G_(w, a, b), x=f"{fp(p)} pts")
+                    cr_ = PC_.get((w, r, i)) if yr == s_.yr else None
                     for X in (agg_t[(i, r)], agg_p[i]):
+                        if cr_: X["wpa"] = X.get("wpa", 0.0) + cr_[0]; X["cpa"] = X.get("cpa", 0.0) + cr_[1]; X["hasp"] = 1
                         X["pts"] += p; X["war"] += wv; X["g"] += 1; X["pm"] += pm; X["wins"] += won; X["xw"] += 0.5 + s_.wi(pm); X["by"][r] += 1; X["nfl"][s_.team_at(w, i)] += max(p, 0) + 1e-3; X["seq"].append(s_.team_at(w, i))
                 irs_ = set(getattr(s, "reserve_wk", {}).get(w, {}).get(r, []))
                 for i, p in d["B"]:
@@ -1637,6 +1647,8 @@ class Site:
                         wi_ = X["xw"] - 0.5 * gw_ if gw_ else 0.0
                         if gw_: A("wi", wi_ - gp, f"{wi_:+.2f}", f"{gw_} starts"); A("wilo", -wi_ - gp, f"{wi_:+.2f}", f"{gw_} starts")
                         if n1: A("top", n1 - g_ * 1e-4, str(n1), f"of {g_} starts")          # ties: fewer starts wins (a higher rate)
+                        if X.get("hasp") and pre_ == "py":             # clutch: the win chance (WPA) and title odds (CPA) his plays added
+                            A("wpa", X["wpa"] - gp, f"{X['wpa']:+.2f}", f"wins added, {g_} starts"); A("cpa", X["cpa"] - gp, f"{X['cpa'] * 100:+.2f}%", f"{g_} starts")
                     bn_ = X.get("bn", 0)
                     if X["ben"] > 0: A("ben", X["ben"] - bn_ * 1e-6, fp(X["ben"]), f"{bn_} week{'' if bn_ == 1 else 's'} on the bench", sq="bseq")
                     if bn_ >= 1: A("benppg", X["ben"] / bn_ + bn_ * 1e-8, fp(X["ben"] / bn_), f"{bn_} week{'' if bn_ == 1 else 's'} on the bench", sq="bseq")
@@ -3202,6 +3214,56 @@ class Site:
         return [("Comeback", (60 * math.log10((1 - lo_) / lo_) if lo_ < 0.5 else 0.0)), ("Finish", 40 * p["late"]),
                 ("Close", 100 + 2.5 * p["close"]), ("Drama", 20 * p.get("early", p["swing"] - p["late"])),
                 ("Lead changes", 15 * p["leads"]), ("Scoring", p["pts"] - 150)]
+    @staticmethod
+    def play_text(t, ks=None):
+        """ESPN's play text, trimmed: no formation tags, tacklers, snappers, injury notes, penalty or replay fine print."""
+        t = re.split(r"\s\*\*\s|\.?\s*PENALTY on|\.?\s*Penalty on|\.?\s*The Replay Official", t or "")[0]
+        t = re.sub(r"\s*\((?:[^()]*)\)", "", t); t = re.sub(r"\s*\[[^\]]*\]", "", t)
+        t = re.sub(r",?\s*(?:Center|Holder)-(?:[A-Z][A-Za-z'\-]*\.)?[A-Za-z'\-]+", "", t)
+        return re.sub(r"\s+", " ", t).strip()
+
+    def play_impacts(s_):
+        """Every scoring play of every finished game, with what it did: WPA, the change in the team's chance to win that matchup, and
+        CPA, the title odds it added (WPA times what the game was worth: title odds with a win minus with a loss, as of that week's start).
+        The clock running and projection changes between plays are left out; nobody gets credit for those.
+        One row per team per play: (w, team, opp, game_url, when, quarter/clock text, play text, [(pid, pts)], wpa, cpa)."""
+        if getattr(s_, "_pimp", None) is not None: return s_._pimp
+        s = s_.s; out = []; TL = getattr(s, "tlev", None) or {}; cred = {}
+        reg = s.L.get("regular_season_weeks", 14)
+        e_txt = lambda ev: max(ev, key=lambda e: max(abs(q[2]) for q in e["who"]))["txt"] or ""
+        for w, a, b, _ in s_.games:
+            if w > s.last or w > reg: continue                     # finished weeks only
+            pts = s_.wp_series(w, a, b)
+            if not pts or (w, a, b) not in getattr(s_, "_wpos", {}): continue
+            for k in range(1, len(pts)):
+                x, y = pts[k], pts[k - 1]
+                if not (x[0] == "·" and len(x) > 5 and x[5]) or not (y[0] == "·" and len(y) > 5): continue
+                dp = x[1] - y[1]
+                for sd, (r, o) in enumerate(((a, b), (b, a))):
+                    who = {}
+                    for e in x[5]:
+                        for q in e["who"]:
+                            if q[1] == sd: who[q[0]] = who.get(q[0], 0.0) + q[2]
+                    if not who: continue
+                    g = dp if sd == 0 else -dp
+                    lv = TL.get((w, r)) or TL.get((w + 1, r)) or TL.get((2, r))     # Week 1 has no earlier state to start from: Week 2's stands in
+                    lev = (lv[0] - lv[1]) if lv else 0.0
+                    tw = sum(abs(v) for v in who.values()) or 1.0
+                    for pid, v in who.items():                                # each player's share of the swing, by his share of the points
+                        c = cred.setdefault((w, r, pid), [0.0, 0.0]); c[0] += g * abs(v) / tw; c[1] += g * lev * abs(v) / tw
+                    if sum(who.values()) <= 0: continue                       # the play list keeps the side whose player made the play
+                    if re.match(r"(Two-Minute Warning|Timeout|End of|END |Official)", e_txt(x[5])): continue
+                    e0 = max(x[5], key=lambda e: max(abs(q[2]) for q in e["who"]))
+                    q = e0["q"]; qn = f"Q{q}" if q <= 4 else "OT"
+                    clk = f"{qn} {int(e0['c']) // 60}:{int(e0['c']) % 60:02d}"
+                    ptx = s_.play_text(e0["txt"])
+                    if s.pos(max(who, key=lambda z: who[z])) != "K":           # the kick after a touchdown isn't part of the play unless it's his
+                        ptx = re.sub(r"\s*TWO-POINT CONVERSION ATTEMPT\..*$", "", re.sub(r"\s*[A-Z][\w'.\-]* extra point is (GOOD|No Good|BLOCKED)\.?", "", ptx)).strip()
+                    out.append((w, r, o, f"game/w{w}-{min(a, b)}-{max(a, b)}.html", x[4], clk, ptx,
+                                sorted(who.items(), key=lambda z: -z[1]), g, g * lev))
+        s_._pimp = out; s_._pcred = cred
+        return out
+
     def excitement(s_, w, a, b):
         """Excitement: the weighted average of the pieces (Comeback 25%, Finish 20%, Close 20%, Drama 15%, Lead changes 10%, Scoring 10%).
         Open-ended, one decimal: about 33 is a typical game, 70+ is a top-tenth classic, a blowout can go below 0."""
@@ -4827,7 +4889,8 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   var BOOK={team:[['Single game',[['g_high','Highest score'],['g_low','Lowest score'],['g_blow','Biggest blowout'],['g_close','Closest game'],['g_comb','Most combined points'],['g_hiloss','Highest score in a loss'],['g_lowin','Lowest score in a win'],['g_upset','Biggest upset'],['g_excite','Most exciting game'],['g_flips','Most lead changes'],['g_dull','Least exciting game'],['g_bench','Most points lost to start/sit']]],['Biggest comebacks',[['g_improb','Lowest win chance overcome'],['g_down','Biggest deficit overcome']]],
       ['Season',[['s_pct','Best record'],['s_pctlo','Worst record'],['s_wins','Most wins'],['s_pf','Most points'],['s_pflow','Fewest points'],['s_pa','Most points against'],['s_xw','Most xWins'],['s_lucky','Luckiest'],['s_unlucky','Unluckiest'],['s_wstreak','Longest win streak'],['s_lstreak','Longest losing streak']],1]],
     player:[['Single game',[['p_start','Most points'],['p_startlo','Fewest points'],['p_pm','Best PAA'],['p_pmlo','Worst PAA'],['p_war1','Most WAR'],['p_war1lo','Fewest WAR'],['p_bench','Most bench points']]],
-      ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_wi','Most Win Impact'],['py_wilo','Least Win Impact'],['py_luck','Best supporting cast'],['py_unluck','Worst supporting cast'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
+      ['Single play',[['p_wpa','Biggest play (win chance added, WPA)'],['p_cpa','Most clutch play (title odds added, CPA)']]],
+      ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_wpa','Most clutch (wins added, WPA)'],['py_cpa','Most clutch (title odds added, CPA)'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_wi','Most Win Impact'],['py_wilo','Least Win Impact'],['py_luck','Best supporting cast'],['py_unluck','Worst supporting cast'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
       ['Career',[['pc_pts','Most points'],['pc_ppg','Most points per game'],['pc_ptslo','Fewest points'],['pc_ppglo','Fewest points per game'],['pc_pm','Best PAA'],['pc_pmlo','Worst PAA'],['pc_war','Most WAR'],['pc_warlo','Fewest WAR'],['pc_wins','Most wins'],['pc_loss','Most losses'],['pc_wpct','Best win %'],['pc_wpctlo','Worst win %'],['pc_wi','Most Win Impact'],['pc_wilo','Least Win Impact'],['pc_luck','Best supporting cast'],['pc_unluck','Worst supporting cast'],['pc_gs','Most starts'],['pc_top','Most weeks as the #1 at his position'],['pc_ben','Most bench points'],['pc_benppg','Most bench points per week']],0,1]],
     mgr:[['Single week or move',[['l_add1','Most gut-call wins added'],['m_besttrade','Most wins gained in a trade'],['m_heist','Most lopsided trade'],['m_pick','Best pickup'],['m_drop','Worst drop']]],
       ['Season',[['m_total','Most total wins added'],['l_add','Most gut-call wins added'],['m_gm','Best GM'],['m_eff','Most efficient GM'],['m_trader','Best trader'],['m_treff','Most efficient trader'],['m_waiver','Best waiver work'],['m_wveff','Most efficient waiver work'],['m_dropcost','Costliest drops'],['m_draft','Best draft'],['l_eff','Best lineup efficiency'],['l_bench','Most points lost to start/sit'],['l_over','Most points over projection'],['w_high','Most weekly high scores'],['w_low','Most weekly low scores'],['w_mvp','Most weekly MVPs'],['m_trades','Most trades'],['m_moves','Most waiver and free-agent moves'],['m_allmv','Most total moves']],1],
