@@ -18,7 +18,6 @@ plays don't add up|2|7588|Javonte Williams|plays 8.8|final 6.5
 plays don't add up|2|9226|De'Von Achane|plays 11.5|final 10.8
 plays don't add up|3|4984|Josh Allen|plays 16.12|final 16.96
 plays don't add up|3|11792|Will Reichard|plays 12.8|final 13.3
-plays don't add up|3|421|Matthew Stafford|plays 22.9|final 20.9
 plays don't add up|3|8228|Jaylen Warren|plays 28.0|final 19.1
 plays don't add up|3|9500|Josh Downs|plays 8.2|final 10.2
 plays don't add up|3|8183|Brock Purdy|plays 32.28|final 31.28
@@ -35,7 +34,6 @@ plays don't add up|4|4199|Aaron Jones Sr.|plays 15.0|final 14.8
 plays don't add up|5|4984|Josh Allen|plays 30.86|final 30.5
 plays don't add up|5|11792|Will Reichard|plays 10.9|final 12.9
 plays don't add up|5|7547|Amon-Ra St. Brown|plays 10.6|final 9.9
-plays don't add up|5|11786|Cam Little|plays 1.9|final 6.6
 plays don't add up|5|8150|Kyren Williams|plays 17.0|final 16.6
 plays don't add up|5|6794|Justin Jefferson|plays 16.1|final 15.8
 plays don't add up|5|6650|Chase McLaughlin|plays 2.6|final 4.6
@@ -44,12 +42,9 @@ plays don't add up|5|3163|Jared Goff|plays 29.22|final 28.94
 plays don't add up|5|13330|Kenyon Sadiq|plays -0.5|final -0.7
 plays don't add up|5|9224|Chase Brown|plays 7.5|final 5.5
 plays don't add up|6|8130|Trey McBride|plays 6.8|final 8.8
-plays don't add up|6|6083|Matt Gay|plays 7.5|final 8.0
 plays don't add up|6|7611|Rhamondre Stevenson|plays 4.0|final 3.6
 plays don't add up|6|9500|Josh Downs|plays 4.7|final 6.7
 plays don't add up|6|12490|Bhayshul Tuten|plays 22.9|final 22.7
-plays don't add up|6|12527|Ashton Jeanty|plays 7.7|final 13.8
-plays don't add up|6|3451|Ka'imi Fairbairn|plays 4.0|final 7.9
 plays don't add up|6|1466|Travis Kelce|plays 5.2|final 7.3
 plays don't add up|6|6790|D'Andre Swift|plays 21.8|final 21.0
 plays don't add up|7|12495|Ollie Gordon II|plays 10.7|final 16.8
@@ -65,9 +60,7 @@ plays don't add up|8|11584|Bucky Irving|plays 21.5|final 21.0
 plays don't add up|8|12501|Matthew Golden|plays 17.8|final 17.4
 plays don't add up|8|11533|Brandon Aubrey|plays 7.7|final 8.2
 plays don't add up|8|12495|Ollie Gordon II|plays 7.8|final 6.9
-plays don't add up|8|8150|Kyren Williams|plays 12.2|final 12.4
-plays don't add up|8|12526|Tetairoa McMillan|plays 7.5|final 8.8
-plays don't add up|8|11646|Jalen Coker|plays 1.4|final 8.6
+plays don't add up|8|11646|Jalen Coker|plays -0.4|final 8.6
 plays don't add up|8|5967|Tony Pollard|plays 27.5|final 27.2
 plays don't add up|8|8151|Kenneth Walker|plays 11.2|final 10.4
 plays don't add up|8|7588|Javonte Williams|plays 6.0|final 6.2
@@ -84,7 +77,7 @@ plays don't add up|10|6770|Joe Burrow|plays 29.0|final 33.16
 plays don't add up|10|7021|Rico Dowdle|plays 3.7|final 4.4
 plays don't add up|10|4984|Josh Allen|plays 16.24|final 22.34
 plays don't add up|10|7594|Chuba Hubbard|plays 32.6|final 31.7
-plays don't add up|10|3294|Dak Prescott|plays 34.14|final 34.42
+plays don't add up|10|3294|Dak Prescott|plays 34.66|final 34.42
 plays don't add up|10|11632|Malik Nabers|plays 5.3|final 4.9
 plays don't add up|10|9224|Chase Brown|plays 17.4|final 24.3
 plays don't add up|10|8146|Garrett Wilson|plays 12.4|final 12.1

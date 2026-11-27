@@ -875,7 +875,7 @@
 7765|Jonathon Cooper|DL|DEN||5|DL,LB
 7770|Patrick Johnson|LB|LV|IR|5|
 7774|Jimmy Morrissey|OL|NYJ||5|
-7777|Trey Smith|OL|KC||5|OG,OL
+7777|Trey Smith|OL|KC|Questionable|5|OG,OL
 7782|Isaiah McDuffie|LB|GB||5|
 7785|Cole Van Lanen|OL|JAX|Questionable|5|OG,OL
 7787|Damar Hamlin|DB|BUF||5|
