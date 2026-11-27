@@ -705,7 +705,9 @@ CSS += """
 CSS += """
 /* desktop nav: wrap to a second row instead of hiding tabs off the edge */
 @media(min-width:701px){.menu{flex-wrap:wrap;gap:0 20px;padding:6px 0}.menu a{padding:8px 0 6px}}
-@media(min-width:761px){.tbtn span{display:none}.tbtn{padding:8px}.top .wrap{gap:18px}.menu{gap:0 15px}.menu a{font-size:14.5px}.mark{font-size:24px}}
+@media(min-width:1121px){.menu{gap:0 18px}.top .wrap{gap:24px}}
+@media(min-width:761px) and (max-width:940px){.menu{gap:0 14px;flex-wrap:nowrap!important}.menu a{font-size:14px}.top .wrap{gap:18px}}
+@media(min-width:761px) and (max-width:1120px){.tbtn span{display:none}.tbtn{padding:8px}.top .wrap{gap:18px}.menu{gap:0 15px}.menu a{font-size:14.5px}.mark{font-size:24px}}
 """
 
 CSS += """
