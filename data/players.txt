@@ -1903,7 +1903,7 @@
 12502|Gunnar Helm|TE|TEN||1|
 12503|Isaiah Bond|WR|CLE||1|
 12504|Kaleb Johnson|RB|GB||1|
-12505|Jalen Royals|WR|KC||1|
+12505|Jalen Royals|WR|KC|Questionable|1|
 12506|Harold Fannin Jr.|TE|CLE||1|
 12507|Omarion Hampton|RB|LAC||1|
 12508|Jaxson Dart|QB|NYG|IR|1|
