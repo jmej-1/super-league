@@ -5095,7 +5095,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     BOOK[RBOOK].forEach(function(g){ var rows='';
       if(g[3]&&per!=='all') return;
       g[1].forEach(function(c){ var k=c[0]+(RBOOK==='player'?'_'+RPOS:''), L=X[k];
-        if(!L||!L.length){ if(sc!=='L') rows+='<div class="rrow rna"><span class="rlab">'+esc(c[1])+'</span><i class="rlg"></i><span class="rhold"><small>Not yet</small></span><span class="ryear"></span><span class="rval">N/A</span></div>'; return; }
+        if(!L||!L.length){ if(sc!=='L'&&!/(^|_)m_(eff|treff|wveff)$/.test(c[0])) rows+='<div class="rrow rna"><span class="rlab">'+esc(c[1])+'</span><i class="rlg"></i><span class="rhold"><small>Not yet</small></span><span class="ryear"></span><span class="rval">N/A</span></div>'; return; }
         // one team picked: every category shows, even with one season (best and worst record are the same season for now)
         rows+=trow(k,RBOOK==='player'&&RPOS!=='ALL'?c[1].replace('the #1 at his position','the #1 '+RPOS):c[1],L); });
       var anyYr=g[1].some(function(c){ return yrOf(c[0]+(RBOOK==='player'?'_'+RPOS:'')); });
