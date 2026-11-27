@@ -758,7 +758,7 @@
 7498|Rex Sunahara|LS|CLE||6|
 7521|Chris Blair|WR|ATL||5|
 7523|Trevor Lawrence|QB|JAX||5|
-7525|DeVonta Smith|WR|PHI||5|
+7525|DeVonta Smith|WR|PHI|Questionable|5|
 7526|Jaylen Waddle|WR|DEN||5|
 7527|Mac Jones|QB|SF||5|
 7528|Najee Harris|RB|||5|
