@@ -4883,11 +4883,11 @@ def bundle(files, s, logo_dir, font_dir, site=None):
           a.gs+=x[0]; a.pts+=x[1]; a.war+=x[3]; a.edge+=x[4]; a.wr+=S.w.filter(function(q){return q[1];}).length; seen[t].war+=x[3]; }); });
       Object.keys(seen).forEach(function(t){ var a=T[t]; if(seen[t].war&&(!a.top||seen[t].war>a.top[1])) a.top=[i,seen[t].war]; }); });
     var ks=Object.keys(T).sort(function(a,b){ return (T[b].war-T[a].war)||(T[b].pts-T[a].pts); });
-    var cv=function(v){ return v>0.005?'pos':(v<-0.005?'neg':'muted'); }, th=function(lab,c,k,def){ return '<th class="'+c+' srt" data-c="'+k+'" tabindex="0" role="button"'+(def?' aria-sort="descending"':'')+'>'+lab+'</th>'; };
+    var cv=function(v){ return v>0.005?'pos':(v<-0.005?'neg':'muted'); }, th=function(lab,c,k,def){ return '<th class="'+c+' srt" data-c="'+k+'" data-s="'+(k?'n':'t')+'" tabindex="0" role="button"'+(def?' aria-sort="descending"':'')+'>'+lab+'</th>'; };
     var h='<section class="field"><div class="wrap"><a class="back" href="#/players">All players</a><h1>NFL teams</h1><p class="lede">All 32 teams by what their players have done on Super League rosters. Tap a column to sort.</p></div></section>';
     h+='<div class="tchips wrap"><div class="chips"><a class="'+(yr==='all'?'nx':'')+'" href="#/nfl/all">All-time</a>'+yrs.map(function(y){ return '<a class="'+(yr===y?'nx':'')+'" href="#/nfl/'+y+'">'+y+'</a>'; }).join('')+'</div></div><main class="wrap">';
     h+='<section><div class="scroll"><table class="srtab nflt" style="min-width:0"><thead><tr>'+th('Team','',0)+th('WAR','r',1,1)+th('PAA','r',2)+th('Pts started','r',3)
-      +'<th class="r srt" data-c="4" tabindex="0" role="button"><span class="tip" tabindex="0" data-tip="Starts, of the weeks their players spent on Super League rosters.">Started</span></th>'+th('Players','r',5)+th('On rosters now','r',6)+'<th>Best player</th></tr></thead><tbody>';
+      +'<th class="r srt" data-c="4" data-s="n" tabindex="0" role="button"><span class="tip" tabindex="0" data-tip="Starts, of the weeks their players spent on Super League rosters.">Started</span></th>'+th('Players','r',5)+th('On rosters now','r',6)+'<th>Best player</th></tr></thead><tbody>';
     ks.forEach(function(t){ var a=T[t], tp=a.top;
       h+='<tr class="'+(a.pl?'':'bn')+'"><td data-v="'+esc(NFLN[t].toLowerCase())+'"><a class="pn" href="#/nfl/'+t+'"><i class="nfl nflm N'+t+'"></i> <b>'+esc(NFLN[t])+'</b></a></td>'
         +'<td class="r '+cv(a.war)+'" data-v="'+a.war+'">'+(a.gs?sgn(+a.war.toFixed(2)):'-')+'</td><td class="r '+cv(a.edge)+'" data-v="'+a.edge+'">'+(a.gs?(a.edge>=0?'+':'')+a.edge.toFixed(1):'-')+'</td>'
@@ -4950,7 +4950,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   }
   document.addEventListener('click',function(e){ var th=e.target.closest&&e.target.closest('table.srtab th.srt'); if(!th) return;
     var tb=th.closest('table'), c=+th.getAttribute('data-c'), body=tb.tBodies[0], rows=[].slice.call(body.rows), cur=th.getAttribute('aria-sort');
-    var txt=(c===0||c===2), d=cur==='descending'?1:(cur==='ascending'?-1:(txt||c===1?1:-1));
+    var txt=th.hasAttribute('data-s')?th.getAttribute('data-s')==='t':(c===0||c===2), d=cur==='descending'?1:(cur==='ascending'?-1:(txt||c===1?1:-1));
     rows.sort(function(a,b){ var x=a.cells[c].getAttribute('data-v'), y=b.cells[c].getAttribute('data-v'); if(!txt){ x=+x; y=+y; return d*(x-y); } return d*(x<y?-1:x>y?1:0); });
     rows.forEach(function(r){ body.appendChild(r); }); [].forEach.call(th.parentNode.children,function(h){ h.removeAttribute('aria-sort'); }); th.setAttribute('aria-sort', d<0?'descending':'ascending'); });
   document.addEventListener('click',function(e){ var th=e.target.closest&&e.target.closest('table.exctab th.xs'); if(!th) return;
