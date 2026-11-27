@@ -705,7 +705,7 @@ CSS += """
 CSS += """
 /* desktop nav: wrap to a second row instead of hiding tabs off the edge */
 @media(min-width:701px){.menu{flex-wrap:wrap;gap:0 20px;padding:6px 0}.menu a{padding:8px 0 6px}}
-@media(min-width:761px) and (max-width:1120px){.tbtn span{display:none}.tbtn{padding:8px}.top .wrap{gap:18px}.menu{gap:0 15px}.menu a{font-size:14.5px}.mark{font-size:24px}}
+@media(min-width:761px){.tbtn span{display:none}.tbtn{padding:8px}.top .wrap{gap:18px}.menu{gap:0 15px}.menu a{font-size:14.5px}.mark{font-size:24px}}
 """
 
 CSS += """
@@ -760,7 +760,7 @@ NAV = [("index.html", "Home", "home"), ("news.html", "News", "news"), ("standing
        ("transactions.html", "Transactions", "transactions"), ("trades.html", "Trades", "trades"), ("analyzer.html", "Analyzer", "analyzer"), ("draft.html", "Draft", "draft")]   # this week, then people, then honors, then the front office
 
 
-PRIMARY = ("home", "standings", "schedule", "teams", "players", "records", "news")
+PRIMARY = ("home", "standings", "schedule", "teams", "players", "records", "news", "transactions")
 ICON_S = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'
 ICON_M = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'
 
