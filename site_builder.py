@@ -503,7 +503,7 @@ a.prow[hidden]{display:none} a.prow:hover{background:#fff} a.prow:hover b{text-d
 .stg{display:inline-block;margin-left:6px;padding:2px 5px;border-radius:3px;font:700 10px/1.2 var(--body);letter-spacing:.02em;vertical-align:1px;white-space:nowrap}
 .stg.fin{background:#DDEEE3;color:var(--win)} .stg.inj{background:#F4DDD7;color:var(--loss)} .stg.pk{background:#FBEFC4;color:#7A5C00}
 .lu .pl .pts.pj{color:var(--mute);font-weight:600}
-.bpj{color:var(--mute);font-weight:600;font-style:italic}.bpj small{font-style:normal;font-size:11px;margin-left:3px;font-weight:500} .lu .pl .pts.pj small{font-style:normal}
+.bpj{color:var(--mute);font-weight:600}.bpj small{font-size:11px;margin-left:3px;font-weight:500} .lu .pl .pts.pj small{font-style:normal}
 .pfilt{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px} .pfilt .chips{margin:0}
 .pown{font:600 14px var(--body);padding:7px 12px;border-radius:999px;border:1px solid var(--rule);background:var(--paper)}
 .ptable th.sortable{cursor:pointer;user-select:none;white-space:nowrap} .ptable th.sortable:hover,.ptable th[aria-sort]{color:var(--ink)}
