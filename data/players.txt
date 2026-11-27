@@ -1229,7 +1229,7 @@
 9482|Michael Mayer|TE|LV||3|
 9484|Tucker Kraft|TE|GB||3|
 9486|Dontayvion Wicks|WR|PHI|IR|3|
-9487|Parker Washington|WR|JAX|Questionable|3|
+9487|Parker Washington|WR|JAX|Out|3|
 9488|Jaxon Smith-Njigba|WR|SEA|Questionable|3|
 9489|Justin Shorter|WR|||3|
 9490|Tyler Scott|WR|LAR||3|
@@ -1316,7 +1316,7 @@
 10903|Quan Martin|DB|WAS||3|
 10904|Keion White|DL|SF||3|
 10905|Brian Branch|DB|DET||3|
-10906|JuJu Brents|DB|MIA|Questionable|3|
+10906|JuJu Brents|DB|MIA|Out|3|
 10907|Joe Tippmann|OL|NYJ||3|
 10908|BJ Ojulari|DE|JAX||3|
 10909|Isaiah Foskey|DL|CIN||3|
@@ -2307,7 +2307,7 @@
 13272|Carson Beck|QB|ARI|Questionable|0|
 13273|Josh Cuevas|TE|BAL||0|
 13274|Germie Bernard|WR|PIT||0|
-13276|Omar Cooper Jr.|WR|NYJ|Questionable|0|
+13276|Omar Cooper Jr.|WR|NYJ|Out|0|
 13277|CJ Donaldson|RB|NO||0|
 13278|Max Klare|TE|LAR||0|
 13279|Carnell Tate|WR|TEN||0|
