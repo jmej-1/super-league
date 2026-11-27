@@ -1595,7 +1595,7 @@ class Site:
                 raw_ = _x[4] if len(_x) > 4 else txt
                 tx_ = f"{clk}, {s_.play_simple(raw_)}"
                 if any(s.pos(i) == "K" and v > 0 for i, v in who) and "extra point is GOOD" in raw_ and "field goal" not in raw_: tx_ += " + XP"
-                if len([1 for _, v in who if v > 0]) > 1: tx_ += "\n" + ", ".join(f"{s.nm(i)} {fp(v)}" for i, v in who if v > 0)   # a team play: who scored what
+                if any(v > 0 for _, v in who): tx_ += "\n" + ", ".join(f"{s.nm(i)} {fp(v)}" for i, v in who if v > 0)   # always say whose play it was and what each scored
                 tp_ = sum(v for _, v in who)                            # the team's single-play marks: everything the play scored for it
                 if tp_ > 0: add("t_ppts", tp_, fp(tp_), r, [r], o=o, w=w, u=G_(w, a_, b_), x=tx_)
                 if wpa > 0: add("t_wpa", wpa, f"{wpa * 100:+.1f}%", r, [r], o=o, w=w, u=G_(w, a_, b_), x=tx_)
