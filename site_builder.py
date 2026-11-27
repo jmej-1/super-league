@@ -3333,6 +3333,38 @@ class Site:
             out += f" + 2-pt ({ln(q.group(1))} to {ln(q.group(2))})" if q else (f" + 2-pt run ({ln(r_.group(1))})" if r_ else " + 2-pt")
         return out
 
+    def chart_text(s_, t, who):
+        import pbp as _pb
+        """The play as it reads on ESPN, cut to what matters to this matchup: no tacklers or long snappers, and the extra point or
+        two-point try only when someone in the matchup was in it. A kicker or two-point man alone sees just his part."""
+        t = s_.play_text(t)                                                        # tags, tacklers, replay and injury notes
+        t = re.sub(r"\s*\((?:[^()]*)\)", "", t)
+        t = re.sub(r"\s*\[[^\]]*\]", "", t)                                   # [D.Olajiga]
+        t = re.sub(r",?\s*Hit (Left|Right) Upright\.?", "", t)
+        t = re.sub(r",?\s*(?:Center|Holder)-(?:[A-Z][A-Za-z'\-]*\.)?[A-Za-z'\-]+", "", t)
+        t = re.sub(r"\s+", " ", t).strip()
+        ks = {k_ for i in who if i.isdigit() for k_ in _pb.keys_of(s_.s.PL.get(i, {}).get("name", ""))}
+        has = lambda x: any(re.search(r"(?<![A-Za-z])" + re.escape(k) + r"(?![a-z])", x) for k in ks)
+        dfn = any(not i.isdigit() for i in who)
+        parts = []
+        m2 = re.search(r"TWO-POINT CONVERSION ATTEMPT\.\s*(.*?)\s*ATTEMPT (SUCCEEDS|FAILS)\.?", t)
+        mx = re.search(r"(" + _pb.NM_ + r") extra point is (GOOD|No Good|BLOCKED)\.?", t)
+        cut = min([m.start() for m in (m2, mx) if m] + [len(t)])
+        main = t[:cut].strip()
+        if has(main) or dfn or not (m2 or mx): parts.append(main)
+        if mx and has(mx.group(0)): parts.append(f"{mx.group(1)} extra point is {mx.group(2)}.")
+        if m2 and m2.group(2) == "SUCCEEDS" and (has(m2.group(1)) or not parts): parts.append(f"Two-point try: {m2.group(1).rstrip('.')}, good.")
+        t = " ".join(p_ for p_ in parts if p_) or main
+        # plain words: no pass direction, run gap or field spot, no trailing period
+        t = re.sub(r"\bpass (incomplete )?(?:short|deep)(?: (?:left|right|middle))?(?= to| intended)", lambda m: "pass " + (m.group(1) or ""), t).replace("pass  ", "pass ")
+        t = re.sub(r"\bscrambles (?:(?:left|right) (?:end|tackle|guard)|up the middle)", "scrambles", t)
+        t = re.sub(r"\b(?:(?:left|right) (?:end|tackle|guard)|up the middle)\b", "runs", t)
+        t = re.sub(r"\s+to (?:[A-Z]{2,3} )?-?\d+(?= for)", "", t)
+        t = re.sub(r"\s+(?:pushed|ran) ob at (?:[A-Z]{2,3} )?-?\d+", "", t)
+        t = re.sub(r",?\s*(?:Wide (?:Left|Right)|Hit (?:Left|Right) Upright)\.?", "", t)
+        t = re.sub(r"\s+", " ", t).strip().rstrip(".").replace("., ", ", ")
+        return t if len(t) <= 160 else t[:157].rsplit(" ", 1)[0] + "..."
+
     def play_impacts(s_):
         """Every scoring play of every finished game, with what it did: WPA, the change in the team's chance to win that matchup, and
         CPA, the title odds it added (WPA times what the game was worth: title odds with a win minus with a loss, as of that week's start).
@@ -3751,28 +3783,7 @@ class Site:
             return left + ((pjblk(pm) if pm else play(ev, nev)) if PBP_ else "")
         def nfl_(t): return f'<i class="nfl N{t}" role="img" aria-label="{t}"></i>' if t in NFL_NICK else ""
         import pbp as _pb
-        def ptxt(t, who):
-            """The play as it reads on ESPN, cut to what matters to this matchup: no tacklers or long snappers, and the extra point or
-            two-point try only when someone in the matchup was in it. A kicker or two-point man alone sees just his part."""
-            t = s_.play_text(t)                                                        # tags, tacklers, replay and injury notes
-            t = re.sub(r"\s*\((?:[^()]*)\)", "", t)
-            t = re.sub(r"\s*\[[^\]]*\]", "", t)                                   # [D.Olajiga]
-            t = re.sub(r",?\s*Hit (Left|Right) Upright\.?", "", t)
-            t = re.sub(r",?\s*(?:Center|Holder)-(?:[A-Z][A-Za-z'\-]*\.)?[A-Za-z'\-]+", "", t)
-            t = re.sub(r"\s+", " ", t).strip()
-            ks = {k_ for i in who if i.isdigit() for k_ in _pb.keys_of(s_.s.PL.get(i, {}).get("name", ""))}
-            has = lambda x: any(re.search(r"(?<![A-Za-z])" + re.escape(k) + r"(?![a-z])", x) for k in ks)
-            dfn = any(not i.isdigit() for i in who)
-            parts = []
-            m2 = re.search(r"TWO-POINT CONVERSION ATTEMPT\.\s*(.*?)\s*ATTEMPT (SUCCEEDS|FAILS)\.?", t)
-            mx = re.search(r"(" + _pb.NM_ + r") extra point is (GOOD|No Good|BLOCKED)\.?", t)
-            cut = min([m.start() for m in (m2, mx) if m] + [len(t)])
-            main = t[:cut].strip()
-            if has(main) or dfn or not (m2 or mx): parts.append(main)
-            if mx and has(mx.group(0)): parts.append(f"{mx.group(1)} extra point is {mx.group(2)}.")
-            if m2 and m2.group(2) == "SUCCEEDS" and (has(m2.group(1)) or not parts): parts.append(f"Two-point try: {m2.group(1).rstrip('.')}, good.")
-            t = " ".join(p_ for p_ in parts if p_) or main
-            return t if len(t) <= 160 else t[:157].rsplit(" ", 1)[0] + "..."
+        def ptxt(t, who): return s_.chart_text(t, who)
         def pjblk(pm):
             who, tot = pm
             tl = "".join(f'<span class="sbtt s{sd}">{E(s_.M[r])} <b>{t0:.1f}</b> to <b>{t1:.1f}</b></span>'
@@ -4337,12 +4348,13 @@ class Site:
         x = s_.play_of_game(w, a, b)
         if not x or len(x) < 14: return ""
         w_, r, o, u, when, clk, txt, who, wpa, cpa, pb, pa_, sc, xs = x[:14]
+        txt = s_.chart_text(x[14] if len(x) > 14 else txt, [i for i, _ in who])
         aw, asc, hm, hsc = sc
         nfl = lambda t: f'<i class="nfl N{t}" role="img" aria-label="{t}"></i>' if t in NFL_NICK else ""
         chips = "".join(f'<a class="tpp" href="{pre}player/{i}.html">{s_.logo(r, pre, "lgs", w)}{nfl(s_.team_at(w, i))}<span>{E(s_.s.nm(i))}</span><b>{v:+.2f}</b></a>'
                         for i, v in who if v > 0)
         game = f'{nfl(aw)}<b>{E(str(aw))} {asc}</b><span class="tpat">at</span>{nfl(hm)}<b>{E(str(hm))} {hsc}</b>' if aw else ""
-        return (f'<section class="tp"><h2>The turning point <small>the play that swung it most toward the winner</small></h2>'
+        return (f'<section class="tp"><h2>The defining play <small>the winner\'s biggest swing</small></h2>'
                 f'<div class="tpc"><div class="tpl"><div class="tpg">{game}<span class="tpk">{E(clk)}</span><span class="tpw">{E(str(when))}</span></div>'
                 f'<p class="tpx">{E(txt)}</p><div class="tpps">{chips}</div></div>'
                 f'<div class="tpr"><div class="tpt">{s_.logo(r, pre, "lgs", w)}<b>{E(s_.TN(r, w))}</b></div>'
