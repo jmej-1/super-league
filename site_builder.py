@@ -282,7 +282,7 @@ a.tm:hover b{text-decoration:underline}
 .lu .pl.star{background:#FBEFC4} .lu .pl.dud{background:#F4DDD7}
 .lu .ln.tot .pl .pts{font-size:30px}
 .vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px 18px;align-items:center}
-.vs .k{text-align:center;color:var(--mute);font-size:14px}
+.vs .k{text-align:center;color:var(--mute);font-size:14px}.vs .k small{display:block;font-size:11.5px;color:var(--mute);opacity:.8;margin-top:1px}
 .vs .a{text-align:right;font:800 24px var(--disp)} .vs .b{font:800 24px var(--disp)}
 .vs .better{color:var(--turf);text-decoration:underline;text-decoration-color:var(--flag);text-decoration-thickness:3px;text-underline-offset:4px}
 footer{color:var(--mute);font-size:14px;padding:30px 0 50px;margin-top:40px;border-top:1px solid var(--rule)}
@@ -771,23 +771,28 @@ class Site:
         s.nm = lambda i: (f"{NFL_NICK[i]} DEF" if i in NFL_NICK else f"{i} DEF") if not i.isdigit() else re.sub(r" III$", "", _nm(i))   # "Kenneth Walker III" -> "Kenneth Walker"   # "MIN DEF" -> "Vikings DEF"
         s_.s = s; s_.T = T; s_.TEAM = TEAM; s_.SIM = SIM; s_.weeks_left = weeks_left; s_.starts_pm = starts_pm; s_.season_pm = season_pm; s_.proj = proj; s_.logo_dir = logo_dir
         from superleague import prov_median as _pm_; s_.prov_median = _pm_
-        # Trades always list the best player first, on every page: points per game this season (every NFL game he played)
-        tot_, gp_ = Counter(), Counter()
-        for w_ in s.weeks:
-            for j, v in (s.NP.get(w_, {}) or {}).items(): tot_[j] += v; gp_[j] += 1
-        s_.pval = lambda j: tot_[j] / gp_[j] if gp_[j] else 0.0
+        # Trades list players by what they've meant to the team that got them: WAR in its lineup since the trade, then season WAR
+        # (the Trades page rule, used on every page)
+        def _imp(w0, r, i):
+            Rv = (s.repl or {}).get("val") if getattr(s, "repl", None) else None
+            if Rv is None: return (0.0, 0.0)
+            war = sum((p - Rv.get(s.pos(i), 0)) * s.wpp for w in s.weeks if w >= w0 for j, p in s.W[w][r]["S"] if j == i)
+            tot = sum((p - Rv.get(s.pos(i), 0)) * s.wpp for w in s.weeks for rr in s.R for j, p in s.W[w][rr]["S"] if j == i)
+            return (war, tot)
+        s_.trade_imp = _imp
         for t_ in s.tx:
-            if t_.get("type") == "trade":
-                for k_ in ("adds", "drops"):
-                    if t_.get(k_): t_[k_] = sorted(t_[k_], key=lambda x: -s_.pval(x[0] if isinstance(x, (list, tuple)) else x))
-        ord_ = lambda L: sorted(L, key=lambda x: -s_.pval(x[0] if isinstance(x, (list, tuple)) else x))
+            if t_.get("type") == "trade" and t_.get("adds"):
+                t_["adds"] = sorted(t_["adds"], key=lambda x: _imp(t_.get("w", 0), x[1], x[0]) if isinstance(x, (list, tuple)) and len(x) > 1 else (0, 0), reverse=True)
         for t_ in getattr(s, "trade_res", []) or []:
-            for x in t_.get("sides", []):
-                for k_ in ("got", "gave"):
-                    if isinstance(x.get(k_), list): x[k_] = ord_(x[k_])
+            sides_ = t_.get("sides", [])
+            for x in sides_:
+                if isinstance(x.get("got"), list): x["got"] = sorted(x["got"], key=lambda i: _imp(t_["w"], x["r"], i), reverse=True)
+                if isinstance(x.get("gave"), list):
+                    rcv = {i: y["r"] for y in sides_ for i in y.get("got", [])}
+                    x["gave"] = sorted(x["gave"], key=lambda i: _imp(t_["w"], rcv.get(i, x["r"]), i), reverse=True)
         for t_ in getattr(s, "trades", []) or []:
             sd_ = t_.get("sides")
-            if isinstance(sd_, dict): t_["sides"] = {r_: tuple(ord_(list(v)) for v in pair) for r_, pair in sd_.items()}
+            if isinstance(sd_, dict): t_["sides"] = {r_: (sorted(pair[0], key=lambda i: _imp(t_["w"], r_, i), reverse=True), sorted(pair[1], key=lambda i: _imp(t_["w"], r_, i)[1], reverse=True)) for r_, pair in sd_.items()}
         sc_f = os.path.join(os.path.dirname(logo_dir), "scoring.txt")
         s_.SC = {k: float(v) for k, v in (l.strip().split("|") for l in open(sc_f) if "|" in l and not l.startswith("#"))} if os.path.exists(sc_f) else {}
         s_.M = s.M; s_.yr = s.L["season"]; s_.f = T["line_factor"]; s_.n = len(s.weeks)
@@ -1587,6 +1592,13 @@ class Site:
         if yr == s_.yr:                                   # single plays: what each play did to the win chance (WPA) and the title odds (CPA)
             for w, r, o, _u, when, clk, txt, who, wpa, cpa, *_x in s_.play_impacts():
                 a_, b_ = s_.game_of[(w, r)]; pid = who[0][0]; tx_ = f"{clk}: {txt}" if len(txt) <= 90 else f"{clk}: {txt[:87].rsplit(' ', 1)[0]}..."
+                tp_ = sum(v for _, v in who)                            # the team's single-play marks: everything the play scored for it
+                if tp_ > 0: add("t_ppts", tp_, fp(tp_), r, [r], o=o, w=w, u=G_(w, a_, b_), x=tx_)
+                if wpa > 0: add("t_wpa", wpa, f"{wpa * 100:+.1f}%", r, [r], o=o, w=w, u=G_(w, a_, b_), x=tx_)
+                if cpa > 0: add("t_cpa", cpa, f"{cpa * 100:+.2f}%", r, [r], o=o, w=w, u=G_(w, a_, b_), x=tx_)
+                for pid_, v_ in who:
+                    if v_ > 0:
+                        for P in ("ALL", s.pos(pid_)): add(f"p_ppts_{P}", v_, fp(v_), r, [r], p=pid_, o=o, w=w, u=G_(w, a_, b_), x=tx_)
                 for P in ("ALL", s.pos(pid)):
                     if wpa > 0: add(f"p_wpa_{P}", wpa, f"{wpa * 100:+.1f}%", r, [r], p=pid, o=o, w=w, u=G_(w, a_, b_), x=tx_)
                     if cpa > 0: add(f"p_cpa_{P}", cpa, f"{cpa * 100:+.2f}%", r, [r], p=pid, o=o, w=w, u=G_(w, a_, b_), x=tx_)
@@ -1845,15 +1857,15 @@ class Site:
         tot, gs, pts, teams, best = s_.season_pm(s)
         F["mvp_order"] = order = sorted(tot, key=lambda i: -tot[i]); F["mvp"] = (tot, gs, pts, teams)
         tlinks = lambda names: f"{len(names)} teams" if len(names) > 2 else " / ".join(s_.tn(s_.bym[t], pre) for t in sorted(names))
-        mvp_rows = "".join(f'<tr><td class="rk">{k}</td><td><b>{s_.plink(i, pre)}</b><small>{tlinks(teams[i])}</small></td><td class="r big">{tot[i]:+.2f}</td><td class="r">{gs[i]}</td><td class="r">{pts[i] / gs[i]:.1f}</td></tr>' for k, i in enumerate(order[:10], 1))
+        mvp_rows = "".join(f'<tr><td class="rk">{k}</td><td><b>{s_.plink(i, pre)}</b><small>{tlinks(teams[i])}</small></td><td class="r big">{tot[i]:+.1f}</td><td class="r">{gs[i]}</td><td class="r">{pts[i] / gs[i]:.1f}</td></tr>' for k, i in enumerate(order[:10], 1))
         wk_rows = "".join(
             f'<tr><td class="rk">{a["w"]}</td>'
             f'<td><b>{s_.plink(a["mvp"][0], pre)}</b><small>{s_.tn(a["mvp"][1], pre)}, <a class="go" href="{s_.gurl_r(a["w"], a["mvp"][1], pre)}">{fp(a["mvp"][2])} pts</a></small></td><td class="r pos">+{a["mvp"][3]:.1f}</td>'
             f'</tr>'
             for a in reversed(s.awards))
-        def mini(pool, k=10, bare=False, key="war"):
+        def mini(pool, k=10, bare=False, key="pm"):
             t_, g_, p_, tm_, _ = s_.season_pm(s, pool, key)
-            fmt_ = (lambda v: f"{v:+.2f}") if key == "war" else fp
+            fmt_ = (lambda v: f"{v:+.1f}") if key == "pm" else fp
             return "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre, s.nm(i) if bare else None)}</b><small>{tlinks(tm_[i])}</small></td><td class="r big">{fmt_(t_[i])}</td></tr>' for j, i in enumerate(sorted(t_, key=lambda i: -t_[i])[:k], 1))
         rook = {i for i, v in s.PL.items() if v.get("exp") == 0}; und = {i for i in s.PL if i not in s.dpick}
         bbp_ = s_.bench_by_player()
@@ -1868,23 +1880,23 @@ class Site:
                     i = x[0] if isinstance(x, (list, tuple)) else x
                     if i and i != "0": avail[i] = avail.get(i, 0) + 1; availT.setdefault(i, Counter())[r] += 1
         eff = sorted((i for i in tot if 0 < gs[i] and gs[i] * 2 <= avail.get(i, 0) and tot[i] > 0), key=lambda i: -tot[i])[:10]
-        six_rows = "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre)}</b><small>{rlinks([r_ for r_, _ in availT[i].most_common()])}</small></td><td class="r muted">{gs[i]}/{avail[i]}</td><td class="r big">{tot[i]:+.2f}</td></tr>' for j, i in enumerate(eff, 1))
+        six_rows = "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre)}</b><small>{rlinks([r_ for r_, _ in availT[i].most_common()])}</small></td><td class="r muted">{gs[i]}/{avail[i]}</td><td class="r big">{tot[i]:+.1f}</td></tr>' for j, i in enumerate(eff, 1))
         nrs = len([w for w in s.weeks if w <= s.L.get("regular_season_weeks", 14)]); emin = 1      # Most Efficient: PAA per start, no minimum
         effp = sorted((i for i in tot if gs[i] >= emin), key=lambda i: -tot[i] / gs[i])[:10]
-        eff_rows = "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre)}</b><small>{tlinks(teams[i])}</small></td><td class="r muted">{gs[i]}</td><td class="r big">{tot[i] / gs[i]:+.3f}</td></tr>' for j, i in enumerate(effp, 1))
+        eff_rows = "".join(f'<tr><td class="rk">{j}</td><td><b>{s_.plink(i, pre)}</b><small>{tlinks(teams[i])}</small></td><td class="r muted">{gs[i]}</td><td class="r big">{tot[i] / gs[i]:+.1f}</td></tr>' for j, i in enumerate(effp, 1))
         vote_ = open(os.path.join(os.path.dirname(s_.logo_dir), "mvp_vote.txt")).read().strip().split("\n")[-1] if os.path.exists(os.path.join(os.path.dirname(s_.logo_dir), "mvp_vote.txt")) else ""
         aw_html = s_.season_awards(pre)
-        races_extra = (f'<section><h2>MVP race</h2><p class="intro">WAR in his starts: wins above a replacement-level player. The top 10 go to a league vote after Week 14.'
-                       + (f' <b>MVP: {s_.plink(vote_, pre)}</b>' if vote_ in s.PL else "") + f'</p><div class="scroll"><table style="min-width:0"><thead><tr><th></th><th>Player</th><th class="r">WAR</th><th class="r">Starts</th><th class="r">Avg</th></tr></thead><tbody>{mvp_rows}</tbody></table></div></section>'
-                       f'<div class="grid2"><section><h2>Rookie of the Year race</h2><p class="intro">WAR in his starts, NFL rookies only.</p><table class="pt"><tbody>{mini(rook)}</tbody></table></section>'
-                       f'<section><h2>Undrafted Player of the Year race</h2><p class="intro">WAR in his starts, undrafted players only.</p><table class="pt"><tbody>{mini(und)}</tbody></table></section></div>'
+        races_extra = (f'<section><h2>MVP race</h2><p class="intro">PAA. The top 10 go to a league vote after Week 14.'
+                       + (f' <b>MVP: {s_.plink(vote_, pre)}</b>' if vote_ in s.PL else "") + f'</p><div class="scroll"><table style="min-width:0"><thead><tr><th></th><th>Player</th><th class="r">PAA</th><th class="r">Starts</th><th class="r">Avg</th></tr></thead><tbody>{mvp_rows}</tbody></table></div></section>'
+                       f'<div class="grid2"><section><h2>Rookie of the Year race</h2><p class="intro">PAA, NFL rookies only.</p><table class="pt"><tbody>{mini(rook)}</tbody></table></section>'
+                       f'<section><h2>Undrafted Player of the Year race</h2><p class="intro">PAA, undrafted players only.</p><table class="pt"><tbody>{mini(und)}</tbody></table></section></div>'
                        + f'<div class="grid2"><section><h2>Benchwarmer of the Year race</h2><p class="intro">Wins a bench player would have added to the teams he sat on.</p><table class="pt"><tbody>{bench_rows}</tbody></table></section>'
-                       + f'<section><h2>Sixth Man of the Year race</h2><p class="intro">WAR in his starts, players who started half their rostered weeks or fewer.</p><table class="pt"><tbody>{six_rows}</tbody></table></section></div>'
-                       + f'<section><h2>Most Efficient Player race</h2><p class="intro">WAR per start.</p><div class="scroll"><table style="min-width:0"><thead><tr><th></th><th>Player</th><th class="r">Starts</th><th class="r">WAR/start</th></tr></thead><tbody>{eff_rows}</tbody></table></div></section>'
+                       + f'<section><h2>Sixth Man of the Year race</h2><p class="intro">PAA, players who started half their rostered weeks or fewer.</p><table class="pt"><tbody>{six_rows}</tbody></table></section></div>'
+                       + f'<section><h2>Most Efficient Player race</h2><p class="intro">PAA per start.</p><div class="scroll"><table style="min-width:0"><thead><tr><th></th><th>Player</th><th class="r">Starts</th><th class="r">PAA/start</th></tr></thead><tbody>{eff_rows}</tbody></table></div></section>'
 
-                       + '<section class="posr"><h2>Position of the Year races</h2><p class="intro">Points in his starts, by position.</p><div class="rtog chips posrt" role="group" aria-label="Position">'
+                       + '<section class="posr"><h2>Position of the Year races</h2><p class="intro">PAA, by position.</p><div class="rtog chips posrt" role="group" aria-label="Position">'
                        + "".join(f'<button type="button" data-p="{P}" aria-pressed="{"true" if P == "QB" else "false"}">{P}</button>' for P in ("QB", "RB", "WR", "TE", "K", "DEF")) + '</div>'
-                       + "".join(f'<div class="posrv" data-p="{P}"{"" if P == "QB" else " hidden"}><table class="pt"><tbody>{mini({i for i in s.PL if s.pos(i) == P or (not i.isdigit() and P == "DEF")}, 5, True, "p")}</tbody></table></div>'
+                       + "".join(f'<div class="posrv" data-p="{P}"{"" if P == "QB" else " hidden"}><table class="pt"><tbody>{mini({i for i in s.PL if s.pos(i) == P or (not i.isdigit() and P == "DEF")}, 5, True)}</tbody></table></div>'
                                  for P in ("QB", "RB", "WR", "TE", "K", "DEF"))
                        + '</section>')
         F["races"] = races_extra + aw_html
@@ -1893,14 +1905,14 @@ class Site:
             F["races"] = F["races"].replace(f"<h2>{t} race</h2>", f'<h2 id="races-{k}" style="scroll-margin-top:70px">{t} race</h2>', 1)
         trophies = "".join(f'<a class="trophy" href="#/races/{k}"><b>{t}</b><span>{"League vote among the top 10, after Week 14." if k == "mvp" else "Regular season only. Final after Week 14."} </span><span class="go">See the race</span></a>' for t, k in season_list)
         F["awards"] = (f'<section><h2>Season awards</h2><p class="intro">Given out once the {s_.yr} season is over. Until then, the races above show who leads each one.</p><div class="trophies">{trophies}</div></section>'
-                       f'<section><h2>Weekly MVP</h2><div class="scroll"><table><thead><tr><th>Wk</th><th>MVP</th><th class="r">Pts over replacement</th></tr></thead><tbody>{wk_rows}</tbody></table></div></section>')
+                       f'<section><h2>Weekly MVP</h2><div class="scroll"><table><thead><tr><th>Wk</th><th>MVP</th><th class="r">PAA</th></tr></thead><tbody>{wk_rows}</tbody></table></div></section>')
         Rv = s.repl["val"]
         def imp(t, r, i):          # how much he has mattered to the team that got him: WAR in its lineup since the trade, then season WAR
             war = sum((p - Rv.get(s.pos(i), 0)) * s.wpp for w in s.weeks if w >= t["w"] for j, p in s.W[w][r]["S"] if j == i)
             tot = sum((p - Rv.get(s.pos(i), 0)) * s.wpp for w in s.weeks for rr in s.R for j, p in s.W[w][rr]["S"] if j == i)
             return (war, tot)
         def gotfrom(t, x):          # most important player first; 3-team deals also say who each player came from
-            got = sorted(x["got"], key=lambda i: -s_.pval(i))           # the same order everywhere: points per game this season
+            got = sorted(x["got"], key=lambda i: imp(t, x["r"], i), reverse=True)
             if len(t["sides"]) < 3: return ", ".join(s_.pa(i, nm(i)) for i in got)
             by = defaultdict(list)
             for i in got: by[t.get("frm", {}).get(i)].append(i)
@@ -1960,7 +1972,7 @@ class Site:
         potw = (f'<a class="potw" href="{s_.gurl_r(w, mr, pre)}"><span class="lab">Week {w} MVP</span><span class="who"><b>{E(nm(mi).rsplit(" ", 1)[0])} <span class="nw">{E(nm(mi).rsplit(" ", 1)[-1])}{mtl}</span></b><span class="ptm"><i class="im L{mr}" aria-hidden="true"></i>{E(s_.TN(mr))}</span></span>'
                 f'<span class="pts">{fp(mp)}<small>pts</small></span></a>')
         tot, gs, pts_, teams = F["mvp"]
-        mvpl = "".join(f'<div><span class="rk">{k}</span><span><b>{s_.pa(i, nm(i))}</b><small class="muted"> {E(s.pos(i))}, {(str(len(teams[i])) + " teams") if len(teams[i]) > 2 else " / ".join(E(s_.TN(s_.bym[t])) for t in sorted(teams[i]))}</small></span><span class="v">{tot[i]:+.2f}</span></div>' for k, i in enumerate(F["mvp_order"][:5], 1))
+        mvpl = "".join(f'<div><span class="rk">{k}</span><span><b>{s_.pa(i, nm(i))}</b><small class="muted"> {E(s.pos(i))}, {(str(len(teams[i])) + " teams") if len(teams[i]) > 2 else " / ".join(E(s_.TN(s_.bym[t])) for t in sorted(teams[i]))}</small></span><span class="v">{tot[i]:+.0f}</span></div>' for k, i in enumerate(F["mvp_order"][:5], 1))
         teams_strip = "".join(f'<a href="{s_.turl(r, pre)}">{s_.logo(r, pre, "")}<b>{E(s_.TN(r))}</b><small>{E(s_.M[r])}</small></a>' for r in s_.stand)
         body = f"""{s_.front()}{hero}
 <main class="wrap">
@@ -3285,8 +3297,8 @@ class Site:
                 x = pts[k]
                 if not (x[0] == "·" and len(x) > 5): continue
                 y, prow = prow, x
-                if y is None or not x[5]: continue
-                dp = x[1] - y[1]
+                if not x[5]: continue
+                dp = x[1] - y[1] if y is not None else 0.0            # the week's very first row: its points count, its swing can't be measured
                 for sd, (r, o) in enumerate(((a, b), (b, a))):
                     who = {}
                     for e in x[5]:
@@ -4346,8 +4358,8 @@ class Site:
                 + tape_row("Points per week", pw[a]["ppg"], pw[b]["ppg"], lambda v: f"{v:.1f}") + tape_row("Last 3 weeks", pw[a]["l3"], pw[b]["l3"], lambda v: f"{v:.1f}")
                 + tape_row("Power", s_.power[a][0], s_.power[b][0], lambda v: f"#{v}", False) + tape_row("xWins", s_.xw[a], s_.xw[b], lambda v: f"{v:.1f}")
                 + tape_row("Playoff odds", out[a]["po"], out[b]["po"], pct) + tape_row("Title odds", out[a]["ti"], out[b]["ti"], pct)
-                + h2h_row("Head-to-head this season", [w2 for w2 in s.weeks if w2 != w and any(set(g) == {a, b} for g in s.G[w2]["pairs"]) and s.G[w2]["scores"]])
-                + h2h_row("Head-to-head all-time", [w2 for w2 in s.weeks if w2 != w and any(set(g) == {a, b} for g in s.G[w2]["pairs"]) and s.G[w2]["scores"]]) + "</div>")
+                + h2h_row("Head-to-head<small>this season</small>", [w2 for w2 in s.weeks if w2 != w and any(set(g) == {a, b} for g in s.G[w2]["pairs"]) and s.G[w2]["scores"]])
+                + h2h_row("Head-to-head<small>all-time</small>", [w2 for w2 in s.weeks if w2 != w and any(set(g) == {a, b} for g in s.G[w2]["pairs"]) and s.G[w2]["scores"]]) + "</div>")
         ser = [w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b} and w2 != w]     # every other meeting, not this one
         series = "".join(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if s.G[w2]["scores"][a] > s.G[w2]["scores"][b] else "l"}">{s_.logo(a, pre, "lgs", w2)}<span class="t">{E(s_.TN(a, w2))}</span><span class="s">{s.G[w2]["scores"][a]:.1f}</span></div>'
                          f'<div class="row {"w" if s.G[w2]["scores"][b] > s.G[w2]["scores"][a] else "l"}">{s_.logo(b, pre, "lgs", w2)}<span class="t">{E(s_.TN(b, w2))}</span><span class="s">{s.G[w2]["scores"][b]:.1f}</span></div><div class="foot">Week {w2}</div></a>' for w2 in ser) or '<p class="muted">First meeting this season.</p>'
@@ -4475,7 +4487,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     if(p[0]==='players'&&p[1]){ var sec=hit.querySelector('.psearch').closest('section');
       sec.querySelector('.psearch').value=''; sec.querySelector('.pown').value='all';
       [].forEach.call(sec.querySelectorAll('.pf'),function(x){x.classList.toggle('nx',x.getAttribute('data-pos')===p[1]);}); pfilter(sec);
-      var th=sec.querySelector('.ptable th[data-k="6"]'); th.removeAttribute('aria-sort'); psort(th);
+      var th=sec.querySelector('.ptable th[data-k="'+(p[2]==='pts'?4:6)+'"]'); th.removeAttribute('aria-sort'); psort(th);
       var row=p[3]&&sec.querySelector('tr[data-id="'+p[3]+'"]');
       if(row){ row.scrollIntoView({block:'center',behavior:'instant'}); row.classList.add('flash'); setTimeout(function(){row.classList.remove('flash');},2200); return; }
       window.scrollTo({top:0,left:0,behavior:'instant'}); return; }
@@ -4763,7 +4775,8 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     if(v>0&&Math.abs(v-L.all[k])<1e-9){ flag.b=1; return '<b class="ldr">'+txt+'</b>'; }
     if(v>0&&L.pos[pos]&&Math.abs(v-L.pos[pos][k])<1e-9){ flag.i=1; return '<i class="ldp">'+txt+'</i>'; }
     return txt; }
-  function prank(id,yr,all){ var d=PD[id], war=function(x){ var t=0,g=0; Object.keys(x.sea).forEach(function(y){ if(!yr||y===yr){ t+=x.sea[y].s[3]; g+=x.sea[y].s[0]; } }); return g?t:null; };
+  // position rank: points in Super League starts (QB8 = 8th-most points started at QB); overall rank: WAR, the one measure across positions
+  function prank(id,yr,all){ var d=PD[id], war=function(x){ var t=0,g=0; Object.keys(x.sea).forEach(function(y){ if(!yr||y===yr){ t+=x.sea[y].s[all?3:1]; g+=x.sea[y].s[0]; } }); return g?t:null; };
     var me=war(d); if(me===null) return null; var r=1;
     Object.keys(PD).forEach(function(i){ var x=PD[i]; if(i===id||(!all&&x.p!==d.p)) return; var v=war(x); if(v!==null&&Math.round(v*100)>Math.round(me*100)) r++; });
     return all?r:d.p+r; }
@@ -4851,10 +4864,10 @@ def bundle(files, s, logo_dir, font_dir, site=None):
       T[0]+=st[0]; T[1]+=st[1]; T[2]+=st[2]; T[3]+=st[3]; T[4]+=st[4]; nmv+=st[6];
       S.w.forEach(function(x){ if(x[2]&&x[6]!==null&&x[6]!==undefined){ if(x[6]) WW++; else LL++; } });
       S.w.forEach(function(x){ if(!x[1]) return; var k=x[1]; if(!per[k]){per[k]={wk:0,st:0,pts:0,yrs:{}}; teams.push(k);} per[k].wk++; per[k].yrs[y]=1; if(x[2]){per[k].st++; per[k].pts+=x[3]||0;} }); });
-    var rl='#/players/'+d.p+'/war/'+id;
+    var rl='#/players/'+d.p+'/pts/'+id;
     var ord=function(n){ var s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); };
     var yrl=function(ex){ return ex===0?'Rookie':ord(ex+1)+' year'; };
-    var off_=0, ag_=d.ag!=null?d.ag-off_:null, ex_=d.ex!=null?d.ex-off_:null, rkp=prank(id,yr||null), rko=prank(id,yr||null,1), rlk='#/players/'+d.p+'/war/'+id;
+    var off_=0, ag_=d.ag!=null?d.ag-off_:null, ex_=d.ex!=null?d.ex-off_:null, rkp=prank(id,yr||null), rko=prank(id,yr||null,1), rlk='#/players/'+d.p+'/pts/'+id;
     var hs=(ag_!=null?'<span><b>'+ag_+'</b>age</span>':'')+(ex_!=null&&ex_>=0?'<span><b>'+(ex_===0?'R':(ex_+1))+'</b>NFL year</span>':'')
       +(rko?'<a class="hrank" href="#/players"><b>#'+rko+'</b>'+(yr?yr+' overall':'overall')+'</a>':'')+(rkp?'<a class="hrank" href="'+rlk+'"><b>'+rkp+'</b>'+(yr?yr:'all-time')+'</a>':'');
     h+='<div class="herostats">'+hs+'</div></div></section>';
@@ -4977,10 +4990,11 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   document.addEventListener('mouseout',function(e){ var t=e.target.closest&&e.target.closest('.tip'); if(t&&!tipEl.classList.contains('pin')) tipEl.hidden=true; });
   document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('.tip'); if(t&&t.closest('th.sortable,th.srt')){ tipEl.hidden=true; return; } if(t){ showTip(t,1); } else if(!(e.target.closest&&e.target.closest('.tipbox')&&!e.target.closest('.cx'))) tipEl.hidden=true; },true);
   window.addEventListener('scroll',function(){tipEl.hidden=true;},{passive:true}); window.addEventListener('hashchange',function(){tipEl.hidden=true;});
-  var BOOK={team:[['Single game',[['g_high','Highest score'],['g_low','Lowest score'],['g_blow','Biggest blowout'],['g_close','Closest game'],['g_comb','Most combined points'],['g_hiloss','Highest score in a loss'],['g_lowin','Lowest score in a win'],['g_upset','Biggest upset'],['g_excite','Most exciting game'],['g_flips','Most lead changes'],['g_dull','Least exciting game'],['g_bench','Most points lost to start/sit']]],['Biggest comebacks',[['g_improb','Lowest win chance overcome'],['g_down','Biggest deficit overcome']]],
+  var BOOK={team:[['Single game',[['g_high','Highest score'],['g_low','Lowest score'],['g_blow','Biggest blowout'],['g_close','Closest game'],['g_comb','Most combined points'],['g_hiloss','Highest score in a loss'],['g_lowin','Lowest score in a win'],['g_upset','Biggest upset'],['g_excite','Most exciting game'],['g_flips','Most lead changes'],['g_dull','Least exciting game'],['g_bench','Most points lost to start/sit']]],
+      ['Single play',[['t_ppts','Most points'],['t_wpa','Most win probability added'],['t_cpa','Most championship probability added']]],['Biggest comebacks',[['g_improb','Lowest win chance overcome'],['g_down','Biggest deficit overcome']]],
       ['Season',[['s_pct','Best record'],['s_pctlo','Worst record'],['s_wins','Most wins'],['s_pf','Most points'],['s_pflow','Fewest points'],['s_pa','Most points against'],['s_xw','Most xWins'],['s_lucky','Luckiest'],['s_unlucky','Unluckiest'],['s_wstreak','Longest win streak'],['s_lstreak','Longest losing streak']],1]],
     player:[['Single game',[['p_start','Most points'],['p_startlo','Fewest points'],['p_pm','Best PAA'],['p_pmlo','Worst PAA'],['p_war1','Most WAR'],['p_war1lo','Fewest WAR'],['p_bench','Most bench points']]],
-      ['Single play',[['p_wpa','Most win probability added'],['p_cpa','Most championship probability added']]],
+      ['Single play',[['p_ppts','Most points'],['p_wpa','Most win probability added'],['p_cpa','Most championship probability added']]],
       ['Season',[['py_pts','Most points'],['py_ppg','Most points per game'],['py_ptslo','Fewest points'],['py_ppglo','Fewest points per game'],['py_pm','Best PAA'],['py_pmlo','Worst PAA'],['py_war','Most WAR'],['py_warlo','Fewest WAR'],['py_wpa','Most win probability added'],['py_wpalo','Least win probability added'],['py_wins','Most wins'],['py_loss','Most losses'],['py_wpct','Best win %'],['py_wpctlo','Worst win %'],['py_wi','Most Win Impact'],['py_wilo','Least Win Impact'],['py_luck','Best supporting cast'],['py_unluck','Worst supporting cast'],['py_gs','Most starts'],['py_top','Most weeks as the #1 at his position'],['py_ben','Most bench points'],['py_benppg','Most bench points per week']]],
       ['Career',[['pc_pts','Most points'],['pc_ppg','Most points per game'],['pc_ptslo','Fewest points'],['pc_ppglo','Fewest points per game'],['pc_pm','Best PAA'],['pc_pmlo','Worst PAA'],['pc_war','Most WAR'],['pc_warlo','Fewest WAR'],['pc_wins','Most wins'],['pc_loss','Most losses'],['pc_wpct','Best win %'],['pc_wpctlo','Worst win %'],['pc_wi','Most Win Impact'],['pc_wilo','Least Win Impact'],['pc_luck','Best supporting cast'],['pc_unluck','Worst supporting cast'],['pc_gs','Most starts'],['pc_top','Most weeks as the #1 at his position'],['pc_ben','Most bench points'],['pc_benppg','Most bench points per week']],0,1]],
     mgr:[['Single week or move',[['l_add1','Most gut-call wins added'],['m_besttrade','Most wins gained in a trade'],['m_heist','Most lopsided trade'],['m_pick','Best pickup'],['m_drop','Worst drop']]],
@@ -5027,7 +5041,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   function rrow(k,t,e,tag){ var h=hold(k,e);
     return '<'+tag+' class="rrow"'+(tag==='button'?' type="button" data-k="'+k+'" data-t="'+esc(t)+'"':' href="'+toHash(e[6])+'"')+'><span class="rlab">'+esc(t)+(RHELP[rbase(k)]?'<small class="rhelp">'+esc(RHELP[rbase(k)])+'</small>':'')+'</span>'+rlogo(k,e,h)
       +'<span class="rhold"><b>'+hname(h)+'</b>'+nflc(h)+rsm(h)+'</span><span class="ryear">'+ychip(k,e,h)+'</span><span class="rval">'+esc(e[0])+(RUNIT[rbase(k)]?'<small class="runit">'+RUNIT[rbase(k)]+'</small>':'')+'</span></'+tag+'>'; }
-  var RUNIT={g_excite:'excitement score',g_dull:'excitement score',g_flips:'lead changes',p_wpa:'win chance',p_cpa:'title odds',py_wpa:'wins',py_wpalo:'wins'};
+  var RUNIT={g_excite:'excitement score',g_dull:'excitement score',g_flips:'lead changes',p_wpa:'win chance',p_cpa:'title odds',t_wpa:'win chance',t_cpa:'title odds',py_wpa:'wins',py_wpalo:'wins'};
   var RHELP={};
   function rbase(k){ return k.replace(/_(ALL|QB|RB|WR|TE|K|DEF)$/,''); }
   function trow(k,t,L){ var T=L.filter(function(e){return tv(e)===tv(L[0]);}), nT=T.length, more=''; T=T.slice(0,4);

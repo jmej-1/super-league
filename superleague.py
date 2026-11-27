@@ -662,7 +662,7 @@ def doc_grades(s, T):
 def doc_awards(s):
     s.awards = []
     o = ["# Super League: Weekly Awards (MVP / LVP)", "", "## Rules",
-         "- Every starter vs a **replacement-level player at his position that same week** (what's free on waivers; the same baseline as WAR). Uses only that week's games, so awards never change once given.",
+         "- Every starter vs the **median starter at his real position that same week** (FLEX players count at RB/WR/TE). Uses only that week's games, so awards never change once given.",
          "- **League MVP** = highest +/- among starters on **winning** teams. **LVP** = lowest +/- in the league. **Team MVP / LVP** = highest / lowest on each team. Empty slots excluded.",
          "- **Decisive** = MVP's +/- > his team's margin of victory; LVP's shortfall > his team's margin of defeat.", "", "## League awards", ""]
     lr = []; weekly = []; lm = Counter(); ll = Counter(); tm = Counter(); tl = Counter(); medtab = []
@@ -671,8 +671,7 @@ def doc_awards(s):
         for a, b in g["pairs"]:
             res[a] = (g["scores"][a] - g["scores"][b], b); res[b] = (g["scores"][b] - g["scores"][a], a)
         med = s.pos_median(w); medtab.append([w] + [f"{med.get(p, 0):.1f}" for p in POSLIST])
-        Rv = s.repl["val"]
-        c = [(p - Rv.at(w, s.pos(i)), p, i, r) for r, d in s.W[w].items() for i, p in d["S"] if i != "0"]   # points above replacement: WAR's order
+        c = [(p - med[s.pos(i)], p, i, r) for r, d in s.W[w].items() for i, p in d["S"] if i != "0"]
         cw = [x for x in c if res[x[3]][0] > 0] or [x for x in c if res[x[3]][0] >= 0] or c          # MVP has to come from a winning team
         b = max(cw); l = min(c)
         def tag(x, mvp):
@@ -695,9 +694,8 @@ def doc_awards(s):
     o += ["", "## Median starter by position each week", ""] + md_table(["Wk"] + POSLIST, medtab) + ["", "## Team awards by week", ""] + weekly
     return "\n".join(o)
 
-def season_pm(s, pool=None, key="war"):
-    """Season totals over starts. Awards that compare positions use WAR (key="war"): value over what's free on waivers.
-    Awards inside one position use points (key="p")."""
+def season_pm(s, pool=None, key="pm"):
+    """Season totals over starts: PAA (key="pm", the award measure), or WAR / points if asked for."""
     tot = Counter(); gs = Counter(); pts = Counter(); teams = defaultdict(set); best = defaultdict(float)
     for x in starts_pm(s):
         if pool is not None and x["i"] not in pool: continue
@@ -727,11 +725,11 @@ def doc_season_mvp(s):
 
 def doc_roty(s):
     rook = {i for i, v in s.PL.items() if v.get("exp") == 0}; und = {i for i in s.PL if i not in s.dpick}
-    o = ["# Super League: ROTY & Undrafted Races", "", f"Through Week {s.last}. Same measure as the Season MVP (WAR over starts). Top 10 each.", ""]
+    o = ["# Super League: ROTY & Undrafted Races", "", f"Through Week {s.last}. Same measure as the Season MVP (sum over starts of +/- vs weekly position median). Top 10 each.", ""]
     for pool, title, note in ((rook, "Rookie of the Year race", "2026 NFL rookies only (Sleeper years_exp = 0)."), (und, "Undrafted race", "Players nobody drafted in Super League (incl. DEF/K).")):
         tot, gs, pts, teams, _ = season_pm(s, pool)
         o += [f"## {title}", note, ""] + md_table(["#", "Player", "Pos", "Team(s)", "Season +/-", "GS", "+/- per start", "PPG"],
-                                                  [(k, s.nm(i), s.pos(i), ", ".join(sorted(teams[i])), f"{tot[i]:+.2f}", gs[i], f"{tot[i] / gs[i]:+.2f}", f"{pts[i] / gs[i]:.1f}") for k, i in enumerate(sorted(tot, key=lambda i: -tot[i])[:10], 1)]) + [""]
+                                                  [(k, s.nm(i), s.pos(i), ", ".join(sorted(teams[i])), f"{tot[i]:+.1f}", gs[i], f"{tot[i] / gs[i]:+.1f}", f"{pts[i] / gs[i]:.1f}") for k, i in enumerate(sorted(tot, key=lambda i: -tot[i])[:10], 1)]) + [""]
     return "\n".join(o)
 
 def doc_trades(s):
