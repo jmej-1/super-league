@@ -647,6 +647,7 @@ CSS += """
 .gfm{text-align:center}.gfm b{font-size:22px}.gfl{display:inline-block;width:16px;border-top:3px solid var(--turf)}.gfl.d{border-top:3px dashed #C9A21A}
 .xcap{display:flex;align-items:center;gap:8px;margin:10px 0 26px;padding:0 2px;font-size:12px;color:var(--mute)}.xcap b{font:800 15px var(--disp);color:var(--ink)}.xcap small{margin-left:-6px}
 .xcap .xbr{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:12px;color:var(--mute)}.xcap .xbr i{font-style:normal}.xcap .xbr small{margin-left:3px;font-size:11px}.xcap .xbr b{color:var(--ink)}.exm{width:72px;height:5px;border-radius:3px;background:var(--rule);overflow:hidden}.exm i{display:block;height:100%;background:var(--flag)}.xcap{display:block;margin:12px 0 26px;padding:12px 14px;border:1px solid var(--rule);border-radius:10px;background:var(--paper)}.xcap .xhd{display:flex;align-items:center;gap:12px}.xcap .xl{font-weight:700;font-size:14px;color:var(--ink)}.xcap .xhd b{font:800 26px var(--disp);color:var(--ink);line-height:1}.xcap .exm{flex:1;width:auto;height:10px;border-radius:5px}.xcap .xft{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:13px}.xcap .xrk{color:var(--ink)}.xcap .xgo{margin-left:auto;color:var(--mute);text-decoration:underline}.xcap .xgo:hover{color:var(--turf)}.xcap .xdt{margin-top:8px}.xcap .xdt summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--mute)}.xcap .xdt[open] summary{color:var(--ink)}.xcap .xbr{margin-top:8px}.tat2x{display:inline-flex;align-items:center;gap:8px}
+.omvp{display:flex;align-items:center;gap:12px;padding:14px 16px}.omvp .im{width:34px;height:34px}.omvt{flex:1;min-width:0}.omvt b{display:block;font-size:15px;color:var(--ink)}.omvt small{color:var(--mute);font-size:12.5px}.omvn{display:flex;align-items:baseline;gap:8px;font:800 28px/1 var(--disp)}.omvn span{color:var(--mute);font-size:22px}.omvn i{font-style:normal;color:var(--flag);font-size:20px}.omvn strong{color:var(--ink)}.omvd{min-width:64px;text-align:right;font-weight:700}
 .tp .tpc{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(250px,1fr);background:radial-gradient(120% 140% at 100% 0%,#1d2c52 0%,#0f1a33 55%,#0b1428 100%);color:#EEF2F8;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(11,20,40,.18)}
 .tp .tpl{padding:22px 24px 20px}.tp .tpg{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13px;color:#C7D2E4}.tp .tpg .nfl{width:18px;height:18px;margin:0}.tp .tpg b{color:#EEF2F8;margin-right:2px}.tp .tpat{opacity:.6;margin:0 2px}.tp .tpk{margin-left:10px;padding:2px 8px;border-radius:999px;background:rgba(201,162,26,.16);color:#E2C25A;font-weight:700}.tp .tpw{margin-left:auto;color:#8FA0BC}
 .tp .tpx{margin:14px 0 16px;font:800 clamp(22px,3.1vw,31px)/1.08 var(--disp);letter-spacing:.2px;color:#fff;text-wrap:balance}
@@ -770,6 +771,23 @@ class Site:
         s.nm = lambda i: (f"{NFL_NICK[i]} DEF" if i in NFL_NICK else f"{i} DEF") if not i.isdigit() else re.sub(r" III$", "", _nm(i))   # "Kenneth Walker III" -> "Kenneth Walker"   # "MIN DEF" -> "Vikings DEF"
         s_.s = s; s_.T = T; s_.TEAM = TEAM; s_.SIM = SIM; s_.weeks_left = weeks_left; s_.starts_pm = starts_pm; s_.season_pm = season_pm; s_.proj = proj; s_.logo_dir = logo_dir
         from superleague import prov_median as _pm_; s_.prov_median = _pm_
+        # Trades always list the best player first, on every page: points per game this season (every NFL game he played)
+        tot_, gp_ = Counter(), Counter()
+        for w_ in s.weeks:
+            for j, v in (s.NP.get(w_, {}) or {}).items(): tot_[j] += v; gp_[j] += 1
+        s_.pval = lambda j: tot_[j] / gp_[j] if gp_[j] else 0.0
+        for t_ in s.tx:
+            if t_.get("type") == "trade":
+                for k_ in ("adds", "drops"):
+                    if t_.get(k_): t_[k_] = sorted(t_[k_], key=lambda x: -s_.pval(x[0] if isinstance(x, (list, tuple)) else x))
+        ord_ = lambda L: sorted(L, key=lambda x: -s_.pval(x[0] if isinstance(x, (list, tuple)) else x))
+        for t_ in getattr(s, "trade_res", []) or []:
+            for x in t_.get("sides", []):
+                for k_ in ("got", "gave"):
+                    if isinstance(x.get(k_), list): x[k_] = ord_(x[k_])
+        for t_ in getattr(s, "trades", []) or []:
+            sd_ = t_.get("sides")
+            if isinstance(sd_, dict): t_["sides"] = {r_: tuple(ord_(list(v)) for v in pair) for r_, pair in sd_.items()}
         sc_f = os.path.join(os.path.dirname(logo_dir), "scoring.txt")
         s_.SC = {k: float(v) for k, v in (l.strip().split("|") for l in open(sc_f) if "|" in l and not l.startswith("#"))} if os.path.exists(sc_f) else {}
         s_.M = s.M; s_.yr = s.L["season"]; s_.f = T["line_factor"]; s_.n = len(s.weeks)
@@ -1875,14 +1893,14 @@ class Site:
             F["races"] = F["races"].replace(f"<h2>{t} race</h2>", f'<h2 id="races-{k}" style="scroll-margin-top:70px">{t} race</h2>', 1)
         trophies = "".join(f'<a class="trophy" href="#/races/{k}"><b>{t}</b><span>{"League vote among the top 10, after Week 14." if k == "mvp" else "Regular season only. Final after Week 14."} </span><span class="go">See the race</span></a>' for t, k in season_list)
         F["awards"] = (f'<section><h2>Season awards</h2><p class="intro">Given out once the {s_.yr} season is over. Until then, the races above show who leads each one.</p><div class="trophies">{trophies}</div></section>'
-                       f'<section><h2>Weekly MVP</h2><div class="scroll"><table><thead><tr><th>Wk</th><th>MVP</th><th class="r">PAA</th></tr></thead><tbody>{wk_rows}</tbody></table></div></section>')
+                       f'<section><h2>Weekly MVP</h2><div class="scroll"><table><thead><tr><th>Wk</th><th>MVP</th><th class="r">Pts over replacement</th></tr></thead><tbody>{wk_rows}</tbody></table></div></section>')
         Rv = s.repl["val"]
         def imp(t, r, i):          # how much he has mattered to the team that got him: WAR in its lineup since the trade, then season WAR
             war = sum((p - Rv.get(s.pos(i), 0)) * s.wpp for w in s.weeks if w >= t["w"] for j, p in s.W[w][r]["S"] if j == i)
             tot = sum((p - Rv.get(s.pos(i), 0)) * s.wpp for w in s.weeks for rr in s.R for j, p in s.W[w][rr]["S"] if j == i)
             return (war, tot)
         def gotfrom(t, x):          # most important player first; 3-team deals also say who each player came from
-            got = sorted(x["got"], key=lambda i: imp(t, x["r"], i), reverse=True)
+            got = sorted(x["got"], key=lambda i: -s_.pval(i))           # the same order everywhere: points per game this season
             if len(t["sides"]) < 3: return ", ".join(s_.pa(i, nm(i)) for i in got)
             by = defaultdict(list)
             for i in got: by[t.get("frm", {}).get(i)].append(i)
@@ -4246,7 +4264,7 @@ class Site:
         n9 = len(s.R) - 1
         outsc = lambda r: sum(G["scores"][r] > G["scores"][x] for x in s.R if x != r)
         extra = {r: [("outscored", f"{outsc(r)} of {n9}"), (f"of best possible ({fp(opt[r])})", pct(G["scores"][r] / opt[r] if opt[r] else 1))] for r in (a, b)}
-        ser = [w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b}]
+        ser = [w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b} and w2 != w]     # every other meeting, not this one
         series = "".join(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if s.G[w2]["scores"][a] > s.G[w2]["scores"][b] else "l"}">{s_.logo(a, pre, "lgs", w2)}<span class="t">{E(s_.TN(a, w2))}</span><span class="s">{s.G[w2]["scores"][a]:.1f}</span></div>'
                          f'<div class="row {"w" if s.G[w2]["scores"][b] > s.G[w2]["scores"][a] else "l"}">{s_.logo(b, pre, "lgs", w2)}<span class="t">{E(s_.TN(b, w2))}</span><span class="s">{s.G[w2]["scores"][b]:.1f}</span></div><div class="foot">Week {w2}</div></a>' for w2 in ser)
         mid = f'<span class="tag">Final</span><div style="margin-top:8px">by {fp(abs(sa - sb))}</div>'
@@ -4271,38 +4289,17 @@ class Site:
         return page(f"Week {w}: {s_.TN(a)} vs {s_.TN(b)}, Super League {yr}", body, pre, "schedule")
 
     def odds_moves(s_, w, a, b):
-        """Pre-kickoff win chance for this game after every site update: a small line chart, team a on top."""
-        from zoneinfo import ZoneInfo
-        rows_ = [r for r in getattr(s_.s, "mlog", []) if int(r[1]) == w and {int(r[2]), int(r[3])} == {a, b}]
-        if not rows_: return ""
-        ET = ZoneInfo("America/New_York")
-        pts = []
-        for r in rows_:
-            pa_ = float(r[4]) if int(r[2]) == a else 1 - float(r[4])
-            ma, mb = (r[5], r[6]) if int(r[2]) == a else (r[6], r[5])
-            dt = datetime.datetime.strptime(r[0], "%Y-%m-%dT%H:%MZ").replace(tzinfo=datetime.timezone.utc).astimezone(ET)
-            pts.append((pa_, dt, float(ma), float(mb)))
-        Wd, Hd, L, Rm, T, B = 640, 210, 40, 40, 16, 34
-        n = len(pts); X = lambda k: L + (k / (n - 1) if n > 1 else 0.5) * (Wd - L - Rm); Y = lambda v: T + (1 - v) * (Hd - T - B)
-        g = "".join(f'<line x1="{L}" x2="{Wd - Rm}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" stroke="{"#C9D1DE" if v == .5 else "#E3E7EE"}"{" stroke-dasharray=\"4 4\"" if v == .5 else ""}/>'
-                    f'<text x="{L - 6}" y="{Y(v) + 4:.1f}" text-anchor="end" font-size="11" fill="var(--mute)">{int(v * 100)}%</text>' for v in (0, .25, .5, .75, 1))
-        line = lambda f_: " ".join(f"{X(k):.1f},{Y(f_(p)):.1f}" for k, p in enumerate(pts))
-        g += f'<polyline fill="none" stroke="var(--flag)" stroke-width="2.4" points="{line(lambda p: 1 - p[0])}"/><polyline fill="none" stroke="var(--turf)" stroke-width="3" points="{line(lambda p: p[0])}"/>'
-        show = set(range(n)) if n <= 7 else {0, n - 1} | {k for k in range(1, n - 1) if abs(pts[k][0] - pts[k - 1][0]) > 0.04}
-        for k, p in enumerate(pts):
-            tip = f'{E(s_.M[a])} {p[0] * 100:.1f}%, {E(s_.M[b])} {(1 - p[0]) * 100:.1f}%. Projected {p[2]:.1f} to {p[3]:.1f}. {p[1].strftime("%a %b %-d, %-I:%M %p")}'
-            g += f'<circle cx="{X(k):.1f}" cy="{Y(p[0]):.1f}" r="4" fill="var(--turf)"><title>{tip}</title></circle>'
-            if k in show:
-                g += (f'<text x="{X(k):.1f}" y="{Y(p[0]) - 9:.1f}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">{p[0] * 100:.0f}%</text>'
-                      f'<text x="{X(k):.1f}" y="{Hd - 14}" text-anchor="middle" font-size="10.5" fill="var(--mute)">{p[1].strftime("%a %-I:%M%p").replace("AM", "a").replace("PM", "p")}</text>')
-        first, last = pts[0], pts[-1]; mv = (last[0] - first[0]) * 100
-        lead = (f'{E(s_.M[a])} opened at {first[0] * 100:.0f}% and {"is" if w == s_.s.nxt and not s_.wk_live(w) else "kicked off"} at <b>{last[0] * 100:.0f}%</b>'
-                + (f' ({mv:+.0f})' if abs(mv) >= 0.5 else ' (no change)') + '.')
-        tbl = "".join(f'<tr><td>{p[1].strftime("%a %b %-d, %-I:%M %p")}</td><td class="r"><b>{p[0] * 100:.1f}%</b></td><td class="r">{(1 - p[0]) * 100:.1f}%</td><td class="r">{p[2]:.1f}-{p[3]:.1f}</td></tr>' for p in reversed(pts))
-        return (f'<section><h2>How the odds moved <small>before kickoff</small></h2><p class="intro">{lead} Saved every time the site updated, until the first game of the week.</p>'
-                f'<div class="panel"><svg viewBox="0 0 {Wd} {Hd}" width="100%" role="img" aria-label="Win chance before kickoff">{g}</svg>'
-                f'<p class="note" style="margin:4px 0 0"><span style="color:var(--turf);font-weight:700">Navy</span> = {E(s_.TN(a))}, <span style="color:#B08A16;font-weight:700">gold</span> = {E(s_.TN(b))}.</p></div>'
-                f'<details class="omd"><summary>Every update</summary><div class="scroll"><table class="pt" style="min-width:0"><thead><tr><th>Saved</th><th class="r">{E(s_.M[a])}</th><th class="r">{E(s_.M[b])}</th><th class="r">Projected</th></tr></thead><tbody>{tbl}</tbody></table></div></details></section>')
+        """Before kickoff, simply: the first look at this game and where it stood at kickoff (or now, if it hasn't started)."""
+        pts = s_.wp_series(w, a, b)
+        if not pts or len(pts) < 2: return ""
+        k0 = next((k for k, x in enumerate(pts) if x[0] == "·" and len(x) > 5), None)     # the first play of the week
+        pre_ = pts[:k0] if k0 else pts
+        if len(pre_) < 2: return ""
+        p0, p1 = pre_[0][1], pre_[-1][1]; fav = a if p1 >= 0.5 else b; f0, f1 = (p0, p1) if fav == a else (1 - p0, 1 - p1)
+        started = k0 is not None; mv = (f1 - f0) * 100
+        return (f'<section class="omv"><h2>Before kickoff</h2><div class="panel omvp">{s_.logo(fav, "../", "lgs", w)}<span class="omvt"><b>{E(s_.TN(fav, w))}</b>'
+                f'<small>first look to {"kickoff" if started else "now"}</small></span><span class="omvn"><span>{f0 * 100:.0f}%</span><i aria-hidden="true">&#8594;</i><strong>{f1 * 100:.0f}%</strong></span>'
+                f'<span class="omvd {"pos" if mv > 0.5 else "neg" if mv < -0.5 else "muted"}">{"no change" if abs(mv) < 0.5 else f"{mv:+.0f}"}</span></div></section>')
 
     def game_next(s_, w, a, b):
         s_._at = s_.wk_start(w)
@@ -4342,11 +4339,16 @@ class Site:
             ba = (va > vb) if hib else (va < vb); bb = (vb > va) if hib else (vb < va)
             return f'<div class="a {"better" if ba else ""}">{fmt(va)}</div><div class="k">{k}</div><div class="b {"better" if bb else ""}">{fmt(vb)}</div>'
         rk = lambda r: s_.stand.index(r) + 1
+        def h2h_row(k, ws):                                   # their record against each other, not counting this game
+            wa = sum(1 for w2 in ws if s.G[w2]["scores"][a] > s.G[w2]["scores"][b]); wb = sum(1 for w2 in ws if s.G[w2]["scores"][b] > s.G[w2]["scores"][a])
+            return f'<div class="a {"better" if wa > wb else ""}">{wa}-{wb}</div><div class="k">{k}</div><div class="b {"better" if wb > wa else ""}">{wb}-{wa}</div>'
         tape = ('<div class="vs">' + f'<div class="a {"better" if s_.W0[a] > s_.W0[b] else ""}">{s_.rec_str(a)}</div><div class="k">Record</div><div class="b {"better" if s_.W0[b] > s_.W0[a] else ""}">{s_.rec_str(b)}</div>' + tape_row("Standings", rk(a), rk(b), lambda v: f"#{v}", False)
                 + tape_row("Points per week", pw[a]["ppg"], pw[b]["ppg"], lambda v: f"{v:.1f}") + tape_row("Last 3 weeks", pw[a]["l3"], pw[b]["l3"], lambda v: f"{v:.1f}")
                 + tape_row("Power", s_.power[a][0], s_.power[b][0], lambda v: f"#{v}", False) + tape_row("xWins", s_.xw[a], s_.xw[b], lambda v: f"{v:.1f}")
-                + tape_row("Playoff odds", out[a]["po"], out[b]["po"], pct) + tape_row("Title odds", out[a]["ti"], out[b]["ti"], pct) + "</div>")
-        ser = [w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b}]
+                + tape_row("Playoff odds", out[a]["po"], out[b]["po"], pct) + tape_row("Title odds", out[a]["ti"], out[b]["ti"], pct)
+                + h2h_row("Head-to-head this season", [w2 for w2 in s.weeks if w2 != w and any(set(g) == {a, b} for g in s.G[w2]["pairs"]) and s.G[w2]["scores"]])
+                + h2h_row("Head-to-head all-time", [w2 for w2 in s.weeks if w2 != w and any(set(g) == {a, b} for g in s.G[w2]["pairs"]) and s.G[w2]["scores"]]) + "</div>")
+        ser = [w2 for w2 in s.weeks for g in s.G[w2]["pairs"] if set(g) == {a, b} and w2 != w]     # every other meeting, not this one
         series = "".join(f'<a class="gm" href="{s_.gurl(w2, a, b, pre)}"><div class="row {"w" if s.G[w2]["scores"][a] > s.G[w2]["scores"][b] else "l"}">{s_.logo(a, pre, "lgs", w2)}<span class="t">{E(s_.TN(a, w2))}</span><span class="s">{s.G[w2]["scores"][a]:.1f}</span></div>'
                          f'<div class="row {"w" if s.G[w2]["scores"][b] > s.G[w2]["scores"][a] else "l"}">{s_.logo(b, pre, "lgs", w2)}<span class="t">{E(s_.TN(b, w2))}</span><span class="s">{s.G[w2]["scores"][b]:.1f}</span></div><div class="foot">Week {w2}</div></a>' for w2 in ser) or '<p class="muted">First meeting this season.</p>'
         is_live = s_.wk_live(w)
