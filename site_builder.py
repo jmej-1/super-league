@@ -1551,8 +1551,10 @@ class Site:
                 if fl_: add("g_flips", fl_, str(fl_), wi, [wi, lo], o=lo, w=w, u=G_(w, wi, lo), x=f'{fp(sc_[wi])} to {fp(sc_[lo])}')
         for x in s_.improbable():
             sc_ = s.G[x["w"]]["scores"]
-            add("g_improb", -x["low"], pct(x["low"]), x["wi"], [x["wi"], x["lo"]], o=x["lo"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=(("at " + x["at"][1:].replace("Live, ", "") + ", ") if x["at"].startswith("@") else "") + f'won {fp(sc_[x["wi"]])} to {fp(sc_[x["lo"]])}')
-            if x["down"] > 0.05: add("g_down", x["down"], fp(x["down"]), x["wi"], [x["wi"], x["lo"]], o=x["lo"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=f'won {fp(sc_[x["wi"]])} to {fp(sc_[x["lo"]])}')
+            add("g_improb", -x["low"], pct(x["low"]), x["wi"], [x["wi"]], o=x["lo"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=(("at " + x["at"][1:].replace("Live, ", "") + ", ") if x["at"].startswith("@") else "") + f'won {fp(sc_[x["wi"]])} to {fp(sc_[x["lo"]])}')
+            if x["down"] > 0.05: add("g_down", x["down"], fp(x["down"]), x["wi"], [x["wi"]], o=x["lo"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=f'won {fp(sc_[x["wi"]])} to {fp(sc_[x["lo"]])}')
+            add("g_choke", 1 - x["low"], pct(1 - x["low"]), x["lo"], [x["lo"]], o=x["wi"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=f'lost {fp(sc_[x["lo"]])} to {fp(sc_[x["wi"]])}')   # the same games from the other side
+            if x["down"] > 0.05: add("g_blown", x["down"], fp(x["down"]), x["lo"], [x["lo"]], o=x["wi"], w=x["w"], u=G_(x["w"], x["wi"], x["lo"]), x=f'lost {fp(sc_[x["lo"]])} to {fp(sc_[x["wi"]])}')
         # ---- team: season
         n = len(s.weeks)
         for r in s.R:
@@ -5026,7 +5028,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('.tip'); if(t&&t.closest('th.sortable,th.srt')){ tipEl.hidden=true; return; } if(t){ showTip(t,1); } else if(!(e.target.closest&&e.target.closest('.tipbox')&&!e.target.closest('.cx'))) tipEl.hidden=true; },true);
   window.addEventListener('scroll',function(){tipEl.hidden=true;},{passive:true}); window.addEventListener('hashchange',function(){tipEl.hidden=true;});
   var BOOK={team:[['Single game',[['g_high','Highest score'],['g_low','Lowest score'],['g_blow','Biggest blowout'],['g_close','Closest game'],['g_comb','Most combined points'],['g_hiloss','Highest score in a loss'],['g_lowin','Lowest score in a win'],['g_upset','Biggest upset'],['g_excite','Most exciting game'],['g_flips','Most lead changes'],['g_dull','Least exciting game'],['g_bench','Most points lost to start/sit']]],
-      ['Single play',[['t_ppts','Most points'],['t_wpa','Most win probability added'],['t_cpa','Most championship probability added']]],['Biggest comebacks',[['g_improb','Lowest win chance overcome'],['g_down','Biggest deficit overcome']]],
+      ['Single play',[['t_ppts','Most points'],['t_wpa','Most win probability added'],['t_cpa','Most championship probability added']]],['Biggest comebacks',[['g_improb','Lowest win chance overcome'],['g_down','Biggest deficit overcome'],['g_choke','Highest win chance lost'],['g_blown','Biggest lead blown']]],
       ['Season',[['s_pct','Best record'],['s_pctlo','Worst record'],['s_wins','Most wins'],['s_pf','Most points'],['s_pflow','Fewest points'],['s_pa','Most points against'],['s_xw','Most xWins'],['s_lucky','Luckiest'],['s_unlucky','Unluckiest'],['s_wstreak','Longest win streak'],['s_lstreak','Longest losing streak']],1]],
     player:[['Single game',[['p_start','Most points'],['p_startlo','Fewest points'],['p_pm','Best PAA'],['p_pmlo','Worst PAA'],['p_war1','Most WAR'],['p_war1lo','Fewest WAR'],['p_bench','Most bench points']]],
       ['Single play',[['p_ppts','Most points'],['p_wpa','Most win probability added'],['p_cpa','Most championship probability added']]],
@@ -5092,7 +5094,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     BOOK[RBOOK].forEach(function(g){ var rows='';
       if(g[3]&&per!=='all') return;
       g[1].forEach(function(c){ var k=c[0]+(RBOOK==='player'?'_'+RPOS:''), L=X[k]; if(!L||!L.length) return;
-        if(g[2]&&sc!=='L'&&L.length<2) return;
+        // one team picked: every category shows, even with one season (best and worst record are the same season for now)
         rows+=trow(k,RBOOK==='player'&&RPOS!=='ALL'?c[1].replace('the #1 at his position','the #1 '+RPOS):c[1],L); });
       var anyYr=g[1].some(function(c){ return yrOf(c[0]+(RBOOK==='player'?'_'+RPOS:'')); });
       if(rows) h+='<section class="rsec"><h2>'+g[0]+'</h2><div class="rcols"><span>Record</span><span>Holder</span><span>'+(anyYr?'Season':'')+'</span><span></span></div><div class="rlist">'+rows+'</div></section>'; });
