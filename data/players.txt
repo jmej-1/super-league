@@ -270,7 +270,7 @@
 4053|Garett Bolles|OT|DEN||9|OL,OT
 4054|Mo Alie-Cox|TE|IND|IR|9|
 4058|Solomon Thomas|DT|TEN||9|
-4065|Derek Barnett|DE|CLE|Questionable|9|
+4065|Derek Barnett|DE|CLE|Out|9|
 4066|Evan Engram|TE|DEN||9|
 4070|T.J. Watt|LB|PIT||9|DL,LB
 4071|Marlon Humphrey|CB|BAL||9|
@@ -390,7 +390,7 @@
 5048|Isaac Yiadom|CB|CHI|Out|8|
 5049|Harrison Phillips|DT|NYJ|Questionable|8|
 5051|Donte Jackson|CB|LAC||8|
-5054|Carlton Davis III|CB|NE|Questionable|8|
+5054|Carlton Davis III|CB|NE|Out|8|
 5055|M.J. Stewart|DB|HOU||8|
 5060|Braden Smith|OL|HOU||8|OG,OL
 5061|Uchenna Nwosu|LB|SEA|Questionable|8|DL,LB
@@ -437,7 +437,7 @@
 5454|Coleman Shelton|OL|LAR|Out|8|
 5461|Trent Sieg|LS|DAL||8|
 5466|John Franklin-Myers|DT|TEN||8|DL,LB
-5493|Charvarius Ward|CB|IND|Questionable|8|
+5493|Charvarius Ward|CB|IND|Out|8|
 5519|Tavierre Thomas|DB|NYG||8|
 5520|Jonathan Owens|DB|IND||8|
 5532|Daniel Ekuale|DT|WAS||8|
@@ -468,7 +468,7 @@
 5854|Drew Lock|QB|SEA|Questionable|7|
 5855|Garrett Bradbury|C|CHI||7|
 5857|Noah Fant|TE|NO||7|
-5859|A.J. Brown|WR|NE|Doubtful|7|
+5859|A.J. Brown|WR|NE|Out|7|
 5861|L.J. Collier|DE|ARI||7|
 5862|Brian Burns|DE|NYG|IR|7|DL,LB
 5864|Byron Murphy Jr.|CB|MIN||7|
@@ -540,7 +540,7 @@
 6124|Montez Sweat|DE|CHI||7|
 6125|Jeffery Simmons|DT|CHI||7|
 6128|Rock Ya-Sin|CB|DET||7|
-6129|Jerry Tillery|DT|IND|Questionable|7|
+6129|Jerry Tillery|DT|IND|Out|7|
 6130|Devin Singletary|RB|NYG||7|
 6131|Mack Wilson Sr.|LB|ARI||7|
 6136|Jarrett Stidham|QB|DEN||7|
@@ -698,7 +698,7 @@
 7018|Malcolm Roach|DT|DEN||6|
 7021|Rico Dowdle|RB|PIT||6|
 7023|Willie Gay Jr.|LB|MIA||6|
-7036|Terrell Burgess|DB|TEN|Questionable|6|
+7036|Terrell Burgess|DB|TEN|Out|6|
 7039|Cody White|WR|LV||6|
 7041|Robert Hunt|OL|CAR||6|
 7042|Tyler Bass|K|BUF||6|
@@ -946,7 +946,7 @@
 8114|Erik Ezukanma|WR|PHI||4|
 8116|Pierre Strong Jr.|RB|GB||4|
 8117|Jalen Tolbert|WR|MIA||4|
-8119|Jahan Dotson|WR|ATL|Questionable|4|
+8119|Jahan Dotson|WR|ATL|Out|4|
 8121|Romeo Doubs|WR|NE|IR|4|
 8122|Zonovan Knight|RB|ARI||4|
 8123|Hassan Haskins|RB|CLE||4|
@@ -1039,7 +1039,7 @@
 8306|John Ridgeway III|DL|NO||4|
 8308|Derek Stingley Jr.|DB|HOU||4|
 8309|Damone Clark|LB|DET|IR|4|
-8310|Cor'Dale Flott|DB|TEN|Questionable|4|
+8310|Cor'Dale Flott|DB|TEN|Out|4|
 8311|Terrel Bernard|LB|BUF||4|
 8314|Jalen Pitre|DB|HOU||4|
 8316|Micheal Clemons|DL|IND|IR|4|
@@ -1117,7 +1117,7 @@
 8455|Joshua Ezeudu|OL|KC||4|
 8457|Abraham Lucas|OL|SEA|Out|4|
 8458|Dylan Parham|OL|NYJ|Questionable|4|
-8459|Bernhard Raimann|OL|IND|Questionable|4|
+8459|Bernhard Raimann|OL|IND||4|
 8460|Sean Rhyan|OL|GB||4|
 8462|Luke Fortner|G|CAR||4|
 8463|Zach Bako-Bewele|OL|GB|IR|4|
@@ -1262,7 +1262,7 @@
 10215|Jake Haener|QB|NYG||3|
 10218|Xavier Hutchinson|WR|HOU||3|
 10219|Chris Rodriguez Jr.|RB|JAX||3|
-10220|Will Mallory|TE|IND|Questionable|3|
+10220|Will Mallory|TE|IND|Out|3|
 10221|Ronnie Bell|WR|ARI||3|
 10222|Jayden Reed|WR|GB|IR|3|
 10223|Eric Gray|RB|IND||3|
@@ -1320,7 +1320,7 @@
 10907|Joe Tippmann|OL|NYJ||3|
 10908|BJ Ojulari|DE|JAX||3|
 10909|Isaiah Foskey|DL|CIN||3|
-10910|Matthew Bergeron|OL|ATL|Questionable|3|
+10910|Matthew Bergeron|OL|ATL|Out|3|
 10911|Derick Hall|DE|SEA||3|
 10912|Steve Avila|C|LAR|Out|3|
 10913|Joey Porter Jr.|DB|DAL||3|
@@ -1351,7 +1351,7 @@
 10942|Viliami Fehoko Jr.|DL|SF||3|
 10943|Isaiah McGuire|DL|CLE|Questionable|3|
 10944|Tavius Robinson|DE|BAL|IR|3|DL,LB
-10946|Jon Gaines II|OL|ARI|Questionable|3|
+10946|Jon Gaines II|OL|ARI|Out|3|
 10947|Ventrell Miller|LB|JAX||3|
 10949|Chamarri Conner|DB|KC||3|
 10952|Colby Wooden|DE|NO||3|
@@ -1426,7 +1426,7 @@
 11044|Nick Broeker|OL|BUF||3|
 11045|Andrew Vorhees|OL|ATL||3|
 11049|Jovaughn Gwyn|OL|BAL|IR|3|
-11050|DeMarcco Hellams|DB|ATL|Questionable|3|
+11050|DeMarcco Hellams|DB|ATL|Out|3|
 11051|Ethan Evans|P|LAR||3|
 11052|Jaylon Jones|DB|TEN||3|
 11056|Jared Wayne|WR|MIA|Questionable|3|
@@ -2028,12 +2028,12 @@
 12639|Malachi Moore|DB|NYJ||1|
 12640|Teddye Buchanan|LB|BAL||1|
 12641|Jaylin Lane|WR|WAS|IR|1|
-12642|Jalen Travis|OT|IND|Questionable|1|
+12642|Jalen Travis|OT|IND|Out|1|
 12643|Kyle Kennard|DE|WAS||1|
 12644|Barryn Sorrell|DE|GB|Questionable|1|
 12645|David Walker|LB|TB||1|DL,LB
 12646|Barrett Carter|LB|CIN||1|
-12647|Billy Bowman Jr.|DB|ATL|Questionable|1|
+12647|Billy Bowman Jr.|DB|ATL|Out|1|
 12648|Cody Simon|LB|ARI|Questionable|1|
 12649|C.J. West|DT|SF||1|
 12650|Danny Stutsman|LB|NO||1|
@@ -2304,7 +2304,7 @@
 13268|Elijah Sarratt|WR|BAL||0|
 13269|Fernando Mendoza|QB|LV||0|
 13270|CJ Daniels|WR|LAR||0|
-13272|Carson Beck|QB|ARI|Questionable|0|
+13272|Carson Beck|QB|ARI|Out|0|
 13273|Josh Cuevas|TE|BAL||0|
 13274|Germie Bernard|WR|PIT||0|
 13276|Omar Cooper Jr.|WR|NYJ|Out|0|
@@ -2340,7 +2340,7 @@
 13317|Ted Hurst III|WR|TB||0|
 13318|Noah Thomas|WR|CIN||0|
 13319|Oscar Delp|TE|NO||0|
-13320|Zachariah Branch|WR|ATL|Questionable|0|
+13320|Zachariah Branch|WR|ATL|Out|0|
 13321|Dan Villari|TE|LAR||0|
 13322|Sam Roush|TE|CHI||0|
 13324|Matt Hibner|TE|BAL||0|
