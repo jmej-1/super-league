@@ -122,6 +122,14 @@ class Cards:
             f'<meta name="twitter:image" content="{SITE}/og/{img}.jpg?v={VER}"></head><body><a href="{e(path)}">{e(title)}</a></body></html>')
         for k_ in {key, re.sub(r"-([a-z])([a-z]*)$", lambda m: "-" + m.group(1).upper() + m.group(2), key), key.lower()}:   # /week12/Jesse and /week12/jesse alike
             open(os.path.join(s.out, f"{k_}.html"), "w").write(page)
+        # The same card at the page's own address, for everyone: link previews read it no matter who's asking, and a person's
+        # browser swaps in the full site right away (same address, so the site opens on the right page).
+        if path and path != "/":
+            stub = page.replace("<body>", '<body><script>fetch("/index.html").then(function(r){return r.text()}).then(function(t){document.open();document.write(t);document.close()})</script><noscript>', 1).replace("</body>", "</noscript></body>", 1)
+            parts = path.strip("/").split("/")
+            for v in {tuple(parts), tuple(parts[:-1] + [parts[-1].lower()]), tuple(parts[:-1] + [parts[-1][:1].upper() + parts[-1][1:].lower()])}:
+                d_ = os.path.join(s.out, "..", "..", "stubs", *v); os.makedirs(d_, exist_ok=True)
+                open(os.path.join(d_, "index.html"), "w").write(stub)
         s.n += 1
 
     # ---------- cards
