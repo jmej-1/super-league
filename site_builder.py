@@ -3270,6 +3270,7 @@ class Site:
     @staticmethod
     def play_text(t, ks=None):
         """ESPN's play text, trimmed: no formation tags, tacklers, snappers, injury notes, penalty or replay fine print."""
+        if re.search(r"the play was REVERSED\.", t or ""): t = re.split(r"the play was REVERSED\.\s*", t, 1)[1] or t   # keep the call that stood
         t = re.split(r"\s\*\*\s|\.?\s*PENALTY on|\.?\s*Penalty on|\.?\s*The Replay Official", t or "")[0]
         t = re.sub(r"\s*\((?:[^()]*)\)", "", t); t = re.sub(r"\s*\[[^\]]*\]", "", t); t = re.sub(r",?\s*Hit (Left|Right) Upright\.?", "", t)
         t = re.sub(r",?\s*(?:Center|Holder)-(?:[A-Z][A-Za-z'\-]*\.)?[A-Za-z'\-]+", "", t)
@@ -3377,13 +3378,45 @@ class Site:
         # Check: every finished start with points should have plays behind them. A miss means the play-by-play couldn't find him
         # (ESPN wrote his name a way we don't know). Logged every build so it gets caught the same day.
         miss = [(w, r, i, p) for w, r, i, p, wp in st_ if abs(p) >= 1 and (w, r, i) not in cred and s.pos(i) != "DEF"]
+        import pbp as _pb
+        bad = []
+        for w, a, b, _ in s_.games:
+            if w > s.last or w > reg: continue
+            for x in (s_.wp_series(w, a, b) or []):
+                if not (x[0] == "·" and len(x) > 5 and x[5]): continue
+                for e in x[5]:
+                    for q in e["who"]:
+                        if not q[0].isdigit(): continue
+                        ks = _pb.keys_of(s.PL.get(q[0], {}).get("name", ""))
+                        if ks and not any(re.search(r"(?<![A-Za-z])" + re.escape(k) + r"(?![a-z])", e["txt"] or "") for k in ks):
+                            bad.append((w, q[0], q[2], (e["txt"] or "")[:90]))
+        s_._pbpbad = bad
+        # and every player's plays must add up to his final: the sum of what each play gave him vs his box-score points
+        psum = defaultdict(float); seenp = set()
+        for w, a, b, _ in s_.games:
+            if w > s.last or w > reg: continue
+            for x in (s_.wp_series(w, a, b) or []):
+                if not (x[0] == "·" and len(x) > 5 and x[5]): continue
+                for e in x[5]:
+                    k_ = (w, e["q"], e["c"], e["txt"])
+                    for q in e["who"]:
+                        if q[0].isdigit() and (k_, q[0]) not in seenp: seenp.add((k_, q[0])); psum[(w, q[0])] += q[2]
+        add_up = []
+        for w, r, i, p, wp in st_:
+            if not i.isdigit(): continue
+            if abs(psum.get((w, i), 0.0) - p) > 0.15: add_up.append((w, i, round(psum.get((w, i), 0.0), 2), p))
+        s_._pbpsum = add_up
         s_._pbpmiss = miss
         try:
             with open(os.path.join(getattr(s, "ddir", "data"), "pbp_check.txt"), "w") as f:
                 f.write("# finished starts with points but no plays found in the play-by-play (should be empty)\n")
                 for w, r, i, p in miss: f.write(f"{w}|{r}|{i}|{s.nm(i)}|{p}\n")
+                for w, i, d, t in bad: f.write(f"credit not in play text|{w}|{i}|{s.nm(i)}|{d}|{t}\n")
+                for w, i, ps, p in add_up: f.write(f"plays don't add up|{w}|{i}|{s.nm(i)}|plays {ps}|final {p}\n")
         except Exception: pass
         if miss: print(f"PBP CHECK: {len(miss)} start(s) with points but no plays:", ", ".join(f"W{w} {s.nm(i)} {p}" for w, r, i, p in miss[:12]))
+        if add_up: print(f"PBP CHECK: {len(add_up)} start(s) where the plays don't add up to the final:", ", ".join(f"W{w} {s.nm(i)} {ps} vs {p}" for w, i, ps, p in add_up[:15]))
+        if bad: print(f"PBP CHECK: {len(bad)} play(s) credit a player the text doesn't name:", "; ".join(f"W{w} {s.nm(i)} {d:+} on '{t[:50]}'" for w, i, d, t in bad[:8]))
         s_._pimp = out; s_._pcred = cred
         return out
 

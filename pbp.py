@@ -9,6 +9,7 @@ from collections import defaultdict
 from scipy.stats import norm
 
 ESPN = {"WSH": "WAS"}
+TCODE = {"LA": "LAR", "HST": "HOU", "BLT": "BAL", "CLV": "CLE", "ARZ": "ARI", "WSH": "WAS", "JAC": "JAX", "SD": "LAC", "OAK": "LV"}   # team codes inside ESPN's play text
 SUF = re.compile(r"\s+(Jr\.?|Sr\.?|II|III|IV|V)$")
 YDS = re.compile(r" for (-?\d+) yards?| for no gain")
 FGD = re.compile(r"(\d+) yard field goal")
@@ -85,6 +86,8 @@ def parse_game(g, cands):
     for p in plays:
         r0 = dict(run)
         wc, per, clk, typ, txt, asc, hsc, ofid = p[:8]; tov = p[8] if len(p) > 8 else 0
+        if re.search(r"the play was REVERSED\.", txt):                # a replay reversal: ESPN writes the original call, then the real one
+            txt = re.split(r"the play was REVERSED\.\s*", txt, 1)[1] or txt
         off = g["tid"].get(str(ofid)); dfn = home if off == away else away if off == home else None
         if "No Play" in txt or typ in ("Penalty", "Timeout", "Official Timeout", "End Period", "End of Half", "End of Game", "Two-minute warning"):
             hits = []
@@ -98,13 +101,25 @@ def parse_game(g, cands):
         yd_m = YDS.search(txt); yd = int(yd_m.group(1)) if (yd_m and yd_m.group(1)) else 0
         td = "TOUCHDOWN" in txt and "NULLIFIED" not in txt
         names = [h[1] for h in hits]
-        if typ in ("Pass Reception", "Passing Touchdown") and names:
-            qb = names[0]; run[qb] += yd * 0.04 + (4 if td else 0)
-            m = re.search(r" to ([A-Z][^ ]*)", txt)
-            rc = next((h[1] for h in hits if m and h[0] >= m.start()), names[1] if len(names) > 1 else None)
+        main0 = re.split(r"TWO-POINT CONVERSION|extra point|FUMBLES", txt)[0]
+        scrim = not re.search(r"\b(kicks|punts|field goal|extra point is|Kickoff)\b", main0) and typ not in ("Kickoff", "Punt", "Field Goal Good", "Field Goal Missed", "Blocked Field Goal", "Extra Point Good", "Extra Point Missed")
+        is_pass = scrim and " pass " in main0 and not re.search(r"incomplete|INTERCEPTED|sacked|spiked", main0)
+        is_rush = scrim and not is_pass and " pass " not in main0 and not re.search(r"sacked|spiked|INTERCEPTED", main0) and bool(re.search(r"for (-?\d+) yards?|for no gain", main0))
+        if is_pass and names:
+            # the passer is the name before " pass ", the catcher the first name after " to ": either may not be in a matchup
+            pm_ = re.search(r" pass ", txt); main_ = re.split(r"TWO-POINT CONVERSION|extra point", txt)[0]
+            qb = next((h[1] for h in reversed(hits) if pm_ and h[0] < pm_.start()), None)
+            m = re.search(r" to ([A-Z][^ ]*)", main_[pm_.end():] if pm_ else main_)
+            st_ = (pm_.end() + m.start()) if (pm_ and m) else None
+            rc = next((h[1] for h in hits if st_ is not None and h[0] >= st_ and h[0] < len(main_)), None)
+            if qb: run[qb] += yd * 0.04 + (4 if td else 0)
             if rc and rc != qb: run[rc] += 0.5 + yd * 0.1 + (6 if td else 0)
-        elif typ in ("Rush", "Rushing Touchdown") and names:
-            run[names[0]] += yd * 0.1 + (6 if td else 0)
+        elif is_rush and names:
+            cut = 0
+            for m_ in re.finditer(r"reported in as eligible\.\s*|Direct snap to [^.]*\.[A-Za-z'\-]*\.?\s*", txt): cut = m_.end()
+            fm = re.search(r"(?<![A-Za-z])[A-Z][a-z]{0,2}\.\s?[A-Z]", txt[cut:])
+            ru = next((h[1] for h in hits if fm and abs(h[0] - (cut + fm.start())) <= 1), None)   # the runner: the first name after any eligibility / direct-snap notes
+            if ru: run[ru] += yd * 0.1 + (6 if td else 0)
         elif typ in ("Pass Interception Return", "Interception Return Touchdown"):
             if names: run[names[0]] += -2
             if dfn: run[dfn] += 2 + (6 if td else 0)
@@ -128,16 +143,28 @@ def parse_game(g, cands):
             if " pass to " in m2.group(1): h2 = h2[:2]
             else: h2 = h2[:1]
             for x in dict.fromkeys(h2): run[x] += 2
-        if tov and "FUMBLES" in txt:
-            fb = fumbler(txt, hits)                          # whoever had the ball, not just the first name on the play
-            if fb: run[fb] += -2
-            if dfn: run[dfn] += 2 + (6 if td else 0)
+        lost = False
+        if "FUMBLES" in txt and typ not in ("Penalty",):
+            # Who lost it is read from the play itself (ESPN's turnover flag misses some): the ball carrier's team is the offense,
+            # or on a kickoff or punt the return team; it's lost when the other team recovers. Scrimmage: recovery 2, forced 1.
+            # Kicks and punts: special teams recovery 1, forced 1. The fumbler is charged 2 either way it's lost.
+            kick_ = bool(re.search(r"\b(kicks|punts)\b", txt)) and typ not in ("Sack",)
+            carry = (dfn if kick_ else off)                                   # the team that had the ball
+            other = (off if kick_ else dfn)
+            seg = txt[txt.rfind("FUMBLES"):]
+            rm = re.search(r"RECOVERED by ([A-Z]{2,3})-", seg)
+            rec = TCODE.get(rm.group(1), rm.group(1)) if rm else None
+            lost = rec is not None and carry is not None and rec != carry and rec in (away, home)
+            if lost:
+                fb = fumbler(txt, hits)                                           # whoever had the ball, not just the first name on the play
+                if fb: run[fb] += -2
+                if other: run[other] += (1 if kick_ else 2) + (6 if td and rec == other else 0)
+            if other and re.search(r"FUMBLES \((?!Aborted)[^)]*\)", txt): run[other] += 1      # forced fumble, whoever recovers
         # the rest of the league's defense / special teams rules
         if dfn and "sacked" in txt.split("TWO-POINT")[0] and typ not in ("Sack", "Safety"): run[dfn] += 1          # a sack logged under another play type (a sack fumble)
-        if dfn and re.search(r"FUMBLES \((?!Aborted)[^)]*\)", txt): run[dfn] += 1         # forced fumble, whoever recovers
         if dfn and (typ.startswith("Blocked") or "extra point is BLOCKED" in txt or re.search(r"[Pp]unt is BLOCKED", txt)) and typ != "Blocked Field Goal":
             run[dfn] += 1                                                                  # blocked punt or extra point (field goals above)
-        if typ in ("Kickoff Return Touchdown", "Punt Return Touchdown", "Blocked Punt Touchdown") or (typ.endswith("Return Touchdown") and "Interception" not in typ and not tov):
+        if typ in ("Kickoff Return Touchdown", "Punt Return Touchdown", "Blocked Punt Touchdown") or (typ.endswith("Return Touchdown") and "Interception" not in typ and not tov and not lost):
             scr = away if asc > pa[home] else home if hsc > pa[away] else None             # whoever's score went up returned it
             if scr: run[scr] += 6
         # a defense's points-allowed bonus is settled at the final, so it isn't counted mid-game: it rides in with the anchor,
