@@ -381,6 +381,7 @@ a.hrank{display:flex;flex-direction:column;color:#B8C2D6;font-size:13px;text-dec
 .rtop .rrow{grid-template-columns:40px minmax(0,1fr) auto auto;grid-template-areas:"lg hold yr val";gap:12px;padding:12px 2px;flex:1}
 .rtop .rlab{display:none} .rtop .rlg{grid-area:lg;width:40px;height:40px} .rtop .rhold{grid-area:hold} .rtop .rhold b{font-size:19px} .rtop .ryear{grid-area:yr;width:170px;text-align:right} .rtop .rval{grid-area:val;font-size:30px}
 .rtop li.r1 .rval{color:#fff}
+.rrow.rna{cursor:default}.rrow.rna .rval{color:#5E6B85}.rrow.rna .rlg{visibility:hidden}.rrow.rna .rhold small{color:#8C99B3}
 .rtop .rlg2{grid-area:lg;align-self:center;width:40px;height:40px}.rtop .rlg2 .im{width:27px;height:27px}.rtop .rval{min-width:96px;text-align:right}.rtop .ryear{width:110px!important}
 @media (max-width:760px){.rtop .rlg2{width:36px;height:36px;align-self:start}.rtop .rlg2 .im{width:24px;height:24px}.rtop .rval{min-width:0;font-size:24px}.rtop .ryear{width:auto!important}.rtop .rk{width:22px;font-size:15px}.rtop li{gap:6px}}
 @media (max-width:760px){.rtop .ryear{width:auto;text-align:left} .rtop .rrow{grid-template-columns:36px minmax(0,1fr) auto;grid-template-areas:"lg hold val" "lg yr val"} .rtop .ryear{display:flex;gap:6px;align-items:center;flex-wrap:wrap}}
@@ -5093,7 +5094,8 @@ def bundle(files, s, logo_dir, font_dir, site=None):
     var h=RBOOK==='player'?'<div class="chips rposc">'+['ALL','QB','RB','WR','TE','K','DEF'].map(function(p){return '<a href="#" class="rpos'+(p===RPOS?' nx':'')+'" data-p="'+p+'">'+(p==='ALL'?'All':p)+'</a>';}).join('')+'</div>':'';
     BOOK[RBOOK].forEach(function(g){ var rows='';
       if(g[3]&&per!=='all') return;
-      g[1].forEach(function(c){ var k=c[0]+(RBOOK==='player'?'_'+RPOS:''), L=X[k]; if(!L||!L.length) return;
+      g[1].forEach(function(c){ var k=c[0]+(RBOOK==='player'?'_'+RPOS:''), L=X[k];
+        if(!L||!L.length){ if(sc!=='L') rows+='<div class="rrow rna"><span class="rlab">'+esc(c[1])+'</span><i class="rlg"></i><span class="rhold"><small>Not yet</small></span><span class="ryear"></span><span class="rval">N/A</span></div>'; return; }
         // one team picked: every category shows, even with one season (best and worst record are the same season for now)
         rows+=trow(k,RBOOK==='player'&&RPOS!=='ALL'?c[1].replace('the #1 at his position','the #1 '+RPOS):c[1],L); });
       var anyYr=g[1].some(function(c){ return yrOf(c[0]+(RBOOK==='player'?'_'+RPOS:'')); });
