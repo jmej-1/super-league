@@ -8,6 +8,7 @@ Files: <out>/og/<key>.html and <out>/og/<key>.jpg (1200x630)."""
 import os, re, html, datetime
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
+VER = __import__('time').strftime('%m%d%H%M')
 SITE = "https://superleague.website"
 W_, H_ = 1200, 630
 NAVY, NAVY2, GOLD, CHALK, MUTE, TURF = (11, 26, 58), (18, 40, 84), (224, 180, 58), (238, 242, 248), (160, 176, 204), (31, 122, 74)
@@ -112,13 +113,15 @@ class Cards:
     def page(s, key, title, desc, img, path):
         e = lambda v: html.escape(v, quote=True)
         t = f"{title} | Super League" if title != "Super League 2026" else title
-        open(os.path.join(s.out, f"{key}.html"), "w").write(
+        page = (
             f'<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>{e(t)}</title>'
             f'<meta name="description" content="{e(desc)}"><meta property="og:type" content="website"><meta property="og:site_name" content="Super League">'
             f'<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{SITE}{e(path)}">'
-            f'<meta property="og:image" content="{SITE}/og/{img}.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">'
+            f'<meta property="og:image" content="{SITE}/og/{img}.jpg?v={VER}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">'
             f'<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(title)}"><meta name="twitter:description" content="{e(desc)}">'
-            f'<meta name="twitter:image" content="{SITE}/og/{img}.jpg"></head><body><a href="{e(path)}">{e(title)}</a></body></html>')
+            f'<meta name="twitter:image" content="{SITE}/og/{img}.jpg?v={VER}"></head><body><a href="{e(path)}">{e(title)}</a></body></html>')
+        for k_ in {key, re.sub(r"-([a-z])([a-z]*)$", lambda m: "-" + m.group(1).upper() + m.group(2), key), key.lower()}:   # /week12/Jesse and /week12/jesse alike
+            open(os.path.join(s.out, f"{k_}.html"), "w").write(page)
         s.n += 1
 
     # ---------- cards

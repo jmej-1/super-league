@@ -5,6 +5,105 @@
   "framework": null,
   "rewrites": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|Twitterbot|Slackbot|Discordbot|WhatsApp|TelegramBot|LinkedInBot|Applebot|Googlebot|bingbot|Embedly|redditbot|SkypeUriPreview|Pinterest|vkShare|iframely|Snapchat).*"
+        }
+      ],
+      "destination": "/og/home.html"
+    },
+    {
+      "source": "/week:n(\\d+)/:name",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|Twitterbot|Slackbot|Discordbot|WhatsApp|TelegramBot|LinkedInBot|Applebot|Googlebot|bingbot|Embedly|redditbot|SkypeUriPreview|Pinterest|vkShare|iframely|Snapchat).*"
+        }
+      ],
+      "destination": "/og/game-:n-:name.html"
+    },
+    {
+      "source": "/week:n(\\d+)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|Twitterbot|Slackbot|Discordbot|WhatsApp|TelegramBot|LinkedInBot|Applebot|Googlebot|bingbot|Embedly|redditbot|SkypeUriPreview|Pinterest|vkShare|iframely|Snapchat).*"
+        }
+      ],
+      "destination": "/og/week-:n.html"
+    },
+    {
+      "source": "/news/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|Twitterbot|Slackbot|Discordbot|WhatsApp|TelegramBot|LinkedInBot|Applebot|Googlebot|bingbot|Embedly|redditbot|SkypeUriPreview|Pinterest|vkShare|iframely|Snapchat).*"
+        }
+      ],
+      "destination": "/og/news-:slug.html"
+    },
+    {
+      "source": "/player/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|Twitterbot|Slackbot|Discordbot|WhatsApp|TelegramBot|LinkedInBot|Applebot|Googlebot|bingbot|Embedly|redditbot|SkypeUriPreview|Pinterest|vkShare|iframely|Snapchat).*"
+        }
+      ],
+      "destination": "/og/player-:id.html"
+    },
+    {
+      "source": "/game/w:n(\\d+)-:a(\\d+)-:b(\\d+)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|Twitterbot|Slackbot|Discordbot|WhatsApp|TelegramBot|LinkedInBot|Applebot|Googlebot|bingbot|Embedly|redditbot|SkypeUriPreview|Pinterest|vkShare|iframely|Snapchat).*"
+        }
+      ],
+      "destination": "/og/g-:n-:a-:b.html"
+    },
+    {
+      "source": "/:pg(standings|schedule|playoffs|records|teams|players|news|races|trades|transactions|draft|h2h|excitement|analyzer)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|Twitterbot|Slackbot|Discordbot|WhatsApp|TelegramBot|LinkedInBot|Applebot|Googlebot|bingbot|Embedly|redditbot|SkypeUriPreview|Pinterest|vkShare|iframely|Snapchat).*"
+        }
+      ],
+      "destination": "/og/page-:pg.html"
+    },
+    {
+      "source": "/team/:name",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|Twitterbot|Slackbot|Discordbot|WhatsApp|TelegramBot|LinkedInBot|Applebot|Googlebot|bingbot|Embedly|redditbot|SkypeUriPreview|Pinterest|vkShare|iframely|Snapchat).*"
+        }
+      ],
+      "destination": "/og/team-:name.html"
+    },
+    {
+      "source": "/:name",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|Twitterbot|Slackbot|Discordbot|WhatsApp|TelegramBot|LinkedInBot|Applebot|Googlebot|bingbot|Embedly|redditbot|SkypeUriPreview|Pinterest|vkShare|iframely|Snapchat).*"
+        }
+      ],
+      "destination": "/og/team-:name.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
