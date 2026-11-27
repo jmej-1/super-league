@@ -4869,7 +4869,7 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   }
   var INJ={Questionable:'Q',Doubtful:'D',Out:'O',Sus:'SUS'}; function ij(j){return j?' <span class="stg inj">'+esc(INJ[j]||j)+'</span>':'';}
   function ngame(ab,x){ var g=x.y===YR&&window.NSCH&&NSCH[ab]&&NSCH[ab][x.w]; if(!g) return '<span class="muted">-</span>';
-    var opp=(g[1]?'vs ':'at ')+'<a href="#/nfl/'+g[0]+'" title="'+esc(NFLN[g[0]]||g[0])+'" style="text-decoration:none"><i class="nfl nflm N'+g[0]+'"></i></a>'; if(g.length<5) return opp;
+    var opp=(g[1]?'vs ':'at ')+'<a href="#/nfl/'+g[0]+'" title="'+esc(NFLN[g[0]]||g[0])+'" style="text-decoration:none"><i class="nfl nflm N'+g[0]+'"></i> '+esc(g[0])+'</a>'; if(g.length<5) return opp;
     var r=g[2]>g[3]?'W':(g[2]<g[3]?'L':'T'); return opp+' <span class="'+(r==='W'?'pos':(r==='L'?'neg':'muted'))+'">'+(g[4]?r+' ':'')+g[2]+'-'+g[3]+'</span>'+(g[4]?'':' <span class="muted">live</span>'); }
   function renderNFLAll(yr){          // every NFL team, sortable, like the Players page
     var el=document.getElementById('nv'), YRS={};
