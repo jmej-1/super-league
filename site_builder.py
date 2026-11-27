@@ -2765,8 +2765,8 @@ class Site:
                     fut.append((s_.slot_label(g2), pf, g2, (lk(A), lk(B)), sum(1 for t in kick if kick[t] == g2) // 2))
                 break
             lab = s_.slot_label(g)
-            when = f"After the {g.strftime('%-I:%M %p').replace(':00', '')} game{'s' if sum(1 for t in kick if kick[t] == g) > 2 else ''}"
-            pts.append((lab, p_of(g), g, sc(g), f"{when}, {g.strftime('%a %b %-d')}"))
+            when = f"After the {g.strftime('%a')} {g.strftime('%-I:%M %p').replace(':00', '')} game{'s' if sum(1 for t in kick if kick[t] == g) > 2 else ''}"
+            pts.append((lab, p_of(g), g, sc(g), when))
             if dec is None and state(A, g)[1] == 0 and state(B, g)[1] == 0: dec = len(pts) - 1      # every starter has played: decided here
         # play by play: the real odds after every play, between the time-slot checkpoints
         pb_ = s_.pbp_rows(w, A, B)
@@ -2811,6 +2811,17 @@ class Site:
                         pos.insert(len([q for q in pos if q <= k0]) + j, k0 + 0.9 * (j + 1) / (len(tail) + 1))
             for j in range(1, len(pos)):                     # plays in different games at the same second: one after the other, not on top of each other
                 if pos[j] <= pos[j - 1] and newp[j][0] == "·": pos[j] = pos[j - 1] + 0.004
+            # a time slot nobody in this game plays in (no starter, or in a live week no one on either roster) gets squeezed to a
+            # sliver: its tick stays so every game that week shares a timeline, but there's no long flat stretch
+            use_t = st_t if done else (st_t | ro_t)
+            wt = [1.0] + [(1.0 if (x[2] is None or any(kick.get(t) == x[2] for t in use_t)) else 0.18) for x in pts[1:]]
+            cum = [0.0]
+            for k in range(1, len(wt)): cum.append(cum[-1] + wt[k])
+            def rem(v):
+                k = int(math.floor(v)); f_ = v - k
+                if k >= len(cum) - 1: return cum[-1] + (v - (len(cum) - 1))
+                return cum[k] + f_ * wt[k + 1]
+            pos = [rem(v) for v in pos]
             decobj = pts[dec] if dec is not None else None
             pts = newp
             if decobj is not None and decobj in pts: dec = pts.index(decobj)
@@ -3297,8 +3308,8 @@ class Site:
     def play_simple(t):
         """A play in a few words for the record book: "Purdy to McCaffrey, 66-yd TD + 2-pt run", "Henry 2-yd TD run", "Bates 54-yd FG"."""
         t = re.sub(r"\s*\((?:[^()]*)\)", "", t or ""); t = re.sub(r"\s+", " ", t)
-        ln = lambda n: re.sub(r"^[A-Z][a-z]*\.\s?", "", n)                      # "C.McCaffrey" -> "McCaffrey"
-        NM = r"(?<![A-Za-z])([A-Z][a-z]{0,2}\.\s?[A-Z][A-Za-z'\-\.]*)"
+        ln = lambda n: re.sub(r"^[A-Z][a-z]*\.\s?", "", n).rstrip(".")           # "C.McCaffrey" -> "McCaffrey"
+        NM = r"(?<![A-Za-z])([A-Z][a-z]{0,2}\.\s?[A-Z][A-Za-z'\-]*(?:(?<=St)\.\s[A-Z][A-Za-z'\-]+)?\.?)"     # "A.St. Brown" stays whole
         main = re.split(r"\s*TWO-POINT CONVERSION ATTEMPT\.|\s*" + NM + r" extra point", t)[0]
         td = "TOUCHDOWN" in main and "NULLIFIED" not in main
         yd = re.search(r"for (-?\d+) yards?", main); n = int(yd.group(1)) if yd else 0
@@ -3670,23 +3681,30 @@ class Site:
             e = end_of(g)
             if iv and g <= iv[-1][1]: iv[-1][1] = max(iv[-1][1], e)
             else: iv.append([g, e])
-        segs = []; acc = GAP                                   # (start, end, axis offset at start)
-        for s0, e0 in iv: segs.append((s0, e0, acc)); acc += (e0 - s0).total_seconds() + GAP
+        # a window nobody in this game plays in is squeezed to a sliver (its tick stays, so every game that week reads alike)
+        S_ = s_.s; done_ = w in S_.G and w <= S_.last
+        ids_ = ([i for r in (a, b) for i, _ in S_.W[w][r]["S"]] if done_ and w in S_.W else
+                [i for r in (a, b) for i in list(s_.lineup_now(w, r)) + list(S_.rost.get(r, []))])
+        rel = {s_.team_at(w, i) for i in ids_ if i and i != "0"}
+        segs = []; acc = GAP                                   # (start, end, axis offset at start, squeeze)
+        for s0, e0 in iv:
+            sc_ = 1.0 if any(s0 <= k <= e0 for t, k in K.items() if t in rel) else 0.12
+            segs.append((s0, e0, acc, sc_)); acc += (e0 - s0).total_seconds() * sc_ + GAP
         tot = acc
         pre_t = [x[2] for x in pts if x[0] == "·" and x[2] is not None and x[2] < segs[0][0]]
         t_first = min(pre_t) - datetime.timedelta(hours=2) if pre_t else None
         def eff(tm):
             # between games the gap is short, but whatever was posted in it is spread across it by time
             if tm is None: return 0.0
-            for k, (s0, e0, o) in enumerate(segs):
+            for k, (s0, e0, o, sc_) in enumerate(segs):
                 if tm < s0:
                     if k == 0:
                         if not t_first: return GAP * 0.5
                         return GAP * 0.08 + GAP * 0.84 * max(0.0, (tm - t_first).total_seconds()) / max(1.0, (s0 - t_first).total_seconds())
-                    prev = segs[k - 1]; lo = prev[2] + (prev[1] - prev[0]).total_seconds(); pe_ = prev[1]
+                    prev = segs[k - 1]; lo = prev[2] + (prev[1] - prev[0]).total_seconds() * prev[3]; pe_ = prev[1]
                     return lo + GAP * (0.08 + 0.84 * (tm - pe_).total_seconds() / max(1.0, (s0 - pe_).total_seconds()))
-                if tm <= e0: return o + (tm - s0).total_seconds()
-            last = segs[-1]; lo = last[2] + (last[1] - last[0]).total_seconds()
+                if tm <= e0: return o + (tm - s0).total_seconds() * sc_
+            last = segs[-1]; lo = last[2] + (last[1] - last[0]).total_seconds() * last[3]
             return min(tot, lo + GAP * 0.5)
         def when_of(x):
             lab, g_ = x[0], x[2]
@@ -3701,7 +3719,10 @@ class Site:
         for g in slots:
             fx = eff(g) / tot
             if ticks and fx - ticks[-1][0] < 0.035: continue        # 4:05 and 4:25 share a tick
-            ticks.append((fx, g.strftime("%-I:%M %p").replace(":00", ""), g.strftime("%a").upper()))
+            lab_ = g.strftime("%-I:%M %p").replace(":00", "")
+            if any(s0 <= g <= e0 and sc_ < 1 for s0, e0, _o, sc_ in segs): lab_ = ""          # a squeezed window: its line, no label
+            elif ticks and fx - max([t[0] for t in ticks if t[1]] or [-1]) < 0.06: lab_ = ""
+            ticks.append((fx, lab_, g.strftime("%a").upper()))
         return FR, FF, ticks
 
     def wp_chart(s_, w, a, b, pre):
@@ -4681,6 +4702,14 @@ def bundle(files, s, logo_dir, font_dir, site=None):
   // press and drag across the win probability chart: the card follows every play
   var scr=null, scrMoved=false;
   // step one stop at a time (plays, projection changes, check-ins): the only way to land on updates packed close together
+  // once you're in a chart (clicked, tapped or dragged on it), the left and right arrow keys step one play at a time
+  var WPA_BOX=null;
+  document.addEventListener('pointerdown',function(e){ WPA_BOX=(e.target.closest&&e.target.closest('.wpc'))||null; },true);
+  document.addEventListener('keydown',function(e){
+    if(!WPA_BOX||!document.body.contains(WPA_BOX)||(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')) return;
+    var t=e.target; if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT'||t.tagName==='TEXTAREA')) return;
+    var bt=WPA_BOX.querySelector('.wps[data-d="'+(e.key==='ArrowLeft'?'-1':'1')+'"]'); if(bt){ e.preventDefault(); bt.click(); }
+  });
   document.addEventListener('click',function(e){
     var bt=e.target.closest&&e.target.closest('.wps'); if(!bt) return;
     var box=bt.closest('.wpc'), svg=[].filter.call(box.querySelectorAll('.gfv svg'),function(v){return v.getBoundingClientRect().width>0;})[0]; if(!svg) return;
