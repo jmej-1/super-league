@@ -14,6 +14,11 @@ from scipy.stats import norm
 E = html.escape
 
 
+def ncdf(z):
+    """Win chance from a z-score. A game that isn't over is never 0% or 100%: a normal tail rounds to exactly 1.0 past z of about 8."""
+    return min(max(float(norm.cdf(z)), 1e-6), 1 - 1e-6)
+
+
 def pct(p, dp=1):
     """Percent with at most one decimal, no trailing .0 (66.7%, 50%, 100%)."""
     if 0.9995 <= p < 1: return "&gt;99.9%"
@@ -1156,7 +1161,8 @@ class Site:
 
     def win_p(s_, a_mu_sd, b_mu_sd):
         (ma, sa), (mb, sb) = a_mu_sd, b_mu_sd
-        return float(norm.cdf((ma - mb) / (math.hypot(sa, sb) or 1)))
+        if not math.hypot(sa, sb): return 1.0 if ma > mb else (0.0 if mb > ma else 0.5)     # nothing left to play: decided
+        return ncdf((ma - mb) / math.hypot(sa, sb))
 
     # ---- shared bits
     def rope(s_, a, b, pa, label="to win"):
@@ -2762,7 +2768,7 @@ class Site:
         def p_of(g):
             (ma, sa), (mb, sb) = state(A, g), state(B, g)
             if sa + sb == 0: return 1.0 if ma > mb else (0.0 if mb > ma else 0.5)
-            return float(norm.cdf((ma - mb) / math.hypot(sa, sb)))
+            return ncdf((ma - mb) / math.hypot(sa, sb))
         groups = sorted(set(kick.values())); dec = None; fut = []
         # drop time slots that can't matter: no starter on either side plays in them. Before a slot kicks off in a live week,
         # anyone on either roster (not IR) could still be started, so it stays unless nobody on either roster plays then.
@@ -2787,7 +2793,7 @@ class Site:
                             else: mu += pj; var += (cv.get(s.pos(i), 0.6) * pj) ** 2
                         return mu, math.sqrt(var) * corr * _WPSD
                     (ma, sa), (mb, sb) = st2(A), st2(B)
-                    pf = (1.0 if ma > mb else 0.0 if mb > ma else 0.5) if sa + sb == 0 else float(norm.cdf((ma - mb) / math.hypot(sa, sb)))
+                    pf = (1.0 if ma > mb else 0.0 if mb > ma else 0.5) if sa + sb == 0 else ncdf((ma - mb) / math.hypot(sa, sb))
                     lk = lambda X: sum((act if fin[t] else pj) for i, act, pj in X for t in [team(i)] if t in kick and kick[t] <= g2)
                     fut.append((s_.slot_label(g2), pf, g2, (lk(A), lk(B)), sum(1 for t in kick if kick[t] == g2) // 2))
                 break
@@ -3708,7 +3714,8 @@ class Site:
         for x in pts[1:-1]:
             tm = T_(x)
             if tm is None and x[2] is not None: tm = KEY(x)          # time-slot ticks shift with the line too, so they sit on it
-            out.append((x[0], min(1.0, max(0.0, x[1] + off(tm))) if tm is not None else x[1]) + x[2:])
+            lo_, hi_ = (1e-4, 1 - 1e-4) if 0 < x[1] < 1 else (0.0, 1.0)   # a shift never turns a live chance into a sure thing
+            out.append((x[0], min(hi_, max(lo_, x[1] + off(tm))) if tm is not None else x[1]) + x[2:])
         out.append(pts[-1])
         # logged updates as their own points, in time order among the plays
         npre = 0
@@ -4030,7 +4037,7 @@ class Site:
                            f'<td class="pbg">{E(str(e0.get("aw", "")))} {e0.get("asc", "")}-{e0.get("hsc", "")} {E(str(e0.get("hm", "")))}</td>'
                            f'<td class="pbp">{E(s_.play_simple(e0["txt"]))}<div class="pbws">{who_}</div></td>'
                            f'<td class="r pbn{" chg" if ca else ""}">{fp(x[3][0])}</td><td class="r pbn{" chg" if cb else ""}">{fp(x[3][1])}</td>'
-                           f'<td class="r pbn{" up" if ga else ""}">{x[1] * 100:.1f}%</td><td class="r pbn{" up" if gb else ""}">{(1 - x[1]) * 100:.1f}%</td>'
+                           f'<td class="r pbn{" up" if ga else ""}">{pct(x[1])}</td><td class="r pbn{" up" if gb else ""}">{pct(1 - x[1])}</td>'
                            f'<td class="r pba">{"" if abs(dp_) < 0.0005 else f"{abs(dp_) * 100:+.1f}%"}<small>{"" if abs(dp_) < 0.0005 else E(s_.M[a if ga else b])}</small></td></tr>')
         pbp_tbl = (f'<details class="pbtab"><summary>Every play, as a table</summary><div class="pbsc"><table><thead><tr><th>When</th><th>NFL score</th><th>Play</th>'
                    f'<th class="r">{E(s_.M[a])}</th><th class="r">{E(s_.M[b])}</th><th class="r">{E(s_.M[a])} win %</th><th class="r">{E(s_.M[b])} win %</th><th class="r">Swing</th></tr></thead>'

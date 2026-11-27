@@ -960,6 +960,7 @@ def live_history(s, T, TEAM, path):
             A, B = TEAM.get((w, a)), TEAM.get((w, b))
             if not A or not B or "live" not in A or "live" not in B: continue
             p = float(norm.cdf((A["mu"] - B["mu"]) / (math.hypot(A["sd"], B["sd"]) or 1)))
+            if math.hypot(A["sd"], B["sd"]) > 0: p = min(max(p, 1e-4), 1 - 1e-4)      # still points to play: never 0 or 100
             la, lb = A["live"]["locked"], B["live"]["locked"]
             last = [r for r in rows_ if int(r[1]) == w and {int(r[2]), int(r[3])} == {a, b}]
             if last and last[-1][0] == ts: continue

@@ -353,7 +353,7 @@ def wp_timeline(sides, paths, kick, cv, corr, pos_of):
                     if who: ev.append(dict(t=t, q=q, c=clk, txt=txt, aw=aw, hm=hm, asc=asc, hsc=hsc, who=who))
         if j + 1 < len(tl) and tl[j + 1][0] == tm and gid(tl[j + 1][1]) == gid(t): continue   # the same play (same game, same second): one point
         (ma, sa, la), (mb, sb, lb) = side_state(sides[0]), side_state(sides[1])
-        p = (1.0 if ma > mb else 0.0 if mb > ma else 0.5) if sa + sb == 0 else float(norm.cdf((ma - mb) / math.hypot(sa, sb)))
+        p = (1.0 if ma > mb else 0.0 if mb > ma else 0.5) if sa + sb == 0 else min(max(float(norm.cdf((ma - mb) / math.hypot(sa, sb))), 1e-6), 1 - 1e-6)   # points still to play: never 0 or 100
         row = (tm, p, la, lb, ma, mb, ev)         # time, A's win chance, points so far, projected finals, what happened
         if prev is None or abs(p - prev[1]) > 1e-4 or abs(la - prev[2]) > 1e-6 or abs(lb - prev[3]) > 1e-6 or ev: out.append(row); prev = row
         ev = []
