@@ -534,7 +534,7 @@
 6105|Joe Giles-Harris|LB|CIN||7|
 6109|Alec Ingold|RB|LAC|IR|7|
 6111|Jake Browning|QB|LAC||7|
-6118|Quinnen Williams|DT|DAL||7|
+6118|Quinnen Williams|DT|DAL|Questionable|7|
 6119|Devin White|LB|DET|IR|7|
 6121|Jawaan Taylor|OL|ATL||7|OL,OT
 6124|Montez Sweat|DE|CHI||7|
@@ -1804,7 +1804,7 @@
 12058|PJ Jules|DB|CIN||2|
 12062|Cam Grandy|TE|CIN||2|
 12069|Gottlieb Ayedze|T|||2|
-12071|Gabe Hall|DT|PHI||2|
+12071|Gabe Hall|DT|PHI|Questionable|2|
 12072|Jacob Roberts|LB|||2|
 12076|Austin McNamara|P|NYJ||2|
 12079|Treyton Welch|TE|NO||2|
