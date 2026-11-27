@@ -653,7 +653,7 @@ CSS += """
 .pbtab thead th{position:sticky;top:0;background:var(--paper);z-index:1;font-size:12px;color:var(--mute);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule)}.pbtab th.r,.pbtab td.r{text-align:right}
 .pbtab th small,.pbtab td small{display:block;font-size:11.5px;color:var(--mute);font-weight:500}.pbtab td{padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
 .pbtab .pbt{white-space:nowrap;color:var(--ink)}.pbtab .pbg{white-space:nowrap}.pbtab .pbp{min-width:220px;color:var(--ink)}.pbtab .pbws{display:flex;flex-wrap:wrap;gap:3px 10px;margin-top:4px;font-size:12px;color:var(--mute)}.pbtab .pbw{display:inline-flex;align-items:center;gap:4px}.pbtab .pbw .im{width:16px;height:16px}
-.pbtab .pbw b.up{color:#1E7A43}.pbtab .pbw b.dn{color:#B23A2E}.pbtab .pbs,.pbtab .pbp2,.pbtab .pba{white-space:nowrap;font-variant-numeric:tabular-nums}.pbtab .pba{font-weight:700;color:var(--ink)}
+.pbtab .pbw b.up{color:#1E7A43}.pbtab .pbw b.dn{color:#B23A2E}.pbtab .pbn,.pbtab .pba{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--mute)}.pbtab .pbn.chg{color:var(--ink);font-weight:700;background:rgba(201,162,26,.12)}.pbtab .pbn.up{color:#1E7A43;font-weight:700}.pbtab .pba{font-weight:700;color:var(--ink)}.pbtab table{min-width:760px}
 .omvp{display:flex;align-items:center;gap:12px;padding:14px 16px}.omvp .im{width:34px;height:34px}.omvt{flex:1;min-width:0}.omvt b{display:block;font-size:15px;color:var(--ink)}.omvt small{color:var(--mute);font-size:12.5px}.omvn{display:flex;align-items:baseline;gap:8px;font:800 28px/1 var(--disp)}.omvn span{color:var(--mute);font-size:22px}.omvn i{font-style:normal;color:var(--flag);font-size:20px}.omvn strong{color:var(--ink)}.omvd{min-width:64px;text-align:right;font-weight:700}
 .tp .tpc{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(250px,1fr);background:radial-gradient(120% 140% at 100% 0%,#1d2c52 0%,#0f1a33 55%,#0b1428 100%);color:#EEF2F8;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(11,20,40,.18)}
 .tp .tpl{padding:22px 24px 20px}.tp .tpg{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13px;color:#C7D2E4}.tp .tpg .nfl{width:18px;height:18px;margin:0}.tp .tpg b{color:#EEF2F8;margin-right:2px}.tp .tpat{opacity:.6;margin:0 2px}.tp .tpk{margin-left:10px;padding:2px 8px;border-radius:999px;background:rgba(201,162,26,.16);color:#E2C25A;font-weight:700}.tp .tpw{margin-left:auto;color:#8FA0BC}
@@ -3943,7 +3943,7 @@ class Site:
                 lows = f'<div class="wlos one">{low_(wi_)}</div>'
             else: lows = f'<div class="wlos">{low_(a)}{low_(b)}</div>'
         # the whole game as a table, Baseball Reference style: every play that scored for someone in the matchup
-        tb_rows = []; prev_ = None
+        tb_rows = []; prev_ = None; last_sc = None
         for x in pts:
             if not (x[0] == "·" and len(x) > 5): continue
             y_, prev_ = prev_, x
@@ -3956,14 +3956,17 @@ class Site:
             q_ = e0["q"]; qn_ = f"Q{q_}" if q_ <= 4 else "OT"
             who_ = "".join(f'<span class="pbw s{sd}">{s_.logo(a if sd == 0 else b, pre, "lgs", w)}{E(s_.s.nm(i))} <b class="{"up" if d > 0 else "dn"}">{d:+.2f}</b></span>'
                            for (i, sd), d in sorted(tot_.items(), key=lambda z: -abs(z[1])) if abs(d) >= 0.005)
-            gain_ = a if dp_ >= 0 else b
+            ca = last_sc is None or abs(x[3][0] - last_sc[0]) > 1e-6; cb = last_sc is None or abs(x[3][1] - last_sc[1]) > 1e-6; last_sc = x[3]
+            ga, gb = dp_ > 0.0005, dp_ < -0.0005                          # who the play moved toward
             tb_rows.append(f'<tr><td class="pbt">{E(str(x[2].strftime("%a %-I:%M %p") if hasattr(x[2], "strftime") else ""))}<small>{qn_} {int(e0["c"]) // 60}:{int(e0["c"]) % 60:02d}</small></td>'
-                           f'<td class="pbg">{E(str(e0.get("aw", "")))} {e0.get("asc", "")}<small>{E(str(e0.get("hm", "")))} {e0.get("hsc", "")}</small></td>'
+                           f'<td class="pbg">{E(str(e0.get("aw", "")))} {e0.get("asc", "")}-{e0.get("hsc", "")} {E(str(e0.get("hm", "")))}</td>'
                            f'<td class="pbp">{E(s_.play_simple(e0["txt"]))}<div class="pbws">{who_}</div></td>'
-                           f'<td class="r pbs">{fp(x[3][0])}<small>{fp(x[3][1])}</small></td><td class="r pbp2">{x[1] * 100:.0f}%</td>'
-                           f'<td class="r pba">{"" if abs(dp_) < 0.0005 else f"{abs(dp_) * 100:+.1f}%"}<small>{"" if abs(dp_) < 0.0005 else E(s_.M[gain_])}</small></td></tr>')
+                           f'<td class="r pbn{" chg" if ca else ""}">{fp(x[3][0])}</td><td class="r pbn{" chg" if cb else ""}">{fp(x[3][1])}</td>'
+                           f'<td class="r pbn{" up" if ga else ""}">{x[1] * 100:.1f}%</td><td class="r pbn{" up" if gb else ""}">{(1 - x[1]) * 100:.1f}%</td>'
+                           f'<td class="r pba">{"" if abs(dp_) < 0.0005 else f"{abs(dp_) * 100:+.1f}%"}<small>{"" if abs(dp_) < 0.0005 else E(s_.M[a if ga else b])}</small></td></tr>')
         pbp_tbl = (f'<details class="pbtab"><summary>Every play, as a table</summary><div class="pbsc"><table><thead><tr><th>When</th><th>NFL score</th><th>Play</th>'
-                   f'<th class="r">Score<small>{E(s_.M[a])} / {E(s_.M[b])}</small></th><th class="r">{E(s_.M[a])} win %</th><th class="r">Swing</th></tr></thead><tbody>{"".join(tb_rows)}</tbody></table></div></details>') if tb_rows else ""
+                   f'<th class="r">{E(s_.M[a])}</th><th class="r">{E(s_.M[b])}</th><th class="r">{E(s_.M[a])} win %</th><th class="r">{E(s_.M[b])} win %</th><th class="r">Swing</th></tr></thead>'
+                   f'<tbody>{"".join(tb_rows)}</tbody></table></div><p class="note" style="margin:6px 0 0">Bold: the score that changed on that play, and the win chance that went up.</p></details>') if tb_rows else ""
         _lp = pts[-1]; _lev = next((x[5] for x in reversed(pts) if len(x) > 5 and x[5]), None)
         sbdef = sb(("Now, " if (w not in s_.s.G and s_.wk_live(w)) else "") + str(_lp[4]), _lp[3][0], _lp[3][1], _lp[1], ev=_lev, nev="Latest", prv=(_lp[3][0], _lp[3][1], _lp[1]) if _lev else None)   # the latest score and odds, with the most recent play
         return (f'<section><h2>Win probability and game flow</h2><div class="panel wpc"><div class="rtog chips gft" role="group" aria-label="Chart">'
