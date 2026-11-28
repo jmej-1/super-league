@@ -1643,7 +1643,7 @@ class Site:
             for _, (p, who_) in best.items():
                 for i, r in who_: top[i][r] += 1
         if yr == s_.yr:                                   # single plays: what each play did to the win chance (WPA) and the title odds (CPA)
-            for w, r, o, _u, when, clk, txt, who, wpa, cpa, *_x in s_.play_impacts():
+            for w, r, o, _u, when, clk, txt, who, wpa, cpa, *_x in list(s_.play_impacts()) + list(s_.live_plays()):   # points marks count this week's plays as they happen
                 a_, b_ = s_.game_of[(w, r)]; pid = who[0][0]
                 raw_ = _x[4] if len(_x) > 4 else txt
                 tx_ = f"{clk}, {s_.play_simple(raw_)}"
@@ -3413,6 +3413,34 @@ class Site:
         t = re.sub(r",?\s*(?:Wide (?:Left|Right)|Hit (?:Left|Right) Upright)\.?", "", t)
         t = re.sub(r"\s+", " ", t).strip().rstrip(".").replace("., ", ", ")
         return t if len(t) <= 160 else t[:157].rsplit(" ", 1)[0] + "..."
+
+    def live_plays(s_):
+        """Scoring plays so far in the week being played, in the same row shape as play_impacts but with no WPA or CPA
+        (those wait for the week to end). Lets the points-in-one-play records count plays as they happen."""
+        if getattr(s_, "_lplays", None) is not None: return s_._lplays
+        s = s_.s; out = []; s_._lplays = out
+        w = s.nxt
+        if not s_.wk_live(w) or w > s.L.get("regular_season_weeks", 14): return out
+        e_txt = lambda ev: max(ev, key=lambda e: max(abs(q[2]) for q in e["who"]))["txt"] or ""
+        for w_, a, b, _ in s_.games:
+            if w_ != w: continue
+            try: pts = s_.wp_series(w, a, b)
+            except Exception: continue
+            for x in pts or []:
+                if not (x[0] == "·" and len(x) > 5 and x[5]): continue
+                for sd, (r, o) in enumerate(((a, b), (b, a))):
+                    who = {}
+                    for e in x[5]:
+                        for q in e["who"]:
+                            if q[1] == sd: who[q[0]] = who.get(q[0], 0.0) + q[2]
+                    if not who or sum(who.values()) <= 0: continue
+                    if re.match(r"(Two-Minute Warning|Timeout|End of|END |Official)", e_txt(x[5])): continue
+                    e0 = max(x[5], key=lambda e: max(abs(q[2]) for q in e["who"]))
+                    q = e0["q"]; qn = f"Q{q}" if q <= 4 else "OT"
+                    clk = f"{qn} {int(e0['c']) // 60}:{int(e0['c']) % 60:02d}"
+                    out.append((w, r, o, f"game/w{w}-{min(a, b)}-{max(a, b)}.html", x[4], clk, s_.play_text(e0["txt"]),
+                                sorted(who.items(), key=lambda z: -z[1]), 0.0, 0.0, 0, 0, None, None, e0["txt"]))
+        return out
 
     def play_impacts(s_):
         """Every scoring play of every finished game, with what it did: WPA, the change in the team's chance to win that matchup, and
