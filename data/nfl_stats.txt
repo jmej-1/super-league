@@ -92,6 +92,7 @@
 1|4227|fgm=1;fga=1;fgm_lng=28;xpm=4;xpa=4
 1|4866|rush_att=15;rush_yd=83;rec_tgt=2;rec=1;rec_yd=-3
 1|4881|pass_att=25;pass_cmp=17;pass_yd=324;pass_td=1;rush_att=7;rush_yd=40;rush_td=1;fum_lost=1
+1|4892|pass_att=28;pass_cmp=23;pass_yd=216;rush_att=5;rush_yd=30;rush_td=1;fum_lost=3
 1|4983|rec_tgt=8;rec=5;rec_yd=100;rec_td=1
 1|4984|pass_att=29;pass_cmp=20;pass_yd=334;pass_td=2;rush_att=6;rush_yd=23;rush_td=2
 1|4993|rec_tgt=7;rec=5;rec_yd=78;rec_td=1
@@ -297,6 +298,7 @@
 2|4227|fgm=4;fga=5;fgm_lng=46;xpm=3;xpa=3
 2|4866|rush_att=4;rush_yd=9;rec_tgt=2;rec=1;rec_yd=11
 2|4881|pass_att=31;pass_cmp=21;pass_yd=235;pass_td=1;pass_int=1;rush_att=4;rush_yd=34
+2|4892|pass_att=34;pass_cmp=21;pass_yd=182;pass_td=1;pass_int=1;rush_att=4;rush_yd=29
 2|4983|rush_att=1;rush_yd=-1
 2|4984|pass_att=31;pass_cmp=20;pass_yd=248;pass_td=3;rush_att=14;rush_yd=69;rush_td=2
 2|5001|rec_tgt=14;rec=12;rec_yd=140
@@ -487,6 +489,7 @@
 3|4227|fgm=1;fga=2;fgm_lng=34;xpm=3;xpa=3
 3|4866|rush_att=15;rush_yd=82;rec_tgt=2;rec=1;rec_yd=-2
 3|4881|pass_att=20;pass_cmp=15;pass_yd=186;pass_td=2;rush_att=6;rush_yd=50
+3|4892|pass_att=34;pass_cmp=17;pass_yd=217;pass_td=1;pass_int=1;rush_att=2;rush_yd=6
 3|4983|rec_tgt=10;rec=6;rec_yd=67
 3|4984|pass_att=26;pass_cmp=16;pass_yd=204;pass_int=2;rush_att=8;rush_yd=22;rush_td=2;rec_tgt=1;rec=1;rec_yd=1;fum_lost=1
 3|4993|rec_tgt=3;rec=3;rec_yd=37;rec_td=1
@@ -1176,6 +1179,7 @@
 7|4217|rec_tgt=10;rec=8;rec_yd=88;fum_lost=1
 7|4227|fgm=1;fga=3;fgm_lng=50
 7|4866|rush_att=7;rush_yd=62;rush_td=1;rec_tgt=2;rec=2;rec_yd=9
+7|4892|pass_att=11;pass_cmp=7;pass_yd=64;pass_td=1;rush_att=1;rush_yd=1
 7|4993|rec_tgt=1;rec=1;rec_yd=6;rec_td=1
 7|5001|rec_tgt=6;rec=5;rec_yd=45
 7|5022|rec_tgt=7;rec=5;rec_yd=48
@@ -1338,6 +1342,7 @@
 8|4227|fgm=1;fga=2;fgm_lng=45;xpm=3;xpa=3
 8|4866|rush_att=13;rush_yd=30;rush_td=1;rec_tgt=1;rec=1;rec_yd=24
 8|4881|pass_att=1
+8|4892|pass_att=3;rush_att=4;rush_yd=14
 8|4983|rush_att=1;rush_yd=4;rec_tgt=7;rec=4;rec_yd=82;rec_td=1;fum_lost=1
 8|4984|pass_att=34;pass_cmp=21;pass_yd=289;pass_td=2;pass_int=1;rush_att=7;rush_yd=30;rush_td=1
 8|4993|rec_tgt=6;rec=4;rec_yd=76;rec_td=1
@@ -1508,6 +1513,7 @@
 9|4217|rec_tgt=7;rec=4;rec_yd=58
 9|4227|fga=1;xpm=5;xpa=5
 9|4866|rush_att=13;rush_yd=22;rush_td=1;rec_tgt=1
+9|4892|pass_att=32;pass_cmp=18;pass_yd=243;pass_int=2;rush_att=1;rush_2pt=1
 9|4983|rush_att=1;rush_yd=11;rec_tgt=5;rec=3;rec_yd=25
 9|4984|pass_att=31;pass_cmp=21;pass_yd=234;pass_td=1;pass_int=1;rush_att=6;rush_yd=15
 9|4993|rec_tgt=2;rec=2;rec_yd=11
@@ -1816,6 +1822,7 @@
 11|4217|rec_tgt=3;rec=3;rec_yd=34;rec_td=2
 11|4227|fgm=2;fga=2;fgm_lng=44;xpm=4;xpa=4
 11|4866|rush_att=17;rush_yd=75;rush_td=1
+11|4892|pass_att=33;pass_cmp=20;pass_yd=187;pass_td=2;rush_att=6;rush_yd=36
 11|4983|rec_tgt=10;rec=8;rec_yd=91;rec_td=1
 11|4984|pass_att=45;pass_cmp=27;pass_yd=304;pass_td=1;pass_int=2
 11|4993|rec_tgt=6;rec=5;rec_yd=77
