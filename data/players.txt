@@ -402,7 +402,7 @@
 5087|JK Scott|P|LAC||8|
 5090|Folorunso Fatukasi|DT|LV||8|
 5095|Daniel Carlson|K|MIA||8|
-5097|Wyatt Teller|G|HOU|Questionable|8|OG,OL
+5097|Wyatt Teller|G|HOU||8|OG,OL
 5098|Siran Neal|CB|SF|Questionable|8|
 5119|Jason Sanders|K|NYJ||8|
 5121|Braxton Berrios|WR|NYG|IR|8|
@@ -824,7 +824,7 @@
 7659|Tre'von Moehrig|DB|CAR||5|
 7661|Levi Onwuzurike|DE|DET||5|
 7663|Teven Jenkins|OL|CLE|IR|5|OL,OT
-7664|Christian Barmore|DT|NE||5|
+7664|Christian Barmore|DT|NE|Questionable|5|
 7665|Landon Dickerson|OL|PHI||5|
 7666|Jevón Holland|DB|NYG||5|
 7667|Tyson Campbell|CB|CLE||5|
@@ -2386,7 +2386,7 @@
 13375|Sonny Styles|LB|WAS||0|
 13376|Caleb Downs|DB|DAL||0|
 13377|Arvell Reese|LB|NYG||0|DL,LB
-13379|Josiah Trotter|LB|TB|Questionable|0|
+13379|Josiah Trotter|LB|TB||0|
 13380|Brenen Thompson|WR|LAC|Doubtful|0|
 13381|Jaishawn Barham|LB|DAL|Out|0|DL,LB
 13382|Keionte Scott|DB|TB||0|
