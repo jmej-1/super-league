@@ -744,7 +744,7 @@
 7342|Michael Hoecht|DT|BUF||6|DL,LB
 7344|Jonah Williams|DE|NO||6|
 7346|Christian Rozeboom|LB|TB|IR|6|
-7369|Bill Murray|DT|LAR|Questionable|6|
+7369|Bill Murray|DT|LAR|Out|6|
 7402|Julian Good-Jones|G|WAS||6|
 7409|Isaac Alarcon|OT|SF||6|OL,OT
 7419|James Pierre|CB|MIN||6|
