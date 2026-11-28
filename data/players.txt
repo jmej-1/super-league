@@ -918,7 +918,7 @@
 7921|Christian Elliss|LB|NE||5|
 7922|Riley Patterson|K|BAL||5|
 7936|Amen Ogbongbemiga|LB|DET||5|
-7946|Jack Stoll|TE|SF||5|
+7946|Jack Stoll|TE|LAR||5|
 7947|Kayode Awosika|OL|LAC||5|OG,OL
 7957|Jon Rhattigan|LB|LAR||5|
 7970|Ar'Darius Washington|DB|NYG||5|
